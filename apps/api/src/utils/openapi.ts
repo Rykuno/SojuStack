@@ -7,32 +7,78 @@ import chalk from 'chalk';
 const DEFAULT_OUTPUT_DIR = './generated';
 const DEFAULT_FILENAME = 'openapi.d.ts';
 
-export async function generateOpenApiSpec(
-  document: OpenAPI3 | OpenAPIObject,
-  fileName: string = DEFAULT_FILENAME,
-): Promise<void> {
-  try {
-    const filePath = `${DEFAULT_OUTPUT_DIR}/${fileName}`;
-    console.log(chalk.blue('🔄 Generating OpenAPI types...'));
+interface OpenApiSpec {
+  document: OpenAPI3 | OpenAPIObject;
+  fileName?: string;
+}
 
+export async function generateOpenApiSpecs(
+  specs: OpenApiSpec[],
+): Promise<void> {
+  if (specs.length === 0) {
+    console.log(chalk.yellow('⚠️  No OpenAPI specs provided'));
+    return;
+  }
+
+  console.log(chalk.blue(`🔄 Generating ${specs.length} OpenAPI spec(s)...`));
+
+  // Generate all specs in parallel
+  const results = await Promise.allSettled(
+    specs.map((spec) => generateSingleSpec(spec)),
+  );
+
+  // Process results
+  const successful = results.filter(
+    (result) => result.status === 'fulfilled',
+  ).length;
+  const failed = results.filter(
+    (result) => result.status === 'rejected',
+  ).length;
+
+  if (failed > 0) {
+    console.log(chalk.yellow(`⚠️  ${failed} spec(s) failed to generate`));
+    results.forEach((result, index) => {
+      if (result.status === 'rejected') {
+        console.error(
+          chalk.red(
+            `❌ Spec ${index + 1} (${specs[index].fileName || DEFAULT_FILENAME}): ${result.reason}`,
+          ),
+        );
+      }
+    });
+  }
+
+  if (successful > 0) {
+    console.log(
+      chalk.green(`✅ ${successful} OpenAPI spec(s) generated successfully`),
+    );
+  }
+
+  if (failed === specs.length) {
+    throw new Error('All OpenAPI specs failed to generate');
+  }
+}
+
+async function generateSingleSpec(spec: OpenApiSpec): Promise<void> {
+  const fileName = spec.fileName || DEFAULT_FILENAME;
+  const filePath = `${DEFAULT_OUTPUT_DIR}/${fileName}`;
+
+  try {
     // Generate new OpenAPI types content
-    const ast = await openapiTS(document as OpenAPI3);
+    const ast = await openapiTS(spec.document as OpenAPI3);
     const newContents = astToString(ast);
 
     // Check if content has changed
     const hasChanged = await hasContentChanged(filePath, newContents);
 
-    if (!hasChanged) {
-      console.log(chalk.green('✅ OpenAPI types are up to date'));
-      return;
-    }
+    if (!hasChanged) return;
 
     // Write the updated file
     await writeOpenApiFile(filePath, newContents);
-    console.log(chalk.green('✅ OpenAPI types generated successfully'));
+    console.log(chalk.green(`  ✅ ${fileName} updated`));
   } catch (error) {
-    console.error(chalk.red('❌ Error generating OpenAPI types:'), error);
-    throw error;
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    throw new Error(`Failed to generate ${fileName}: ${errorMessage}`);
   }
 }
 
@@ -48,9 +94,6 @@ async function hasContentChanged(
     const existingContents = await fs.readFile(filePath, 'utf8');
     return existingContents !== newContents;
   } catch {
-    console.warn(
-      chalk.yellow('⚠️  Could not read existing file, will create new one'),
-    );
     return true;
   }
 }
@@ -64,4 +107,9 @@ async function writeOpenApiFile(
 
   // Write file
   await fs.writeFile(filePath, contents, 'utf8');
+}
+
+// Convenience function for single spec (backward compatibility)
+export async function generateOpenApiSpec(spec: OpenApiSpec): Promise<void> {
+  return generateOpenApiSpecs([spec]);
 }

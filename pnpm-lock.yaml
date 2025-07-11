@@ -11,6 +11,9 @@ importers:
       '@types/shelljs':
         specifier: ^0.8.17
         version: 0.8.17
+      chalk:
+        specifier: ^5.4.1
+        version: 5.4.1
       prettier:
         specifier: ^3.6.2
         version: 3.6.2

@@ -7,13 +7,14 @@
   "scripts": {
     "build": "turbo run build",
     "dev": "turbo run dev",
-    "dev:gen": "pnpm -C packages/api-client dev:gen",
+    "dev:setup": "pnpm dlx tsx setup.ts",
     "lint": "turbo run lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "check-types": "turbo run check-types"
   },
   "devDependencies": {
     "@types/shelljs": "^0.8.17",
+    "chalk": "^5.4.1",
     "prettier": "^3.6.2",
     "shelljs": "^0.10.0",
     "turbo": "^2.5.4",

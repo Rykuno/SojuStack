@@ -3,7 +3,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
-import { generateOpenApiSpec } from './utils/openapi';
+import { generateOpenApiSpecs } from './utils/openapi';
 import chalk from 'chalk';
 import { ConfigService } from '@nestjs/config';
 import { EnvironmentVariables } from './common/configs/env-validation';
@@ -11,6 +11,7 @@ import { EnvironmentVariables } from './common/configs/env-validation';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const configService = app.get(ConfigService<EnvironmentVariables>);
+
   /* -------------------------------------------------------------------------- */
   /*                                 Validation                                 */
   /* -------------------------------------------------------------------------- */
@@ -37,7 +38,7 @@ async function bootstrap() {
   });
 
   /* -------------------------------------------------------------------------- */
-  /*                                   Swagger                                  */
+  /*                                   OpenAPI                                  */
   /* -------------------------------------------------------------------------- */
   const config = new DocumentBuilder()
     .setTitle('Cats example')
@@ -52,8 +53,11 @@ async function bootstrap() {
     yamlDocumentUrl: 'openapi/yaml',
   });
 
-  void generateOpenApiSpec(document);
+  void generateOpenApiSpecs([{ document }]);
 
+  /* -------------------------------------------------------------------------- */
+  /*                                   Server                                   */
+  /* -------------------------------------------------------------------------- */
   const port = configService.getOrThrow('PORT', { infer: true });
   await app.listen(port, () => {
     console.log(chalk.green(`🚀 Server is running on port ${port}`));

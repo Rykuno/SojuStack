@@ -77,7 +77,6 @@ function RootComponent() {
 }
 
 function RootDocument({ children }: { children: React.ReactNode }) {
-  apiClient().GET("/auth/test");
   return (
     <html>
       <head>

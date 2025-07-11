@@ -1,6 +1,5 @@
-import * as shell from "shelljs";
-import * as fs from "fs";
-import * as path from "path";
+import shell from "shelljs";
+import chalk from "chalk";
 
 console.log("🚀 Setting up SojuStack development environment...\n");
 
@@ -99,22 +98,26 @@ if (!shell.which("nc")) {
 
 console.log("\n✅ All services are ready!");
 
+// Go back to root directory
+shell.cd("../..");
+
 // Run db migrations
 console.log("🗄️  Running database migrations...");
-if (shell.exec("pnpm db:push").code !== 0) {
+if (shell.exec("pnpm -C ./apps/api db:push").code !== 0) {
   console.error("❌ Failed to run database migrations");
   shell.exit(1);
 }
 
-// Go back to root directory
-shell.cd("../..");
-
 console.log("✅ Setup completed successfully!");
-console.log("\n🚀 Starting development servers...");
-console.log("   - API: http://localhost:8080");
-console.log("   - Web: http://localhost:3000");
+console.log("\n🚀 Services are running on:");
+console.log("   - Postgres: http://localhost:5432");
+console.log("   - Redis: http://localhost:6379");
 console.log("   - Mailpit: http://localhost:8025");
 console.log("   - MinIO: http://localhost:9001\n");
 
 // Run turbo dev
 shell.exec("pnpm dev");
+console.log(chalk.bgGreen("✅ Setup completed successfully!"));
+console.log(
+  chalk.bgGreen("❗ Run `pnpm dev` to start the development servers!")
+);
