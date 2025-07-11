@@ -1,0 +1,5 @@
+apis:
+  api:
+    root: http://localhost:8080/swagger/json
+    x-openapi-ts:
+      output: ./src/types/openapi.d.ts

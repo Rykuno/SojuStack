@@ -12,4 +12,10 @@ export class AuthController {
   session(@ActiveUser() user: ActiveUserDto) {
     return user;
   }
+
+  @Get('/test')
+  @Auth(AuthType.Public)
+  test(@ActiveUser() user: ActiveUserDto) {
+    return user;
+  }
 }

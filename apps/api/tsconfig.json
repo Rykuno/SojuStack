@@ -19,5 +19,6 @@
     "jsx": "react-jsx",
     "jsxImportSource": "react",
     "noFallthroughCasesInSwitch": false
-  }
+  },
+  "include": ["src"]
 }

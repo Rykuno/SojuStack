@@ -3,10 +3,14 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
+import { generateOpenApiSpec } from './utils/openapi';
+import chalk from 'chalk';
+import { ConfigService } from '@nestjs/config';
+import { EnvironmentVariables } from './common/configs/env-validation';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-
+  const configService = app.get(ConfigService<EnvironmentVariables>);
   /* -------------------------------------------------------------------------- */
   /*                                 Validation                                 */
   /* -------------------------------------------------------------------------- */
@@ -43,12 +47,17 @@ async function bootstrap() {
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('/swagger', app, document, {
-    jsonDocumentUrl: 'swagger/json',
-    yamlDocumentUrl: 'swagger/yaml',
+  SwaggerModule.setup('/openapi', app, document, {
+    jsonDocumentUrl: 'openapi/json',
+    yamlDocumentUrl: 'openapi/yaml',
   });
 
-  await app.listen(process.env.PORT ?? 8080);
+  void generateOpenApiSpec(document);
+
+  const port = configService.getOrThrow('PORT', { infer: true });
+  await app.listen(port, () => {
+    console.log(chalk.green(`🚀 Server is running on port ${port}`));
+  });
 }
 
 void bootstrap();
