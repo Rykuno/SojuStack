@@ -7,7 +7,6 @@ import { APP_GUARD } from '@nestjs/core';
 import { AuthGuard } from './auth/guards/auth.guard';
 import { NotificationsModule } from './notifications/notifications.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { UsersModule } from './users/users.module';
 import {
   EnvironmentVariables,
   validate,
@@ -28,9 +27,7 @@ import { CacheableMemory } from 'cacheable';
       isGlobal: true,
       inject: [ConfigService],
       imports: [ConfigModule],
-      useFactory: async (
-        configService: ConfigService<EnvironmentVariables>,
-      ) => {
+      useFactory: (configService: ConfigService<EnvironmentVariables>) => {
         return {
           stores: [
             new Keyv({
@@ -44,7 +41,6 @@ import { CacheableMemory } from 'cacheable';
     DatabasesModule,
     AuthModule,
     NotificationsModule,
-    UsersModule,
   ],
   controllers: [AppController],
   providers: [

@@ -1,7 +1,7 @@
 import { Controller, Get } from '@nestjs/common';
-import { ActiveSession } from './decorators/active-user.decorator';
+import { ActiveUser } from './decorators/active-user.decorator';
 import { Auth, AuthType } from './decorators/auth.decorator';
-import { SessionDto } from './dtos/session.dto';
+import { ActiveUserDto } from './dtos/active-user.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -9,7 +9,7 @@ export class AuthController {
 
   @Get('/session')
   @Auth(AuthType.Public)
-  async session(@ActiveSession() session: SessionDto) {
-    return session;
+  session(@ActiveUser() user: ActiveUserDto) {
+    return user;
   }
 }

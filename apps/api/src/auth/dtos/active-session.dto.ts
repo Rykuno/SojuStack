@@ -1,6 +1,6 @@
 import { Session } from 'better-auth';
 
-export class SessionDto implements Session {
+export class ActiveSessionDto implements Session {
   id: string;
   token: string;
   userId: string;

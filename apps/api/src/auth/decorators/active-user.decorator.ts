@@ -1,10 +1,11 @@
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';
-import { SessionDto } from '../dtos/session.dto';
+import { ActiveUserDto } from '../dtos/active-user.dto';
+import { AuthGuardRequest } from '../guards/auth.guard';
 
-export const ActiveSession = createParamDecorator(
-  (field: keyof SessionDto | undefined, ctx: ExecutionContext) => {
-    const request = ctx.switchToHttp().getRequest();
-    const session: SessionDto | undefined = request['session'];
-    return field ? session?.[field] : session;
+export const ActiveUser = createParamDecorator(
+  (field: keyof ActiveUserDto | undefined, ctx: ExecutionContext) => {
+    const request: AuthGuardRequest = ctx.switchToHttp().getRequest();
+    const user: ActiveUserDto | undefined = request?.user;
+    return field ? user?.[field] : user;
   },
 );

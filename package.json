@@ -1,6 +1,9 @@
 {
-  "name": "super-repo",
+  "name": "SojuStack",
   "private": true,
+  "description": "Starter kit for building scalable web, backend, and mobile applications",
+  "author": "rykuno",
+  "license": "UNLICENSED",
   "scripts": {
     "build": "turbo run build",
     "dev": "turbo run dev",
