@@ -1,8 +1,8 @@
-import { Outlet, createFileRoute } from '@tanstack/react-router'
+import { Outlet, createFileRoute } from "@tanstack/react-router";
 
-export const Route = createFileRoute('/_pathlessLayout')({
-  component: PathlessLayoutComponent,
-})
+export const Route = createFileRoute("/_pathlessLayout")({
+  component: PathlessLayoutComponent
+});
 
 function PathlessLayoutComponent() {
   return (
@@ -12,5 +12,5 @@ function PathlessLayoutComponent() {
         <Outlet />
       </div>
     </div>
-  )
+  );
 }

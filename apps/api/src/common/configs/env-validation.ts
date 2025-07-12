@@ -27,7 +27,7 @@ export class EnvironmentVariables {
   BASE_URL: string;
 
   @IsString()
-  BETTER_AUTH_SECRET: string;
+  AUTH_SECRET: string;
 
   @IsString()
   POSTGRES_URL: string;

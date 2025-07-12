@@ -19,13 +19,15 @@ export function apiClient() {
   return createIsomorphicFn()
     .server(() => {
       const { headers } = getWebRequest();
-      return createFetchClient<paths>({
+      const client = createFetchClient<paths>({
         baseUrl: apiUrl,
         headers: Object.fromEntries(headers)
       });
+      client.use(middleware);
+      return client;
     })
     .client(() => {
-      return createFetchClient<paths>({
+      const client = createFetchClient<paths>({
         baseUrl: apiUrl,
         fetch: (input: RequestInfo | URL, init?: RequestInit) => {
           return fetch(input, {
@@ -34,5 +36,7 @@ export function apiClient() {
           });
         }
       });
+      client.use(middleware);
+      return client;
     })();
 }
