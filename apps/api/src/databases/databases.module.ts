@@ -1,16 +1,11 @@
 import { Module } from '@nestjs/common';
-import { PostgresService } from './postgres/postgres.service';
+import { PrismaService } from './prisma.service';
 import { ConfigModule } from '@nestjs/config';
-import { databaseConfig } from './databases.config';
 
 @Module({
-  imports: [
-    ConfigModule.forRoot({
-      load: [databaseConfig],
-    }),
-  ],
+  imports: [ConfigModule],
 
-  providers: [PostgresService],
-  exports: [PostgresService],
+  providers: [PrismaService],
+  exports: [PrismaService],
 })
 export class DatabasesModule {}

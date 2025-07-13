@@ -3,7 +3,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { DatabasesModule } from './databases/databases.module';
 import { AuthModule } from './auth/auth.module';
-import { APP_GUARD } from '@nestjs/core';
+import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { AuthGuard } from './auth/guards/auth.guard';
 import { NotificationsModule } from './notifications/notifications.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
@@ -11,17 +11,18 @@ import {
   EnvironmentVariables,
   validate,
 } from './common/configs/env-validation';
-import { appConfig } from './common/configs/app.config';
 import { CacheModule } from '@nestjs/cache-manager';
 import { createKeyv, Keyv } from '@keyv/redis';
 import { CacheableMemory } from 'cacheable';
+import config from './common/configs/config';
+import { BrowserSessionInterceptor } from './common/guards/browser-session.interceptor';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       validate,
       expandVariables: true,
-      load: [appConfig],
+      load: [config],
     }),
     CacheModule.registerAsync({
       isGlobal: true,
@@ -48,6 +49,10 @@ import { CacheableMemory } from 'cacheable';
     {
       provide: APP_GUARD,
       useClass: AuthGuard,
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: BrowserSessionInterceptor,
     },
   ],
 })

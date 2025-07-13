@@ -9,8 +9,8 @@ import {
   Preview,
   Section,
   Tailwind,
-  Text
-} from "@react-email/components";
+  Text,
+} from '@react-email/components';
 
 export interface EmailVerificationProps {
   userEmail?: string;
@@ -20,9 +20,9 @@ export interface EmailVerificationProps {
 
 const EmailVerification = (props: EmailVerificationProps) => {
   const {
-    userEmail = "me@rykuno.com",
-    verificationUrl = "https://example.com/verify",
-    expirationHours = 24
+    userEmail = 'me@rykuno.com',
+    verificationUrl = 'https://example.com/verify',
+    expirationHours = 24,
   } = props;
 
   return (
@@ -47,7 +47,7 @@ const EmailVerification = (props: EmailVerificationProps) => {
             {/* Main Content */}
             <Section className="mb-[32px]">
               <Text className="text-[16px] text-gray-700 mb-[16px] m-0">
-                Thanks for signing up! We need to verify your email address{" "}
+                Thanks for signing up! We need to verify your email address{' '}
                 <strong>{userEmail}</strong> to complete your account setup.
               </Text>
               <Text className="text-[16px] text-gray-700 mb-[24px] m-0">
@@ -98,9 +98,9 @@ const EmailVerification = (props: EmailVerificationProps) => {
 };
 
 EmailVerification.PreviewProps = {
-  userEmail: "me@rykuno.com",
-  verificationUrl: "https://example.com/verify?token=abc123xyz789",
-  expirationHours: 24
+  userEmail: 'me@rykuno.com',
+  verificationUrl: 'https://example.com/verify?token=abc123xyz789',
+  expirationHours: 24,
 } as EmailVerificationProps;
 
 export default EmailVerification;

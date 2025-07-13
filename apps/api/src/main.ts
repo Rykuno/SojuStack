@@ -6,36 +6,24 @@ import { ValidationPipe } from '@nestjs/common';
 import { generateOpenApiSpecs } from './utils/openapi';
 import chalk from 'chalk';
 import { ConfigService } from '@nestjs/config';
-import { EnvironmentVariables } from './common/configs/env-validation';
+import { AppConfig, Config } from './common/configs/config.interface';
+import * as cookieParser from 'cookie-parser';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  const configService = app.get(ConfigService<EnvironmentVariables>);
+  const configService = app.get(ConfigService<Config>);
 
   /* -------------------------------------------------------------------------- */
-  /*                                 Validation                                 */
+  /*                                 Middlewares                                */
   /* -------------------------------------------------------------------------- */
+  app.enableCors(configService.getOrThrow<AppConfig>('app').cors);
+  app.use(cookieParser('secret'));
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
       transform: true,
     }),
   );
-
-  /* -------------------------------------------------------------------------- */
-  /*                                    Cors                                    */
-  /* -------------------------------------------------------------------------- */
-  app.enableCors({
-    origin: 'http://localhost:3000',
-    methods: ['GET', 'PATCH', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'HEAD'],
-    allowedHeaders: [
-      'Content-Type',
-      'Authorization',
-      'X-Requested-With',
-      'Accept',
-    ],
-    credentials: true,
-  });
 
   /* -------------------------------------------------------------------------- */
   /*                                   OpenAPI                                  */
@@ -58,7 +46,7 @@ async function bootstrap() {
   /* -------------------------------------------------------------------------- */
   /*                                   Server                                   */
   /* -------------------------------------------------------------------------- */
-  const port = configService.getOrThrow('PORT', { infer: true });
+  const port = configService.getOrThrow<AppConfig>('app').port;
   await app.listen(port, () => {
     console.log(chalk.green(`🚀 Server is running on port ${port}`));
   });

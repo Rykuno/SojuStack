@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { render } from '@react-email/render';
 import ChangeEmailVerification, {
   ChangeEmailVerificationProps,
@@ -7,8 +7,12 @@ import PasswordReset, { PasswordResetProps } from './emails/password-reset';
 import EmailVerification, {
   EmailVerificationProps,
 } from './emails/email-verification';
-import { MailConfig, mailConfig } from './mail.config';
-import { AppConfig, appConfig } from 'src/common/configs/app.config';
+import {
+  AppConfig,
+  Config,
+  MailConfig,
+} from 'src/common/configs/config.interface';
+import { ConfigService } from '@nestjs/config';
 
 interface SendMailConfiguration {
   email: string;
@@ -23,13 +27,16 @@ interface Email<T> {
 
 @Injectable()
 export class MailService {
-  constructor(
-    @Inject(mailConfig.KEY) private mailConfig: MailConfig,
-    @Inject(appConfig.KEY) private appConfig: AppConfig,
-  ) {}
+  private readonly mailConfig: MailConfig;
+  private readonly appConfig: AppConfig;
 
-  private async send({ email, subject, template }: SendMailConfiguration) {
-    this.appConfig.isProduction
+  constructor(private configService: ConfigService<Config>) {
+    this.mailConfig = this.configService.getOrThrow<MailConfig>('mail');
+    this.appConfig = this.configService.getOrThrow<AppConfig>('app');
+  }
+
+  private send({ email, subject, template }: SendMailConfiguration) {
+    return this.appConfig.isProduction
       ? this.sendProd({ email, subject, template })
       : this.sendDev({ email, subject, template });
   }
@@ -63,7 +70,7 @@ export class MailService {
       `${this.mailConfig.mailpit.url}/api/v1/send`,
       options,
     );
-    const data: { ID: string } = await response.json();
+    const data = (await response.json()) as { ID: string };
     console.log(`${this.mailConfig.mailpit.url}/view/${data.ID}`);
   }
 
