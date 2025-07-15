@@ -68,7 +68,7 @@ export const Route = createRootRouteWithContext<{
   },
   notFoundComponent: () => <NotFound />,
   beforeLoad: async ({ context }) => {
-    await context.queryClient.prefetchQuery(authApi.sessionQuery());
+    await context.queryClient.prefetchQuery(authApi.meQuery());
   },
   component: RootComponent
 });

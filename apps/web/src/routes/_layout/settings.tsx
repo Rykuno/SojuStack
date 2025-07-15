@@ -3,12 +3,13 @@ import { authApi } from "~/utils/auth";
 import { UpdateProfileForm } from "~/components/update-profile-form";
 import { UpdateEmailForm } from "~/components/update-email-form";
 import { ResetPasswordForm } from "~/components/reset-password-form";
+import AvatarCropper from "~/components/image-cropper";
 
 export const Route = createFileRoute("/_layout/settings")({
   component: RouteComponent,
   loader: async ({ context }) => {
     const session = await context.queryClient.fetchQuery(
-      authApi.sessionQuery()
+      authApi.meQuery()
     );
 
     if (!session) throw redirect({ to: "/login" });
@@ -27,7 +28,10 @@ function RouteComponent() {
           Manage your account settings and preferences.
         </p>
       </div>
-      <UpdateProfileForm currentName={session.name} />
+      <UpdateProfileForm
+        currentName={session.name}
+        currentImage={session.image}
+      />
       <UpdateEmailForm
         currentEmail={session.email}
         emailVerified={session.emailVerified}

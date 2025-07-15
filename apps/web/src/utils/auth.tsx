@@ -1,5 +1,4 @@
-import { queryOptions } from "@tanstack/react-query";
-import { $api, fetchClient } from "~/lib/api";
+import { $api } from "~/lib/api";
 import { authClient } from "~/lib/auth";
 
 export type SignInEmail = {
@@ -30,14 +29,16 @@ export type ChangeEmailData = {
 export class AuthAPI {
   queryKey = "auth";
 
+  meQuery() {
+    return $api().queryOptions("get", "/auth/user");
+  }
+
   sessionQuery() {
-    return queryOptions({
-      queryKey: [this.queryKey, "session"],
-      queryFn: () =>
-        fetchClient()
-          .GET("/auth/session")
-          .then(res => res.data)
-    });
+    return $api().queryOptions("get", "/auth/session");
+  }
+
+  sessionsQuery() {
+    return $api().queryOptions("get", "/auth/sessions");
   }
 
   signInEmail(data: SignInEmail) {

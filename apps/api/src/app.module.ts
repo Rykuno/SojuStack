@@ -16,6 +16,9 @@ import { createKeyv, Keyv } from '@keyv/redis';
 import { CacheableMemory } from 'cacheable';
 import config from './common/configs/config';
 import { BrowserSessionInterceptor } from './common/guards/browser-session.interceptor';
+import { UsersModule } from './users/users.module';
+import { MulterModule } from '@nestjs/platform-express';
+import { StorageModule } from './storage/storage.module';
 
 @Module({
   imports: [
@@ -24,6 +27,7 @@ import { BrowserSessionInterceptor } from './common/guards/browser-session.inter
       expandVariables: true,
       load: [config],
     }),
+    MulterModule,
     CacheModule.registerAsync({
       isGlobal: true,
       inject: [ConfigService],
@@ -42,6 +46,8 @@ import { BrowserSessionInterceptor } from './common/guards/browser-session.inter
     DatabasesModule,
     AuthModule,
     NotificationsModule,
+    UsersModule,
+    StorageModule,
   ],
   controllers: [AppController],
   providers: [

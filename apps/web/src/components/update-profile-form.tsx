@@ -2,7 +2,7 @@
 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
+import { z } from "zod/v4";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Button } from "~/components/ui/button";
@@ -24,22 +24,35 @@ import {
   FormMessage
 } from "~/components/ui/form";
 import { authApi, UpdateProfileData } from "~/utils/auth";
+import { usersApi } from "~/utils/users";
+import AvatarUploader from "./avatar-uploader";
 
 const updateProfileSchema = z.object({
-  name: z.string().min(2, "Name must be at least 2 characters")
+  name: z.string().min(2, "Name must be at least 2 characters"),
+  image: z.file()
 });
 
 type UpdateProfileFormProps = {
   currentName: string;
+  currentImage: string | null;
 };
 
-export function UpdateProfileForm({ currentName }: UpdateProfileFormProps) {
+export function UpdateProfileForm({
+  currentName,
+  currentImage
+}: UpdateProfileFormProps) {
   const queryClient = useQueryClient();
 
   const updateProfileMutation = useMutation({
-    mutationFn: (data: UpdateProfileData) => authApi.updateProfile(data),
-    onSuccess: () => {
-      queryClient.invalidateQueries();
+    mutationFn: async (data: UpdateProfileData) => {
+      await usersApi.updateImage({
+        image: form.getValues("image"),
+        name: data.name
+      });
+      return authApi.updateProfile(data);
+    },
+    onSuccess: async () => {
+      await queryClient.invalidateQueries();
       toast.success("Profile updated successfully!");
     },
     onError: error => {
@@ -54,10 +67,6 @@ export function UpdateProfileForm({ currentName }: UpdateProfileFormProps) {
     }
   });
 
-  const onSubmit = (data: z.infer<typeof updateProfileSchema>) => {
-    updateProfileMutation.mutate(data);
-  };
-
   return (
     <Card>
       <CardHeader>
@@ -66,26 +75,50 @@ export function UpdateProfileForm({ currentName }: UpdateProfileFormProps) {
       </CardHeader>
       <CardContent>
         <Form {...form}>
-          <FormField
-            control={form.control}
-            name="name"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Full Name</FormLabel>
-                <FormControl>
-                  <Input placeholder="Enter your name" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          <div className="grid gap-6">
+            <FormField
+              control={form.control}
+              name="image"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Avatar</FormLabel>
+                  <FormControl>
+                    <div className="flex mt-4">
+                      <AvatarUploader
+                        preview={currentImage}
+                        onChange={file => {
+                          field.onChange(file);
+                        }}
+                      />
+                    </div>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Full Name</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Enter your name" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
         </Form>
       </CardContent>
       <CardFooter>
         <Button
           type="submit"
           loading={updateProfileMutation.isPending}
-          onClick={form.handleSubmit(onSubmit)}
+          onClick={form.handleSubmit(() =>
+            updateProfileMutation.mutate(form.getValues())
+          )}
         >
           Update Profile
         </Button>

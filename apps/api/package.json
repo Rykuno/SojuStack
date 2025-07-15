@@ -49,12 +49,14 @@
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "keyv": "^5.3.4",
+    "minio": "^8.0.5",
     "pg": "^8.16.3",
     "react": "^19.1.0",
     "react-dom": "19.1.0",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1",
-    "set-cookie-parser": "^2.7.1"
+    "set-cookie-parser": "^2.7.1",
+    "sharp": "^0.34.3"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.2.0",

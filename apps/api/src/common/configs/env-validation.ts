@@ -37,6 +37,18 @@ export class EnvironmentVariables {
 
   @IsUrl({ require_tld: true, require_protocol: false })
   EMAIL_DOMAIN: string;
+
+  @IsString()
+  STORAGE_HOST: string;
+
+  @IsNumber()
+  STORAGE_PORT: number;
+
+  @IsString()
+  STORAGE_ACCESS_KEY: string;
+
+  @IsString()
+  STORAGE_SECRET_KEY: string;
 }
 
 export function validate(config: Record<string, unknown>) {

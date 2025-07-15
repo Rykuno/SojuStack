@@ -74,6 +74,7 @@ export function UpdateEmailForm({
   });
 
   const onSubmit = (data: z.infer<typeof changeEmailSchema>) => {
+    console.log("DATA => ", data);
     changeEmailMutation.mutate(data);
   };
 
@@ -147,7 +148,7 @@ export function UpdateEmailForm({
       </CardContent>
       <CardFooter>
         <Button
-          onClick={() => form.handleSubmit(onSubmit)}
+          onClick={form.handleSubmit(onSubmit)}
           loading={changeEmailMutation.isPending}
         >
           Update Email

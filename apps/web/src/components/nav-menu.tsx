@@ -46,12 +46,6 @@ interface MenuItem {
 }
 
 interface Navbar1Props {
-  logo?: {
-    url: string;
-    src: string;
-    alt: string;
-    title: string;
-  };
   menu?: MenuItem[];
   mobileExtraLinks?: {
     name: string;
@@ -60,12 +54,6 @@ interface Navbar1Props {
 }
 
 export const NavMenu = ({
-  logo = {
-    url: "/public/logo.svg",
-    src: "/public/logo.svg",
-    alt: "logo",
-    title: ""
-  },
   menu = [
     { title: "Home", url: "#" },
     {
@@ -156,7 +144,8 @@ export const NavMenu = ({
     }
   });
 
-  const { data: authedUser } = useQuery(authApi.sessionQuery());
+  const { data: authedUser } = useQuery(authApi.meQuery());
+  console.log({ authedUser });
 
   return (
     <section className="py-3 px-6">
@@ -216,10 +205,9 @@ export const NavMenu = ({
         </nav>
         <div className="block lg:hidden">
           <div className="flex items-center justify-between">
-            <a href={logo.url} className="flex items-center gap-2">
-              <img src={logo.src} className="w-8" alt={logo.alt} />
-              <span className="text-lg font-semibold">{logo.title}</span>
-            </a>
+            <Link to={"/"} className="flex items-center gap-2">
+              <img src={"/logo.svg"} className="w-32" alt={"logo"} />
+            </Link>
             <Sheet>
               <SheetTrigger asChild>
                 <Button variant="outline" size="icon">
@@ -229,12 +217,9 @@ export const NavMenu = ({
               <SheetContent className="overflow-y-auto">
                 <SheetHeader>
                   <SheetTitle>
-                    <a href={logo.url} className="flex items-center gap-2">
-                      <img src={logo.src} className="w-8" alt={logo.alt} />
-                      <span className="text-lg font-semibold">
-                        {logo.title}
-                      </span>
-                    </a>
+                    <Link to={"/"} className="flex items-center gap-2">
+                      <img src={"/logo.svg"} className="w-36" alt={"logo"} />
+                    </Link>
                   </SheetTitle>
                 </SheetHeader>
                 <div className="my-6 flex flex-col gap-6">

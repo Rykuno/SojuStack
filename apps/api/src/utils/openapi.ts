@@ -3,6 +3,7 @@ import * as fs from 'node:fs/promises';
 import * as fsSync from 'node:fs';
 import { OpenAPIObject } from '@nestjs/swagger';
 import chalk from 'chalk';
+import * as ts from 'typescript';
 
 const DEFAULT_OUTPUT_DIR = './generated';
 const DEFAULT_FILENAME = 'openapi.d.ts';
@@ -63,9 +64,22 @@ async function generateSingleSpec(spec: OpenApiSpec): Promise<void> {
   const fileName = spec.fileName || DEFAULT_FILENAME;
   const filePath = `${DEFAULT_OUTPUT_DIR}/${fileName}`;
 
+  const BLOB = ts.factory.createTypeReferenceNode(
+    ts.factory.createIdentifier('Blob'),
+  ); // `Blob`
+  const NULL = ts.factory.createLiteralTypeNode(ts.factory.createNull()); // `null`
+
   try {
     // Generate new OpenAPI types content
-    const ast = await openapiTS(spec.document as OpenAPI3);
+    const ast = await openapiTS(spec.document as OpenAPI3, {
+      transform(schemaObject) {
+        if (schemaObject.format === 'binary') {
+          return schemaObject.nullable
+            ? ts.factory.createUnionTypeNode([BLOB, NULL])
+            : BLOB;
+        }
+      },
+    });
     const newContents = astToString(ast);
 
     // Check if content has changed

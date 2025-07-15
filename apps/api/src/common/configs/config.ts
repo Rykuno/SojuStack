@@ -42,6 +42,12 @@ const config: Config = {
       url: 'http://localhost:8025',
     },
   },
+  storage: {
+    host: process.env.STORAGE_HOST!,
+    port: parseInt(process.env.STORAGE_PORT!),
+    accessKey: process.env.STORAGE_ACCESS_KEY!,
+    secretKey: process.env.STORAGE_SECRET_KEY!,
+  },
 };
 
 export default (): Config => ({

@@ -5,6 +5,7 @@ export interface Config {
   database: DatabaseConfig;
   auth: AuthConfig;
   mail: MailConfig;
+  storage: StorageConfig;
 }
 
 export interface AppConfig {
@@ -39,4 +40,11 @@ export interface MailConfig {
   mailpit: {
     url: string;
   };
+}
+
+export interface StorageConfig {
+  host: string;
+  port: number;
+  accessKey: string;
+  secretKey: string;
 }
