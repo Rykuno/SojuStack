@@ -64,6 +64,8 @@ NestJS is the first to check all of the boxes above. It's on its v11 release, it
 
 It gets a bad rap in the node world for being verbose or from those who hate "OOP" in a "functional language". I for one embrace OOP in JS as it naturally documents your applications domain and business logic, keeps your application easily testable, and idk...its the way I mentally model things already so it translates well in my case. Also, have you ever written a monad? 
 
+Testability is also a massive incentive for building in NestJS. I'm not the largest fan of TDD or unit testing, but in some cases it sure does come in handy. And when you finally have the needs to write tests, you'll be thankful for an environment that makes it painless.
+
 #### Postgres (Database)
 I'm a relational database type of guy. NoSQL databases have their role and place in the world but by large and whole you can't go wrong with Postgres. The only other real option is MySQL, which has some benefits, but in my experience I always end up wanting to reach for a feature or plugin it lacks.
 
