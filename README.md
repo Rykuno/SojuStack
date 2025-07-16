@@ -16,7 +16,7 @@ $ pnpm dev:setup
 
 ### 🛠️ Manual Setup (Recommended)
 
-For more control over the setup process:
+For more control over the setup process, run the following in the order listed at the root of the project.
 
 ```sh
 # 1. Create environment files
