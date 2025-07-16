@@ -145,7 +145,6 @@ export const NavMenu = ({
   });
 
   const { data: authedUser } = useQuery(authApi.meQuery());
-  console.log({ authedUser });
 
   return (
     <section className="py-3 px-6">

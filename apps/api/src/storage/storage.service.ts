@@ -51,7 +51,6 @@ export class StorageService {
 
   async upload({ file, resizeOptions, key }: Upload) {
     let buffer = await this.convertToBuffer(file);
-
     if (resizeOptions) {
       if (!file.type.startsWith('image'))
         throw new Error("Can't resize non-image files");
@@ -75,6 +74,6 @@ export class StorageService {
   }
 
   private async resizeImage(fileBuffer: Buffer, resizeOptions: ResizeOptions) {
-    return sharp(fileBuffer).resize(resizeOptions).toBuffer();
+    return sharp(fileBuffer).resize(resizeOptions).webp().toBuffer();
   }
 }

@@ -74,7 +74,6 @@ export function UpdateEmailForm({
   });
 
   const onSubmit = (data: z.infer<typeof changeEmailSchema>) => {
-    console.log("DATA => ", data);
     changeEmailMutation.mutate(data);
   };
 

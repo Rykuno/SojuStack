@@ -4,7 +4,7 @@ export class UsersAPI {
   queryKey = "users";
 
   updateImage({ image, name }: { image: File; name: string }) {
-    return fetchClient().POST("/users/image", {
+    return fetchClient().PATCH("/users/me", {
       body: {
         image: image,
         name

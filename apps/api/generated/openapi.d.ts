@@ -63,23 +63,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/users": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["UsersController_getUser"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/users/image": {
+    "/users/me": {
         parameters: {
             query?: never;
             header?: never;
@@ -88,11 +72,11 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        post: operations["UsersController_update"];
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
-        patch?: never;
+        patch: operations["UsersController_update"];
         trace?: never;
     };
 }
@@ -211,23 +195,6 @@ export interface operations {
             };
         };
     };
-    UsersController_getUser: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
     UsersController_update: {
         parameters: {
             query?: never;
@@ -241,7 +208,7 @@ export interface operations {
             };
         };
         responses: {
-            201: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };

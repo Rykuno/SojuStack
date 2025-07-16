@@ -25,14 +25,17 @@ export class UsersService {
 
   private async uploadImage(userId: string, file: Express.Multer.File) {
     const { key } = await this.storageService.upload({
-      file: new File([file.buffer], 'avatar', { type: file.mimetype }),
+      key: `users/${userId}/avatar`,
+      file: new File([file.buffer], `avatar`, {
+        type: file.mimetype,
+      }),
       resizeOptions: {
-        height: 128,
-        width: 128,
+        height: 400,
+        width: 400,
       },
     });
 
-    await this.prisma.user.update({
+    return this.prisma.user.update({
       where: {
         id: userId,
       },

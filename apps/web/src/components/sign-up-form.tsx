@@ -64,7 +64,6 @@ export function SignUpForm({
   });
 
   const handleSignUp = () => {
-    console.log(form.getValues());
     signUpMutation.mutate(form.getValues());
   };
 
