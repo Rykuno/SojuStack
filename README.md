@@ -71,11 +71,11 @@ I'm a relational database type of guy. NoSQL databases have their role and place
 
 > First, I'd love to choose Drizzle but its a pre-v1.0 release with limited production usage. In addition, they're apparently doing a full re-write of its core kit. Maybe in a couple years I'll check back on it. Prisma is also catching up to it...quickly.
 
-I'm a fan of writing SQL, i'm actually well versed in it - but I've also worked in sizable projects without ORM'S. In my experience, if you don't end up using an ORM you end up building one. And the one you build isn't going to be nearly as good as one thats maintained by a community. <ins>What I look for in an ORM is its feature/ability to break out of it at anytime and just write SQL, ideally in a type-safe environment, should push come to shove.</ins> Most offer this, but some do it better than others. Prisma is FANTASTIC at this. 
+I'm a fan of writing SQL, i'm actually well versed in it - but I've also worked in sizable projects without ORM'S. In my experience, if you don't use an ORM you end up building one. And the one you build isn't going to be nearly as good as one thats maintained by a community. <ins>What I look for in an ORM is its feature/ability to break out of it at anytime and just write SQL, ideally in a type-safe environment, should push come to shove.</ins> Most offer this, but some do it better than others. Prisma is FANTASTIC at this. 
 
 This **fantastic** ORM gets a bad rap for both a very good and a very terrible reason. The main complaint people have about prisma is that it was "slow" - but it's not. 
 
-When people hear an ORM is slow they just presume its because of unoptimized queries. In reality, Prisma had a rust binary as a dependency that required recompilation on startup. This was very noticeable in serverless environments when cold-starts were required. This lead to an echo chamber of people repeating "prisma is slow" online without actually understanding the issue.
+When people hear Prisma is slow they just presume its because of unoptimized generated queries. In reality, Prisma had a rust binary as a dependency that required recompilation on startup. This was very noticeable in serverless environments when cold-starts were required. This lead to an echo chamber of people repeating "prisma is slow" online without actually understanding the issue.
 
 Only problem here is that you only require a cold start in a serverless environment if you have no users generally - lol. Those of us who ran in VPS environments did not notice this at all.
 
