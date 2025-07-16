@@ -1,9 +1,9 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/databases/prisma.service';
 import { betterAuth } from 'better-auth';
 import { openAPI } from 'better-auth/plugins';
 import { MailService } from 'src/notifications/mail.service';
-import { Cache, CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Cache } from '@nestjs/cache-manager';
 import { prismaAdapter } from 'better-auth/adapters/prisma';
 import { ConfigService } from '@nestjs/config';
 import { AuthConfig, Config } from 'src/common/configs/config.interface';
@@ -17,7 +17,6 @@ export class BetterAuthService {
     private configService: ConfigService<Config>,
     private prismaService: PrismaService,
     private mailService: MailService,
-    @Inject(CACHE_MANAGER)
     private cache: Cache,
   ) {
     this.authConfig = this.configService.getOrThrow<AuthConfig>('auth');

@@ -145,7 +145,7 @@ export const NavMenu = ({
   });
 
   const { data: authedUser } = useQuery(authApi.meQuery());
-
+  
   return (
     <section className="py-3 px-6">
       <div className="container mx-auto">

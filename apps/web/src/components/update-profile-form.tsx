@@ -34,7 +34,7 @@ const updateProfileSchema = z.object({
 
 type UpdateProfileFormProps = {
   currentName: string;
-  currentImage: string | null;
+  currentImage: string | null | undefined;
 };
 
 export function UpdateProfileForm({

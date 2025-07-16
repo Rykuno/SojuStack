@@ -1,7 +1,6 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import type { AvatarProps } from "@radix-ui/react-avatar";
-import { createAvatar } from "@dicebear/core";
-import { funEmoji } from "@dicebear/collection";
+import { usersApi } from "~/utils/users";
 
 interface UserAvatarProps extends AvatarProps {
   user: {
@@ -11,19 +10,20 @@ interface UserAvatarProps extends AvatarProps {
 }
 
 export function UserAvatar({ user, ...props }: UserAvatarProps) {
-  const avatar = createAvatar(funEmoji, {
-    seed: user.id
-  });
-
   return (
     <Avatar {...props}>
       <AvatarImage
-        className="object-cover"
+        className="h-full w-full object-cover"
         alt="user avatar"
-        src={user?.image || avatar.toDataUri()}
+        src={user?.image || ""}
       />
       <AvatarFallback>
-        <img alt="user avatar" src={avatar.toDataUri()} />
+        <svg
+          className="w-full h-full object-cover"
+          dangerouslySetInnerHTML={{
+            __html: usersApi.getDefaultAvatar(user.id).toJson().svg
+          }}
+        />
       </AvatarFallback>
     </Avatar>
   );

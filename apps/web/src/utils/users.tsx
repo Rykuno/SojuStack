@@ -1,7 +1,15 @@
+import { createAvatar } from "@dicebear/core";
+import { funEmoji } from "@dicebear/collection";
 import { fetchClient } from "~/lib/api";
 
 export class UsersAPI {
   queryKey = "users";
+
+  getDefaultAvatar(userId: string) {
+    return createAvatar(funEmoji, {
+      seed: userId
+    });
+  }
 
   updateImage({ image, name }: { image: File; name: string }) {
     return fetchClient().PATCH("/users/me", {

@@ -3,22 +3,20 @@ import { authApi } from "~/utils/auth";
 import { UpdateProfileForm } from "~/components/update-profile-form";
 import { UpdateEmailForm } from "~/components/update-email-form";
 import { ResetPasswordForm } from "~/components/reset-password-form";
-import AvatarCropper from "~/components/image-cropper";
+import { usersApi } from "~/utils/users";
 
 export const Route = createFileRoute("/_layout/settings")({
   component: RouteComponent,
   loader: async ({ context }) => {
-    const session = await context.queryClient.fetchQuery(
-      authApi.meQuery()
-    );
+    const authedUser = await context.queryClient.fetchQuery(authApi.meQuery());
 
-    if (!session) throw redirect({ to: "/login" });
-    return { session };
+    if (!authedUser) throw redirect({ to: "/login" });
+    return { authedUser };
   }
 });
 
 function RouteComponent() {
-  const { session } = Route.useLoaderData();
+  const { authedUser } = Route.useLoaderData();
 
   return (
     <div className="container max-w-4xl mx-auto p-6 space-y-8">
@@ -29,12 +27,15 @@ function RouteComponent() {
         </p>
       </div>
       <UpdateProfileForm
-        currentName={session.name}
-        currentImage={session.image}
+        currentName={authedUser.name}
+        currentImage={
+          authedUser.image ||
+          usersApi.getDefaultAvatar(authedUser.id).toDataUri()
+        }
       />
       <UpdateEmailForm
-        currentEmail={session.email}
-        emailVerified={session.emailVerified}
+        currentEmail={authedUser.email}
+        emailVerified={authedUser.emailVerified}
       />
       <ResetPasswordForm />
     </div>

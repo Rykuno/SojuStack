@@ -19,6 +19,9 @@ import { BrowserSessionInterceptor } from './common/guards/browser-session.inter
 import { UsersModule } from './users/users.module';
 import { MulterModule } from '@nestjs/platform-express';
 import { StorageModule } from './storage/storage.module';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { ThrottlerStorageRedisService } from '@nest-lab/throttler-storage-redis';
+import { Config, DatabaseConfig } from './common/configs/config.interface';
 
 @Module({
   imports: [
@@ -28,6 +31,20 @@ import { StorageModule } from './storage/storage.module';
       load: [config],
     }),
     MulterModule,
+    ThrottlerModule.forRootAsync({
+      inject: [ConfigService],
+      imports: [ConfigModule],
+      useFactory: (configService: ConfigService<Config>) => {
+        return {
+          throttlers: [],
+          storage: new ThrottlerStorageRedisService(
+            configService.getOrThrow<DatabaseConfig>(
+              'database',
+            ).redis.connectionString,
+          ),
+        };
+      },
+    }),
     CacheModule.registerAsync({
       isGlobal: true,
       inject: [ConfigService],
@@ -52,6 +69,10 @@ import { StorageModule } from './storage/storage.module';
   controllers: [AppController],
   providers: [
     AppService,
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
     {
       provide: APP_GUARD,
       useClass: AuthGuard,
