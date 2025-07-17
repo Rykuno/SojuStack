@@ -47,6 +47,17 @@ redis: redis://localhost:6379
 minio: http://localhost:9000
 ```
 
+## E2E Typesafety
+
+When developing applications with a smaller team(or solo) that tends to pivot, E2E typesafety is pretty imparative to develop with confidence. This stack acheives E2E type-safety through a few different means,
+1) A monorepo where types can be shared.
+2) OpenAPI(Swagger) docs actively generated.
+3) OpenAPI-Fetch client on the frontends.
+
+**There is no need to regnerate types in the SojuStack, this is done automatically.** The only necessity is to ensure DTO's have their correct OpenAPI annotations. 
+
+This is achieved by a non-blocking helper function that listens and regenerates the `openapi.d.ts` file upon any changes - instantly reflecting on all frontend clients. Go ahead, change an endpoint or DTO in NestJS and view the errors in the frontend clients.
+
 ## Whats Inside and Why?
 
 Hopefully this helps understand my logic and reasoning behind my choices in technology.
