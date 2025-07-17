@@ -24,7 +24,6 @@
     "email:dev": "email dev",
     "db:push": "prisma db push",
     "db:generate": "prisma generate"
-
   },
   "dependencies": {
     "@keyv/redis": "^4.6.0",
@@ -70,7 +69,6 @@
     "@nestjs/testing": "^11.0.1",
     "@swc/cli": "^0.6.0",
     "@swc/core": "^1.10.7",
-    "@types/better-sqlite3": "^7.6.13",
     "@types/cookie-parser": "^1.4.9",
     "@types/express": "^5.0.0",
     "@types/jest": "^29.5.14",
