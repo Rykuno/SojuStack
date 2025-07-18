@@ -1,26 +1,26 @@
 import { Injectable } from '@nestjs/common';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { StorageService } from 'src/storage/storage.service';
-import { PrismaService } from 'src/databases/prisma.service';
+import { DrizzleService } from 'src/databases/drizzle.service';
+import { users } from 'src/databases/schema';
+import { eq } from 'drizzle-orm';
 
 @Injectable()
 export class UsersService {
   constructor(
     private readonly storageService: StorageService,
-    private readonly prisma: PrismaService,
+    private readonly drizzleService: DrizzleService,
   ) {}
 
   async update(id: string, updateUserDto: UpdateUserDto) {
     if (updateUserDto.image) await this.uploadImage(id, updateUserDto.image);
-
-    return this.prisma.user.update({
-      where: {
-        id: id,
-      },
-      data: {
+    return this.drizzleService.client
+      .update(users)
+      .set({
         name: updateUserDto.name,
-      },
-    });
+      })
+      .where(eq(users.id, id))
+      .returning();
   }
 
   private async uploadImage(userId: string, file: Express.Multer.File) {
@@ -35,17 +35,16 @@ export class UsersService {
       },
     });
 
-    return this.prisma.user.update({
-      where: {
-        id: userId,
-      },
-      data: {
+    return this.drizzleService.client
+      .update(users)
+      .set({
         image: key,
-      },
-    });
+      })
+      .where(eq(users.id, userId))
+      .returning();
   }
 
   findMany() {
-    return this.prisma.user.findMany();
+    return this.drizzleService.client.select().from(users);
   }
 }

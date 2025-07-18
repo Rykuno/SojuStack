@@ -1,12 +1,13 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from 'src/databases/prisma.service';
 import { betterAuth } from 'better-auth';
 import { openAPI } from 'better-auth/plugins';
 import { MailService } from 'src/notifications/mail.service';
 import { Cache } from '@nestjs/cache-manager';
-import { prismaAdapter } from 'better-auth/adapters/prisma';
+import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import { ConfigService } from '@nestjs/config';
 import { AuthConfig, Config } from 'src/common/configs/config.interface';
+import { DrizzleService } from 'src/databases/drizzle.service';
+import { seconds } from '@nestjs/throttler';
 
 @Injectable()
 export class BetterAuthService {
@@ -15,23 +16,34 @@ export class BetterAuthService {
 
   constructor(
     private configService: ConfigService<Config>,
-    private prismaService: PrismaService,
+    private drizzleService: DrizzleService,
     private mailService: MailService,
     private cache: Cache,
   ) {
     this.authConfig = this.configService.getOrThrow<AuthConfig>('auth');
     this.client = betterAuth({
-      database: prismaAdapter(this.prismaService, {
-        provider: 'postgresql',
+      database: drizzleAdapter(this.drizzleService.client, {
+        provider: 'pg',
+        schema: {
+          ...this.drizzleService.schema,
+          user: this.drizzleService.schema.users,
+          session: this.drizzleService.schema.sessions,
+          account: this.drizzleService.schema.accounts,
+          verification: this.drizzleService.schema.verifications,
+        },
       }),
-
+      advanced: {
+        database: {
+          generateId: false,
+        },
+      },
       secondaryStorage: {
         get: async (key) => {
           const value = await this.cache.get<string>(key);
           return value ? value : null;
         },
         set: async (key, value, ttl) => {
-          if (ttl) await this.cache.set(key, value, ttl * 1000);
+          if (ttl) await this.cache.set(key, value, seconds(ttl));
           else await this.cache.set(key, value);
         },
         delete: async (key) => {
@@ -42,11 +54,6 @@ export class BetterAuthService {
       baseURL: this.authConfig.betterAuth.baseUrl,
       basePath: this.authConfig.betterAuth.basePath,
       trustedOrigins: this.authConfig.betterAuth.trustedOrigins,
-      advanced: {
-        database: {
-          generateId: false,
-        },
-      },
       session: {
         cookieCache: {
           enabled: true,
