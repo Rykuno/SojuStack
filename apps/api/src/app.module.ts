@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { DatabasesModule } from './databases/databases.module';
 import { AuthModule } from './auth/auth.module';
 import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { AuthGuard } from './auth/guards/auth.guard';
@@ -22,6 +21,7 @@ import { StorageModule } from './storage/storage.module';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { ThrottlerStorageRedisService } from '@nest-lab/throttler-storage-redis';
 import { Config, DatabaseConfig } from './common/configs/config.interface';
+import { MikroOrmModule } from '@mikro-orm/nestjs';
 
 @Module({
   imports: [
@@ -30,6 +30,7 @@ import { Config, DatabaseConfig } from './common/configs/config.interface';
       expandVariables: true,
       load: [config],
     }),
+    MikroOrmModule.forRoot(),
     MulterModule,
     ThrottlerModule.forRootAsync({
       inject: [ConfigService],
@@ -60,7 +61,6 @@ import { Config, DatabaseConfig } from './common/configs/config.interface';
         };
       },
     }),
-    DatabasesModule,
     AuthModule,
     NotificationsModule,
     UsersModule,

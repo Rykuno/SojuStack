@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common';
 import { BetterAuthService } from './better-auth.service';
 import { AuthController } from './auth.controller';
-import { DatabasesModule } from '../databases/databases.module';
 import { HttpAdapterHost } from '@nestjs/core';
 import { toNodeHandler } from 'better-auth/node';
 import { ConfigModule, ConfigService } from '@nestjs/config';
@@ -12,9 +11,17 @@ import {
   AuthConfig,
   Config,
 } from 'src/common/configs/config.interface';
+import { MikroOrmModule } from '@mikro-orm/nestjs';
+import { Session } from './entities/session.entity';
+import { Verification } from './entities/verifications.entity';
+import { Account } from './entities/accounts.entity';
 
 @Module({
-  imports: [ConfigModule, DatabasesModule, NotificationsModule],
+  imports: [
+    ConfigModule,
+    NotificationsModule,
+    MikroOrmModule.forFeature([Session, Verification, Account]),
+  ],
   providers: [BetterAuthService],
   controllers: [AuthController],
   exports: [BetterAuthService],

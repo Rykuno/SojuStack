@@ -30,6 +30,9 @@
   },
   "dependencies": {
     "@keyv/redis": "^4.6.0",
+    "@mikro-orm/core": "^6.4.16",
+    "@mikro-orm/nestjs": "^6.1.1",
+    "@mikro-orm/postgresql": "^6.4.16",
     "@nest-lab/throttler-storage-redis": "^1.1.0",
     "@nestjs/cache-manager": "^3.0.1",
     "@nestjs/common": "^11.0.1",
@@ -52,8 +55,10 @@
     "class-validator": "^0.14.2",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
+    "dotenv": "^17.2.0",
     "drizzle-orm": "^0.44.3",
     "keyv": "^5.3.4",
+    "mikro-orm": "^6.4.16",
     "minio": "^8.0.5",
     "pg": "^8.16.3",
     "react": "^19.1.0",
@@ -66,6 +71,8 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3.2.0",
     "@eslint/js": "^9.18.0",
+    "@mikro-orm/cli": "^6.4.16",
+    "@mikro-orm/migrations": "^6.4.16",
     "@nestjs/cli": "^11.0.0",
     "@nestjs/schematics": "^11.0.0",
     "@nestjs/testing": "^11.0.1",
@@ -117,5 +124,11 @@
   "packageManager": "pnpm@9.0.0",
   "engines": {
     "node": ">=22.17.1"
+  },
+  "mikro-orm": {
+    "configPaths": [
+      "./mikro-orm.config.ts",
+      "./dist/mikro-orm.config.js"
+    ]
   }
 }

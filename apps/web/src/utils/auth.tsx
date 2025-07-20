@@ -73,7 +73,8 @@ export class AuthAPI {
 
   sendVerificationEmail(currentEmail: string) {
     return authClient.sendVerificationEmail({
-      email: currentEmail
+      email: currentEmail,
+      callbackURL: `${import.meta.env.VITE_WEB_URL}/settings`
     });
   }
 }

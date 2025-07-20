@@ -1,26 +1,27 @@
 import { Injectable } from '@nestjs/common';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { StorageService } from 'src/storage/storage.service';
-import { DrizzleService } from 'src/databases/drizzle.service';
-import { users } from 'src/databases/schema';
-import { eq } from 'drizzle-orm';
+import { InjectRepository } from '@mikro-orm/nestjs';
+import { User } from './entities/user.entity';
+import { EntityRepository } from '@mikro-orm/core';
 
 @Injectable()
 export class UsersService {
   constructor(
     private readonly storageService: StorageService,
-    private readonly drizzleService: DrizzleService,
+    @InjectRepository(User)
+    private readonly userRepository: EntityRepository<User>,
   ) {}
 
   async update(id: string, updateUserDto: UpdateUserDto) {
     if (updateUserDto.image) await this.uploadImage(id, updateUserDto.image);
-    return this.drizzleService.client
-      .update(users)
-      .set({
-        name: updateUserDto.name,
-      })
-      .where(eq(users.id, id))
-      .returning();
+
+    const user = await this.userRepository.nativeUpdate(
+      { id },
+      { name: updateUserDto.name },
+    );
+
+    return user;
   }
 
   private async uploadImage(userId: string, file: Express.Multer.File) {
@@ -35,16 +36,10 @@ export class UsersService {
       },
     });
 
-    return this.drizzleService.client
-      .update(users)
-      .set({
-        image: key,
-      })
-      .where(eq(users.id, userId))
-      .returning();
+    await this.userRepository.nativeUpdate({ id: userId }, { image: key });
   }
 
   findMany() {
-    return this.drizzleService.client.select().from(users);
+    return this.userRepository.findAll();
   }
 }

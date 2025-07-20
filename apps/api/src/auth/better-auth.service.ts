@@ -3,11 +3,14 @@ import { betterAuth } from 'better-auth';
 import { openAPI } from 'better-auth/plugins';
 import { MailService } from 'src/notifications/mail.service';
 import { Cache } from '@nestjs/cache-manager';
-import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import { ConfigService } from '@nestjs/config';
-import { AuthConfig, Config } from 'src/common/configs/config.interface';
-import { DrizzleService } from 'src/databases/drizzle.service';
+import {
+  AuthConfig,
+  Config,
+  DatabaseConfig,
+} from 'src/common/configs/config.interface';
 import { seconds } from '@nestjs/throttler';
+import { Pool } from 'pg';
 
 @Injectable()
 export class BetterAuthService {
@@ -16,25 +19,38 @@ export class BetterAuthService {
 
   constructor(
     private configService: ConfigService<Config>,
-    private drizzleService: DrizzleService,
     private mailService: MailService,
     private cache: Cache,
   ) {
     this.authConfig = this.configService.getOrThrow<AuthConfig>('auth');
     this.client = betterAuth({
-      database: drizzleAdapter(this.drizzleService.client, {
-        provider: 'pg',
-        schema: {
-          ...this.drizzleService.schema,
-          user: this.drizzleService.schema.users,
-          session: this.drizzleService.schema.sessions,
-          account: this.drizzleService.schema.accounts,
-          verification: this.drizzleService.schema.verifications,
-        },
+      database: new Pool({
+        connectionString:
+          this.configService.getOrThrow<DatabaseConfig>('database').postgres
+            .connectionString,
       }),
       advanced: {
         database: {
+          useNumberId: false,
           generateId: false,
+        },
+      },
+      account: {
+        modelName: 'account',
+        fields: {
+          id: 'id',
+          accountId: 'account_id',
+          providerId: 'provider_id',
+          userId: 'user_id',
+          accessToken: 'access_token',
+          refreshToken: 'refresh_token',
+          idToken: 'id_token',
+          accessTokenExpiresAt: 'access_token_expires_at',
+          refreshTokenExpiresAt: 'refresh_token_expires_at',
+          scope: 'scope',
+          password: 'password',
+          createdAt: 'created_at',
+          updatedAt: 'updated_at',
         },
       },
       secondaryStorage: {
@@ -55,12 +71,33 @@ export class BetterAuthService {
       basePath: this.authConfig.betterAuth.basePath,
       trustedOrigins: this.authConfig.betterAuth.trustedOrigins,
       session: {
+        modelName: 'session',
+        fields: {
+          id: 'id',
+          expiresAt: 'expires_at',
+          token: 'token',
+          ipAddress: 'ip_address',
+          userAgent: 'user_agent',
+          userId: 'user_id',
+          createdAt: 'created_at',
+          updatedAt: 'updated_at',
+        },
         cookieCache: {
           enabled: true,
           maxAge: 60 * 5,
         },
       },
       user: {
+        modelName: 'user',
+        fields: {
+          id: 'id',
+          name: 'name',
+          email: 'email',
+          emailVerified: 'email_verified',
+          image: 'image',
+          createdAt: 'created_at',
+          updatedAt: 'updated_at',
+        },
         changeEmail: {
           enabled: true,
           sendChangeEmailVerification: async ({ user, newEmail, url }) => {
@@ -75,8 +112,18 @@ export class BetterAuthService {
         },
       },
       emailVerification: {
+        modelName: 'verification',
+        fields: {
+          id: 'id',
+          identifier: 'identifier',
+          value: 'value',
+          expiresAt: 'expires_at',
+          createdAt: 'created_at',
+          updatedAt: 'updated_at',
+        },
         sendOnSignUp: true,
         sendVerificationEmail: async ({ user, url }) => {
+          console.log('sendVerificationEmail', user, url);
           return this.mailService.sendVerificationEmail({
             to: user.email,
             props: {
