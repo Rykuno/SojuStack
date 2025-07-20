@@ -45,6 +45,7 @@ async function bootstrap() {
   });
 
   void generateOpenApiSpecs([{ document }]);
+  app.enableShutdownHooks();
 
   /* -------------------------------------------------------------------------- */
   /*                                   Server                                   */

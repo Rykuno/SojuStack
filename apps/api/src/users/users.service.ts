@@ -16,12 +16,12 @@ export class UsersService {
   async update(id: string, updateUserDto: UpdateUserDto) {
     if (updateUserDto.image) await this.uploadImage(id, updateUserDto.image);
 
-    const user = await this.userRepository.nativeUpdate(
+    await this.userRepository.nativeUpdate(
       { id },
       { name: updateUserDto.name },
     );
 
-    return user;
+    return this.userRepository.findOne({ id });
   }
 
   private async uploadImage(userId: string, file: Express.Multer.File) {

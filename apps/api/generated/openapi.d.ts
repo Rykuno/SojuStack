@@ -213,7 +213,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": number;
+                    "application/json": Record<string, never>;
                 };
             };
         };
