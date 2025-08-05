@@ -91,7 +91,7 @@ If you know SQL, you know Drizzle and I like it for a few reasons,
 
 #### Redis (Cache)
 
-Substitute this for ValKey if you wish. The cache manager in NestJS uses KeyV as an interface so the only migration needed it to change the URL.
+Substitute this for ValKey if you wish. The cache manager in NestJS uses KeyV as an interface so the only migration needed is to change the URL.
 
 #### Better-Auth (Auth)
 
