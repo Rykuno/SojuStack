@@ -82,7 +82,12 @@ I'm a relational database type of guy. NoSQL databases have their role and place
 
 #### Drizzle (ORM)
 
-Its just SQL with a nice migrations tied to it. If you know SQL, you know Drizzle.
+Drizzle is early, sure - but its also very, very, very simple. Its a query builder with migrations. I've had more confidence using Drizzle than the industry standard TypeORM by a long shot. 
+If you know SQL, you know Drizzle and I like it for a few reasons,
+
+1) Its basic and simple; there is no magic. You write SQL like typescript and it generates pure SQL migrations to review. Infinite room to grow and no regrets to be had(ALWAYS REVIEW YOUR SQL MIGRATIONS MANUALLY, THIS IS TRUE FOR ANYTHING).
+2) It offers a type-safe, SQL-first approach that strikes an ideal balance between raw SQL flexibility and modern TypeScript ergonomics.
+3) It doesn't need an ecosystem like traditional ORMS. Its built to write sql and typesafe sql you shall write.
 
 #### Redis (Cache)
 
