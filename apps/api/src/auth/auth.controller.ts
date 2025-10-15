@@ -1,5 +1,4 @@
 import {
-  ClassSerializerInterceptor,
   Controller,
   Get,
   Request,

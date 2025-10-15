@@ -65,7 +65,7 @@ export class BetterAuthService {
           enabled: true,
           sendChangeEmailVerification: async ({ user, newEmail, url }) => {
             await this.mailService.sendChangeEmailVerificationEmail({
-              to: user.email, // verification email must be sent to the current user email to approve the change
+              to: user.email,
               props: {
                 newEmail,
                 verificationUrl: url,
@@ -100,7 +100,6 @@ export class BetterAuthService {
               expirationHours: 1,
               userEmail: user.email,
               resetUrl: url,
-              requestTime: new Date().toLocaleString(),
             },
           });
         },

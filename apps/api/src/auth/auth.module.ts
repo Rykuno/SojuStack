@@ -6,7 +6,7 @@ import { HttpAdapterHost } from '@nestjs/core';
 import { toNodeHandler } from 'better-auth/node';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { NotificationsModule } from 'src/notifications/notifications.module';
-import * as cors from 'cors';
+import cors, { CorsOptions } from 'cors'
 import {
   AppConfig,
   AuthConfig,
@@ -22,18 +22,17 @@ import {
 export class AuthModule {
   constructor(
     private readonly adapter: HttpAdapterHost,
-    private readonly betterAuthService: BetterAuthService,
+    private readonly _betterAuthService: BetterAuthService,
     private readonly configService: ConfigService<Config>,
   ) {
     const basePath =
       this.configService.getOrThrow<AuthConfig>('auth').betterAuth.basePath;
     const corsOptions = this.configService.getOrThrow<AppConfig>('app').cors;
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-    this.adapter.httpAdapter.use(cors(corsOptions));
+    this.adapter.httpAdapter.use(cors(corsOptions as CorsOptions));
     this.adapter.httpAdapter.all(
       `${basePath}/{*any}`,
-      toNodeHandler(betterAuthService.client),
+      toNodeHandler(this._betterAuthService.client),
     );
   }
 }

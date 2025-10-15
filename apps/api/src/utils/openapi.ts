@@ -1,8 +1,8 @@
-import openapiTS, { astToString, OpenAPI3 } from 'openapi-typescript';
-import * as fs from 'node:fs/promises';
-import * as fsSync from 'node:fs';
 import { OpenAPIObject } from '@nestjs/swagger';
 import chalk from 'chalk';
+import * as fsSync from 'node:fs';
+import * as fs from 'node:fs/promises';
+import openapiTS, { astToString, OpenAPI3 } from 'openapi-typescript';
 import * as ts from 'typescript';
 
 const DEFAULT_OUTPUT_DIR = './generated';
@@ -42,7 +42,7 @@ export async function generateOpenApiSpecs(
       if (result.status === 'rejected') {
         console.error(
           chalk.red(
-            `❌ Spec ${index + 1} (${specs[index].fileName || DEFAULT_FILENAME}): ${result.reason}`,
+            `❌ Spec ${index + 1} (${specs[index]?.fileName || DEFAULT_FILENAME}): ${result.reason}`,
           ),
         );
       }
@@ -78,6 +78,7 @@ async function generateSingleSpec(spec: OpenApiSpec): Promise<void> {
             ? ts.factory.createUnionTypeNode([BLOB, NULL])
             : BLOB;
         }
+        return undefined; // Use default transformation for other schema objects
       },
     });
     const newContents = astToString(ast);

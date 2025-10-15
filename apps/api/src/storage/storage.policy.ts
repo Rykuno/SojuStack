@@ -14,7 +14,7 @@ export const policy = `
         ]
       },
       "Resource": [
-        "arn:aws:s3:::dev"
+        "arn:aws:s3:::public"
       ],
       "Sid": ""
     },
@@ -29,7 +29,7 @@ export const policy = `
         ]
       },
       "Resource": [
-        "arn:aws:s3:::dev/*"
+        "arn:aws:s3:::public/*"
       ],
       "Sid": ""
     }

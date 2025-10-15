@@ -1,30 +1,34 @@
-import { createAvatar } from "@dicebear/core";
-import { funEmoji } from "@dicebear/collection";
-import { fetchClient } from "~/lib/api";
+import { queryOptions } from '@tanstack/react-query'
+import axios from 'redaxios'
 
-export class UsersAPI {
-  queryKey = "users";
-
-  getDefaultAvatar(userId: string) {
-    return createAvatar(funEmoji, {
-      seed: userId
-    });
-  }
-
-  updateImage({ image, name }: { image: File; name: string }) {
-    return fetchClient().PATCH("/users/me", {
-      body: {
-        image: image,
-        name
-      },
-      bodySerializer: body => {
-        const formData = new FormData();
-        formData.set("image", body.image as Blob);
-        formData.set("name", body.name ?? "");
-        return formData;
-      }
-    });
-  }
+export type User = {
+  id: number
+  name: string
+  email: string
 }
 
-export const usersApi = new UsersAPI();
+export const DEPLOY_URL = 'http://localhost:3000'
+
+export const usersQueryOptions = () =>
+  queryOptions({
+    queryKey: ['users'],
+    queryFn: () =>
+      axios
+        .get<Array<User>>(DEPLOY_URL + '/api/users')
+        .then((r) => r.data)
+        .catch(() => {
+          throw new Error('Failed to fetch users')
+        }),
+  })
+
+export const userQueryOptions = (id: string) =>
+  queryOptions({
+    queryKey: ['users', id],
+    queryFn: () =>
+      axios
+        .get<User>(DEPLOY_URL + '/api/users/' + id)
+        .then((r) => r.data)
+        .catch(() => {
+          throw new Error('Failed to fetch user')
+        }),
+  })

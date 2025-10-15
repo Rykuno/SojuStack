@@ -10,13 +10,11 @@ import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 import * as React from "react";
 import type { QueryClient } from "@tanstack/react-query";
-import { DefaultCatchBoundary } from "~/components/default-catch-boundry";
-import { NotFound } from "~/components/not-found";
-import { Toaster } from "~/components/ui/sonner";
+import { DefaultCatchBoundary } from "~/components/DefaultCatchBoundary";
+import { NotFound } from "~/components/NotFound";
 import appCss from "~/styles/app.css?url";
 import { seo } from "~/utils/seo";
-import { authApi } from "~/utils/auth";
-// import { sessionQuery } from "~/utils/auth";
+import Header from "~/components/header";
 
 export const Route = createRootRouteWithContext<{
   queryClient: QueryClient;
@@ -67,9 +65,6 @@ export const Route = createRootRouteWithContext<{
     );
   },
   notFoundComponent: () => <NotFound />,
-  beforeLoad: async ({ context }) => {
-    await context.queryClient.prefetchQuery(authApi.meQuery());
-  },
   component: RootComponent
 });
 
@@ -83,16 +78,16 @@ function RootComponent() {
 
 function RootDocument({ children }: { children: React.ReactNode }) {
   return (
-    <html>
+    <html lang="en">
       <head>
         <HeadContent />
       </head>
-      <body>
+      <body className="flex min-h-screen flex-col">
+        <Header />
         {children}
         <TanStackRouterDevtools position="bottom-right" />
         <ReactQueryDevtools buttonPosition="bottom-left" />
         <Scripts />
-        <Toaster />
       </body>
     </html>
   );

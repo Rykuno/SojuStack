@@ -9,97 +9,67 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as SignupRouteImport } from './routes/signup'
 import { Route as LoginRouteImport } from './routes/login'
-import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
-import { Route as LayoutRouteImport } from './routes/_layout'
-import { Route as LayoutIndexRouteImport } from './routes/_layout/index'
-import { Route as LayoutSettingsRouteImport } from './routes/_layout/settings'
+import { Route as IndexRouteImport } from './routes/index'
+import { Route as ApiUsersRouteImport } from './routes/api/users'
+import { Route as ApiUsersIdRouteImport } from './routes/api/users.$id'
 
-const SignupRoute = SignupRouteImport.update({
-  id: '/signup',
-  path: '/signup',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
-  id: '/forgot-password',
-  path: '/forgot-password',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LayoutRoute = LayoutRouteImport.update({
-  id: '/_layout',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LayoutIndexRoute = LayoutIndexRouteImport.update({
+const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => LayoutRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-const LayoutSettingsRoute = LayoutSettingsRouteImport.update({
-  id: '/settings',
-  path: '/settings',
-  getParentRoute: () => LayoutRoute,
+const ApiUsersRoute = ApiUsersRouteImport.update({
+  id: '/api/users',
+  path: '/api/users',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiUsersIdRoute = ApiUsersIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => ApiUsersRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
-  '/forgot-password': typeof ForgotPasswordRoute
+  '/': typeof IndexRoute
   '/login': typeof LoginRoute
-  '/signup': typeof SignupRoute
-  '/settings': typeof LayoutSettingsRoute
-  '/': typeof LayoutIndexRoute
+  '/api/users': typeof ApiUsersRouteWithChildren
+  '/api/users/$id': typeof ApiUsersIdRoute
 }
 export interface FileRoutesByTo {
-  '/forgot-password': typeof ForgotPasswordRoute
+  '/': typeof IndexRoute
   '/login': typeof LoginRoute
-  '/signup': typeof SignupRoute
-  '/settings': typeof LayoutSettingsRoute
-  '/': typeof LayoutIndexRoute
+  '/api/users': typeof ApiUsersRouteWithChildren
+  '/api/users/$id': typeof ApiUsersIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/_layout': typeof LayoutRouteWithChildren
-  '/forgot-password': typeof ForgotPasswordRoute
+  '/': typeof IndexRoute
   '/login': typeof LoginRoute
-  '/signup': typeof SignupRoute
-  '/_layout/settings': typeof LayoutSettingsRoute
-  '/_layout/': typeof LayoutIndexRoute
+  '/api/users': typeof ApiUsersRouteWithChildren
+  '/api/users/$id': typeof ApiUsersIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/forgot-password' | '/login' | '/signup' | '/settings' | '/'
+  fullPaths: '/' | '/login' | '/api/users' | '/api/users/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/forgot-password' | '/login' | '/signup' | '/settings' | '/'
-  id:
-    | '__root__'
-    | '/_layout'
-    | '/forgot-password'
-    | '/login'
-    | '/signup'
-    | '/_layout/settings'
-    | '/_layout/'
+  to: '/' | '/login' | '/api/users' | '/api/users/$id'
+  id: '__root__' | '/' | '/login' | '/api/users' | '/api/users/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  LayoutRoute: typeof LayoutRouteWithChildren
-  ForgotPasswordRoute: typeof ForgotPasswordRoute
+  IndexRoute: typeof IndexRoute
   LoginRoute: typeof LoginRoute
-  SignupRoute: typeof SignupRoute
+  ApiUsersRoute: typeof ApiUsersRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/signup': {
-      id: '/signup'
-      path: '/signup'
-      fullPath: '/signup'
-      preLoaderRoute: typeof SignupRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/login': {
       id: '/login'
       path: '/login'
@@ -107,56 +77,56 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/forgot-password': {
-      id: '/forgot-password'
-      path: '/forgot-password'
-      fullPath: '/forgot-password'
-      preLoaderRoute: typeof ForgotPasswordRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/_layout': {
-      id: '/_layout'
-      path: ''
-      fullPath: ''
-      preLoaderRoute: typeof LayoutRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/_layout/': {
-      id: '/_layout/'
+    '/': {
+      id: '/'
       path: '/'
       fullPath: '/'
-      preLoaderRoute: typeof LayoutIndexRouteImport
-      parentRoute: typeof LayoutRoute
+      preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/_layout/settings': {
-      id: '/_layout/settings'
-      path: '/settings'
-      fullPath: '/settings'
-      preLoaderRoute: typeof LayoutSettingsRouteImport
-      parentRoute: typeof LayoutRoute
+    '/api/users': {
+      id: '/api/users'
+      path: '/api/users'
+      fullPath: '/api/users'
+      preLoaderRoute: typeof ApiUsersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/users/$id': {
+      id: '/api/users/$id'
+      path: '/$id'
+      fullPath: '/api/users/$id'
+      preLoaderRoute: typeof ApiUsersIdRouteImport
+      parentRoute: typeof ApiUsersRoute
     }
   }
 }
 
-interface LayoutRouteChildren {
-  LayoutSettingsRoute: typeof LayoutSettingsRoute
-  LayoutIndexRoute: typeof LayoutIndexRoute
+interface ApiUsersRouteChildren {
+  ApiUsersIdRoute: typeof ApiUsersIdRoute
 }
 
-const LayoutRouteChildren: LayoutRouteChildren = {
-  LayoutSettingsRoute: LayoutSettingsRoute,
-  LayoutIndexRoute: LayoutIndexRoute,
+const ApiUsersRouteChildren: ApiUsersRouteChildren = {
+  ApiUsersIdRoute: ApiUsersIdRoute,
 }
 
-const LayoutRouteWithChildren =
-  LayoutRoute._addFileChildren(LayoutRouteChildren)
+const ApiUsersRouteWithChildren = ApiUsersRoute._addFileChildren(
+  ApiUsersRouteChildren,
+)
 
 const rootRouteChildren: RootRouteChildren = {
-  LayoutRoute: LayoutRouteWithChildren,
-  ForgotPasswordRoute: ForgotPasswordRoute,
+  IndexRoute: IndexRoute,
   LoginRoute: LoginRoute,
-  SignupRoute: SignupRoute,
+  ApiUsersRoute: ApiUsersRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+  }
+}

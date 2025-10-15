@@ -16,39 +16,39 @@ export enum Environment {
 
 export class EnvironmentVariables {
   @IsEnum(Environment)
-  NODE_ENV: Environment;
+  NODE_ENV!: Environment;
 
   @IsNumber()
   @Min(0)
   @Max(65535)
-  PORT: number;
+  PORT!: number;
 
-  @IsUrl({ require_tld: process.env.NODE_ENV === Environment.Production })
-  BASE_URL: string;
-
-  @IsString()
-  AUTH_SECRET: string;
+  @IsUrl({ require_tld: process.env['NODE_ENV'] === Environment.Production })
+  BASE_URL!: string;
 
   @IsString()
-  POSTGRES_URL: string;
+  AUTH_SECRET!: string;
 
   @IsString()
-  REDIS_URL: string;
+  POSTGRES_URL!: string;
+
+  @IsString()
+  REDIS_URL!: string;
 
   @IsUrl({ require_tld: true, require_protocol: false })
-  EMAIL_DOMAIN: string;
+  EMAIL_DOMAIN!: string;
 
   @IsString()
-  STORAGE_HOST: string;
+  STORAGE_HOST!: string;
 
   @IsNumber()
-  STORAGE_PORT: number;
+  STORAGE_PORT!: number;
 
   @IsString()
-  STORAGE_ACCESS_KEY: string;
+  STORAGE_ACCESS_KEY!: string;
 
   @IsString()
-  STORAGE_SECRET_KEY: string;
+  STORAGE_SECRET_KEY!: string;
 }
 
 export function validate(config: Record<string, unknown>) {

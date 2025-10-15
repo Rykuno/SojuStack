@@ -1,0 +1,66 @@
+name: Node.js CI
+
+on:
+  push:
+    branches: ["main", "develop"]
+  pull_request:
+    branches: ["main", "develop"]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [24.4.1]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: ⎔ Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.13.1
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Check Types
+        run: pnpm typecheck
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Test
+        run: pnpm test
+
+      - name: Build project
+        run: pnpm build
+
+      - name: Create .env file
+        working-directory: ./apps/api
+        run: cp .env.example .env
+
+      - name: Docker compose up
+        working-directory: ./apps/api
+        run: pnpm nuke
+
+      - name: Wait for services to be ready
+        run: |
+          echo "Waiting for database to be ready..."
+          timeout 60 bash -c 'until docker compose exec -T postgres psql -U postgres -d postgres -c "SELECT 1;" > /dev/null 2>&1; do
+            echo "Database not ready, waiting...";
+            sleep 3;
+          done'
+
+          echo "Database is ready!"
+
+      - name: Run API tests
+        working-directory: ./apps/api
+        run: pnpm test:e2e

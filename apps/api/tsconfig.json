@@ -1,24 +1,11 @@
 {
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "display": "api",
+  "extends": "@package/typescript-config/nestjs.json",
   "compilerOptions": {
-    "module": "commonjs",
-    "declaration": true,
-    "removeComments": true,
-    "emitDecoratorMetadata": true,
-    "experimentalDecorators": true,
-    "allowSyntheticDefaultImports": true,
-    "target": "ES2021",
-    "sourceMap": true,
-    "outDir": "./dist",
     "baseUrl": "./",
-    "incremental": true,
-    "skipLibCheck": true,
-    "strictNullChecks": true,
-    "forceConsistentCasingInFileNames": true,
-    "noImplicitAny": false,
-    "strictBindCallApply": false,
-    "jsx": "react-jsx",
-    "jsxImportSource": "react",
-    "noFallthroughCasesInSwitch": false
+    "outDir": "./dist"
   },
-  "include": ["src"]
+  "include": ["src"],
+  "exclude": ["node_modules", "dist"]
 }

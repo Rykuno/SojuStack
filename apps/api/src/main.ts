@@ -7,20 +7,16 @@ import { generateOpenApiSpecs } from './utils/openapi';
 import chalk from 'chalk';
 import { ConfigService } from '@nestjs/config';
 import { AppConfig, Config } from './common/configs/config.interface';
-import * as cookieParser from 'cookie-parser';
 import { NestExpressApplication } from '@nestjs/platform-express';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
   const configService = app.get(ConfigService<Config>);
 
-  app.set('trust proxy', 'loopback');
-
   /* -------------------------------------------------------------------------- */
   /*                                 Middlewares                                */
   /* -------------------------------------------------------------------------- */
   app.enableCors(configService.getOrThrow<AppConfig>('app').cors);
-  app.use(cookieParser('secret'));
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,

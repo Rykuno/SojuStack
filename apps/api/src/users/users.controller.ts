@@ -24,16 +24,14 @@ export class UsersController {
   @ApiConsumes('multipart/form-data')
   @Auth(AuthType.Required)
   @UseInterceptors(FileInterceptor('image'))
-  async update(
+  update(
     @Body() updateUserDto: UpdateUserDto,
     @UploadedFile() image: Express.Multer.File,
     @ActiveUser() activeUser: ActiveUserDto,
   ) {
-    if (image) {
-      return this.usersService.update(activeUser.id, {
-        ...updateUserDto,
-        image,
-      });
-    }
+    return this.usersService.update(activeUser.id, {
+      ...updateUserDto,
+      image,
+    });
   }
 }

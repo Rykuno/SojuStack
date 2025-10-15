@@ -41,7 +41,7 @@ export class MailService {
       : this.sendDev({ email, subject, template });
   }
 
-  private async sendProd({ email, subject, template }: SendMailConfiguration) {
+  private async sendProd(_props: SendMailConfiguration) {
     // TODO: Implement production email sending.
     // Maybe start with `resend` and switch to ses later?
   }

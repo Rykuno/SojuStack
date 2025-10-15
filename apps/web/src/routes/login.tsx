@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import Container from "~/components/container";
 import { LoginForm } from "~/components/login-form";
 
 export const Route = createFileRoute("/login")({
@@ -7,6 +8,8 @@ export const Route = createFileRoute("/login")({
 
 function RouteComponent() {
   return (
-    <LoginForm className="flex h-screen w-screen items-center justify-center" />
+    <Container className="max-w-lg mx-auto mt-[10%]">
+      <LoginForm />
+    </Container>
   );
 }
