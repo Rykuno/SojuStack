@@ -4,32 +4,34 @@ import { openAPI } from 'better-auth/plugins';
 import { MailService } from 'src/notifications/mail.service';
 import { Cache } from '@nestjs/cache-manager';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
-import { ConfigService } from '@nestjs/config';
-import { AuthConfig, Config } from 'src/common/configs/config.interface';
-import { DrizzleService } from 'src/databases/drizzle.service';
 import { seconds } from '@nestjs/throttler';
+import { DatabaseTransactionAdapter } from 'src/databases/database.provider';
+import { TransactionHost } from '@nestjs-cls/transactional';
+import * as schema from 'src/databases/drizzle.schema';
+import { AuthConfig } from 'src/common/config/auth.config';
+import { AppConfig } from 'src/common/config/app.config';
 
 @Injectable()
 export class BetterAuthService {
   readonly client: ReturnType<typeof betterAuth>;
-  private readonly authConfig: AuthConfig;
 
   constructor(
-    private configService: ConfigService<Config>,
-    private drizzleService: DrizzleService,
+    private readonly db: TransactionHost<DatabaseTransactionAdapter>,
     private mailService: MailService,
     private cache: Cache,
+    private readonly appConfig: AppConfig,
+    private readonly authConfig: AuthConfig,
   ) {
-    this.authConfig = this.configService.getOrThrow<AuthConfig>('auth');
+    console.log(this.authConfig);
     this.client = betterAuth({
-      database: drizzleAdapter(this.drizzleService.client, {
+      database: drizzleAdapter(this.db.tx, {
         provider: 'pg',
         schema: {
-          ...this.drizzleService.schema,
-          user: this.drizzleService.schema.users,
-          session: this.drizzleService.schema.sessions,
-          account: this.drizzleService.schema.accounts,
-          verification: this.drizzleService.schema.verifications,
+          ...schema,
+          user: schema.users,
+          session: schema.sessions,
+          account: schema.accounts,
+          verification: schema.verifications,
         },
       }),
       advanced: {
@@ -50,10 +52,10 @@ export class BetterAuthService {
           await this.cache.del(key);
         },
       },
-      secret: this.authConfig.betterAuth.secret,
-      baseURL: this.authConfig.betterAuth.baseUrl,
-      basePath: this.authConfig.betterAuth.basePath,
-      trustedOrigins: this.authConfig.betterAuth.trustedOrigins,
+      secret: this.authConfig.secret,
+      baseURL: this.appConfig.url,
+      basePath: this.authConfig.basePath,
+      trustedOrigins: this.authConfig.trustedOrigins,
       session: {
         cookieCache: {
           enabled: true,

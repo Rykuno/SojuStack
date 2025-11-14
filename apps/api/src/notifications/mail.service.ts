@@ -7,12 +7,8 @@ import PasswordReset, { PasswordResetProps } from './emails/password-reset';
 import EmailVerification, {
   EmailVerificationProps,
 } from './emails/email-verification';
-import {
-  AppConfig,
-  Config,
-  MailConfig,
-} from 'src/common/configs/config.interface';
-import { ConfigService } from '@nestjs/config';
+import { MailConfig } from 'src/common/config/mail.config';
+import { AppConfig } from 'src/common/config/app.config';
 
 interface SendMailConfiguration {
   email: string;
@@ -27,13 +23,10 @@ interface Email<T> {
 
 @Injectable()
 export class MailService {
-  private readonly mailConfig: MailConfig;
-  private readonly appConfig: AppConfig;
-
-  constructor(private configService: ConfigService<Config>) {
-    this.mailConfig = this.configService.getOrThrow<MailConfig>('mail');
-    this.appConfig = this.configService.getOrThrow<AppConfig>('app');
-  }
+  constructor(
+    private readonly mailConfig: MailConfig,
+    private readonly appConfig: AppConfig,
+  ) {}
 
   private send({ email, subject, template }: SendMailConfiguration) {
     return this.appConfig.isProduction
@@ -56,8 +49,8 @@ export class MailService {
       body: JSON.stringify({
         Attachments: [],
         From: {
-          Email: this.mailConfig.addresses.noreply,
-          Name: this.mailConfig.name,
+          Email: `noreply@${this.mailConfig.domain}`,
+          Name: 'SojuStack',
         },
         HTML: html,
         Subject: subject,

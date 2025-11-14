@@ -1,15 +1,18 @@
 import { Injectable } from '@nestjs/common';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { DrizzleService } from 'src/databases/drizzle.service';
 import { users } from 'src/databases/drizzle.schema';
 import { eq } from 'drizzle-orm';
+import { TransactionHost } from '@nestjs-cls/transactional';
+import { DatabaseTransactionAdapter } from 'src/databases/database.provider';
 
 @Injectable()
 export class UsersService {
-  constructor(private readonly drizzleService: DrizzleService) {}
+  constructor(
+    private readonly db: TransactionHost<DatabaseTransactionAdapter>,
+  ) {}
 
   async update(id: string, updateUserDto: UpdateUserDto) {
-    return this.drizzleService.client
+    return this.db.tx
       .update(users)
       .set({
         name: updateUserDto.name,
@@ -19,6 +22,6 @@ export class UsersService {
   }
 
   findMany() {
-    return this.drizzleService.client.select().from(users);
+    return this.db.tx.select().from(users);
   }
 }

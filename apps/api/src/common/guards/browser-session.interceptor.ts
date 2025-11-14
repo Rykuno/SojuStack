@@ -7,13 +7,12 @@ import {
 import { Request, Response } from 'express';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
-import { ConfigService } from '@nestjs/config';
-import { AppConfig } from '../configs/config.interface';
 import { randomUUID } from 'crypto';
+import { AppConfig } from 'src/common/config/app.config';
 
 @Injectable()
 export class BrowserSessionInterceptor implements NestInterceptor {
-  constructor(private configService: ConfigService) {}
+  constructor(private readonly appConfig: AppConfig) {}
 
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     return next.handle().pipe(
@@ -21,22 +20,18 @@ export class BrowserSessionInterceptor implements NestInterceptor {
         const request = context.switchToHttp().getRequest<Request>();
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         const hasBrowserSession = request.signedCookies['browser_sid'];
-        console.log('hasBrowserSession', hasBrowserSession);
 
         if (hasBrowserSession) {
           return;
         }
 
         const response = context.switchToHttp().getResponse<Response>();
-        const appConfig = this.configService.get<AppConfig>('app');
-        // Determine if we're in production
-        const isProduction = appConfig?.isProduction || false;
 
         response.cookie('browser_sid', randomUUID(), {
           httpOnly: true,
           path: '/',
           signed: true,
-          sameSite: isProduction ? 'strict' : 'lax',
+          sameSite: this.appConfig.isProduction ? 'strict' : 'lax',
         });
       }),
     );

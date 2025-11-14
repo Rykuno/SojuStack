@@ -6,56 +6,56 @@ import { AuthModule } from './auth/auth.module';
 import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { AuthGuard } from './auth/guards/auth.guard';
 import { NotificationsModule } from './notifications/notifications.module';
-import { ConfigModule, ConfigService } from '@nestjs/config';
-import {
-  EnvironmentVariables,
-  validate,
-} from './common/configs/env-validation';
 import { CacheModule } from '@nestjs/cache-manager';
 import { createKeyv, Keyv } from '@keyv/redis';
 import { CacheableMemory } from 'cacheable';
-import config from './common/configs/config';
 import { BrowserSessionInterceptor } from './common/guards/browser-session.interceptor';
 import { UsersModule } from './users/users.module';
 import { MulterModule } from '@nestjs/platform-express';
 import { StorageModule } from './storage/storage.module';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { ThrottlerStorageRedisService } from '@nest-lab/throttler-storage-redis';
-import { Config, DatabaseConfig } from './common/configs/config.interface';
+import { ClsPluginTransactional } from '@nestjs-cls/transactional';
+import { ClsModule } from 'nestjs-cls';
+import { TransactionalAdapterDrizzleOrm } from '@nestjs-cls/transactional-adapter-drizzle-orm';
+import { DB_PROVIDER } from './databases/database.provider';
+import { ConfigifyModule } from '@itgorillaz/configify';
+import { CacheConfig } from './common/config/cache.config';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({
-      validate,
-      expandVariables: true,
-      load: [config],
-    }),
+    ConfigifyModule.forRootAsync(),
     MulterModule,
     ThrottlerModule.forRootAsync({
-      inject: [ConfigService],
-      imports: [ConfigModule],
-      useFactory: (configService: ConfigService<Config>) => {
+      inject: [CacheConfig],
+      useFactory: (cacheConfig: CacheConfig) => {
         return {
           throttlers: [],
-          storage: new ThrottlerStorageRedisService(
-            configService.getOrThrow<DatabaseConfig>(
-              'database',
-            ).redis.connectionString,
-          ),
+          storage: new ThrottlerStorageRedisService(cacheConfig.url),
         };
       },
     }),
+    ClsModule.forRoot({
+      global: true,
+      plugins: [
+        new ClsPluginTransactional({
+          imports: [DatabasesModule],
+          adapter: new TransactionalAdapterDrizzleOrm({
+            drizzleInstanceToken: DB_PROVIDER,
+          }),
+        }),
+      ],
+    }),
     CacheModule.registerAsync({
       isGlobal: true,
-      inject: [ConfigService],
-      imports: [ConfigModule],
-      useFactory: (configService: ConfigService<EnvironmentVariables>) => {
+      inject: [CacheConfig],
+      useFactory: (cacheConfig: CacheConfig) => {
         return {
           stores: [
             new Keyv({
               store: new CacheableMemory({ lruSize: 5000 }),
             }),
-            createKeyv(configService.getOrThrow('REDIS_URL')),
+            createKeyv(cacheConfig.url),
           ],
         };
       },

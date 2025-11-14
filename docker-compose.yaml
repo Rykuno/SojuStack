@@ -21,6 +21,20 @@ services:
     networks:
       - app-network
 
+
+  minio-console:
+    image: ghcr.io/georgmangold/console
+    ports:
+      - 9090:9090
+    networks:
+      - app-network
+    environment:
+      - MINIO_ENDPOINT=http://minio:9000
+      - MINIO_ACCESS_KEY=user
+      - MINIO_SECRET_KEY=password
+    depends_on:
+      - minio
+
   minio:
     image: minio/minio:RELEASE.2025-09-07T16-13-09Z
     ports:

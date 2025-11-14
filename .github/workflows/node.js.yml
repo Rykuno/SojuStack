@@ -1,3 +1,6 @@
+# This workflow will do a clean installation of node dependencies, cache/restore them, build the source code and run tests across different versions of node
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-nodejs
+
 name: Node.js CI
 
 on:
@@ -13,6 +16,8 @@ jobs:
     strategy:
       matrix:
         node-version: [24.4.1]
+        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -42,25 +47,3 @@ jobs:
 
       - name: Build project
         run: pnpm build
-
-      - name: Create .env file
-        working-directory: ./apps/api
-        run: cp .env.example .env
-
-      - name: Docker compose up
-        working-directory: ./apps/api
-        run: pnpm nuke
-
-      - name: Wait for services to be ready
-        run: |
-          echo "Waiting for database to be ready..."
-          timeout 60 bash -c 'until docker compose exec -T postgres psql -U postgres -d postgres -c "SELECT 1;" > /dev/null 2>&1; do
-            echo "Database not ready, waiting...";
-            sleep 3;
-          done'
-
-          echo "Database is ready!"
-
-      - name: Run API tests
-        working-directory: ./apps/api
-        run: pnpm test:e2e

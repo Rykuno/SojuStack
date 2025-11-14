@@ -5,18 +5,18 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
 import { generateOpenApiSpecs } from './utils/openapi';
 import chalk from 'chalk';
-import { ConfigService } from '@nestjs/config';
-import { AppConfig, Config } from './common/configs/config.interface';
 import { NestExpressApplication } from '@nestjs/platform-express';
+import { AppConfig } from './common/config/app.config';
+import { CorsOptions } from '@nestjs/common/interfaces/external/cors-options.interface';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
-  const configService = app.get(ConfigService<Config>);
+  const { cors, port } = app.get(AppConfig);
 
   /* -------------------------------------------------------------------------- */
   /*                                 Middlewares                                */
   /* -------------------------------------------------------------------------- */
-  app.enableCors(configService.getOrThrow<AppConfig>('app').cors);
+  app.enableCors(cors);
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
@@ -45,7 +45,6 @@ async function bootstrap() {
   /* -------------------------------------------------------------------------- */
   /*                                   Server                                   */
   /* -------------------------------------------------------------------------- */
-  const port = configService.getOrThrow<AppConfig>('app').port;
   await app.listen(port, () => {
     console.log(chalk.green(`🚀 Server is running on port ${port}`));
   });

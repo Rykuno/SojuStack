@@ -1,7 +1,8 @@
+import { TransactionHost } from '@nestjs-cls/transactional';
 import { Injectable } from '@nestjs/common';
 import { eq, InferInsertModel } from 'drizzle-orm';
+import { DatabaseTransactionAdapter } from 'src/databases/database.provider';
 import { files } from 'src/databases/drizzle.schema';
-import { DrizzleService } from 'src/databases/drizzle.service';
 import { takeFirstOrThrow } from 'src/databases/drizzle.utils';
 
 type Create = Pick<
@@ -11,13 +12,19 @@ type Create = Pick<
 
 @Injectable()
 export class FilesWriteRepository {
-  constructor(private readonly drizzleService: DrizzleService) {}
+  constructor(
+    private readonly db: TransactionHost<DatabaseTransactionAdapter>,
+  ) {}
 
-  async create(values: Create, tx = this.drizzleService.client) {
-    return tx.insert(files).values(values).returning().then(takeFirstOrThrow);
+  async create(values: Create) {
+    return this.db.tx
+      .insert(files)
+      .values(values)
+      .returning()
+      .then(takeFirstOrThrow);
   }
 
-  delete(id: string, tx = this.drizzleService.client) {
-    return tx.delete(files).where(eq(files.id, id));
+  delete(id: string) {
+    return this.db.tx.delete(files).where(eq(files.id, id));
   }
 }
