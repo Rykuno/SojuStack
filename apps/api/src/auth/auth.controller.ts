@@ -31,7 +31,14 @@ export class AuthController {
   @Auth(AuthType.Public)
   @SerializeOptions({ type: ActiveSessionDto })
   session(@ActiveSession() session: ActiveSessionDto) {
+    console.log(session);
     return session;
+  }
+
+  @Get('/test')
+  @Auth(AuthType.Public)
+  test() {
+    return { test: 'test' };
   }
 
   @Get('/sessions')
