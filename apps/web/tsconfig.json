@@ -1,24 +1,11 @@
 {
+  "$schema": "https://json.schemastore.org/tsconfig",
   "include": ["**/*.ts", "**/*.tsx"],
+  "extends": "@package/typescript-config/vite.json",
   "compilerOptions": {
-    "strict": true,
-    "esModuleInterop": true,
-    "jsx": "react-jsx",
-    "module": "ESNext",
-    "moduleResolution": "Bundler",
-    "lib": ["DOM", "DOM.Iterable", "ES2022"],
-    "isolatedModules": true,
-    "resolveJsonModule": true,
-    "skipLibCheck": true,
-    "target": "ES2022",
-    "allowJs": true,
-    "forceConsistentCasingInFileNames": true,
-    "noUncheckedIndexedAccess": true,
     "baseUrl": ".",
     "paths": {
-      "~/*": ["./src/*"],
-      "@/*": ["./app/*"]
-    },
-    "noEmit": true
+      "@/*": ["./src/*"]
+    }
   }
 }

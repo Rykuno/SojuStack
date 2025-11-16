@@ -9,6 +9,7 @@ import EmailVerification, {
 } from './emails/email-verification';
 import { MailConfig } from 'src/common/config/mail.config';
 import { AppConfig } from 'src/common/config/app.config';
+import SignInOtp, { SignInOtpProps } from './emails/sign-in-otp.email';
 
 interface SendMailConfiguration {
   email: string;
@@ -72,6 +73,14 @@ export class MailService {
       email: to,
       subject: 'Verify your email',
       template: EmailVerification(props),
+    });
+  }
+
+  sendSignInOtpEmail({ to, props }: Email<SignInOtpProps>) {
+    return this.send({
+      email: to,
+      subject: 'Sign in verification code',
+      template: SignInOtp(props),
     });
   }
 

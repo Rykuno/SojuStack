@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { betterAuth } from 'better-auth';
-import { openAPI } from 'better-auth/plugins';
+import { emailOTP, openAPI } from 'better-auth/plugins';
 import { MailService } from 'src/notifications/mail.service';
 import { Cache } from '@nestjs/cache-manager';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
@@ -10,6 +10,7 @@ import { TransactionHost } from '@nestjs-cls/transactional';
 import * as schema from 'src/databases/drizzle.schema';
 import { AuthConfig } from 'src/common/config/auth.config';
 import { AppConfig } from 'src/common/config/app.config';
+import { emailOTPClient } from 'better-auth/client/plugins';
 
 @Injectable()
 export class BetterAuthService {
@@ -22,7 +23,6 @@ export class BetterAuthService {
     private readonly appConfig: AppConfig,
     private readonly authConfig: AuthConfig,
   ) {
-    console.log(this.authConfig);
     this.client = betterAuth({
       database: drizzleAdapter(this.db.tx, {
         provider: 'pg',
@@ -91,6 +91,7 @@ export class BetterAuthService {
         autoSignInAfterVerification: true,
         expiresIn: 3600, // 1 hour
       },
+
       emailAndPassword: {
         resetPasswordTokenExpiresIn: 3600, // 1 hour
         enabled: true,
@@ -107,6 +108,22 @@ export class BetterAuthService {
         },
       },
       plugins: [
+        emailOTP({
+          overrideDefaultEmailVerification: true,
+          otpLength: 6,
+          expiresIn: 300,
+          allowedAttempts: 5,
+          sendVerificationOTP: async ({ email, otp, type }) => {
+            if (type === 'sign-in') {
+              return this.mailService.sendSignInOtpEmail({
+                to: email,
+                props: {
+                  otpCode: otp,
+                },
+              });
+            }
+          },
+        }),
         openAPI({
           path: '/reference',
         }),

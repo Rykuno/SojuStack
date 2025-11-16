@@ -77,10 +77,6 @@ import { CacheConfig } from './common/config/cache.config';
       provide: APP_GUARD,
       useClass: AuthGuard,
     },
-    {
-      provide: APP_INTERCEPTOR,
-      useClass: BrowserSessionInterceptor,
-    },
   ],
 })
 export class AppModule {}

@@ -1,24 +1,25 @@
-/// <reference types="vite/client" />
 import {
   HeadContent,
-  Link,
-  Outlet,
   Scripts,
   createRootRouteWithContext
 } from "@tanstack/react-router";
-import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
-import * as React from "react";
-import type { QueryClient } from "@tanstack/react-query";
-import { DefaultCatchBoundary } from "~/components/DefaultCatchBoundary";
-import { NotFound } from "~/components/NotFound";
-import appCss from "~/styles/app.css?url";
-import { seo } from "~/utils/seo";
-import Header from "~/components/header";
+import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
+import { TanStackDevtools } from "@tanstack/react-devtools";
 
-export const Route = createRootRouteWithContext<{
+import TanStackQueryDevtools from "../integrations/tanstack-query/devtools";
+
+import appCss from "../styles.css?url";
+
+import { useSuspenseQuery, type QueryClient } from "@tanstack/react-query";
+import { api } from "@/lib/api";
+import { createAuthClient } from "better-auth/react";
+import { $authClient } from "@/lib/auth-client";
+
+interface MyRouterContext {
   queryClient: QueryClient;
-}>()({
+}
+
+export const Route = createRootRouteWithContext<MyRouterContext>()({
   head: () => ({
     meta: [
       {
@@ -28,53 +29,28 @@ export const Route = createRootRouteWithContext<{
         name: "viewport",
         content: "width=device-width, initial-scale=1"
       },
-      ...seo({
-        title:
-          "TanStack Start | Type-Safe, Client-First, Full-Stack React Framework",
-        description: `TanStack Start is a type-safe, client-first, full-stack React framework. `
-      })
+      {
+        title: "TanStack Start Starter"
+      }
     ],
     links: [
-      { rel: "stylesheet", href: appCss },
       {
-        rel: "apple-touch-icon",
-        sizes: "180x180",
-        href: "/apple-touch-icon.png"
-      },
-      {
-        rel: "icon",
-        type: "image/png",
-        sizes: "32x32",
-        href: "/favicon-32x32.png"
-      },
-      {
-        rel: "icon",
-        type: "image/png",
-        sizes: "16x16",
-        href: "/favicon-16x16.png"
-      },
-      { rel: "manifest", href: "/site.webmanifest", color: "#fffff" },
-      { rel: "icon", href: "/favicon.ico" }
+        rel: "stylesheet",
+        href: appCss
+      }
     ]
   }),
-  errorComponent: props => {
-    return (
-      <RootDocument>
-        <DefaultCatchBoundary {...props} />
-      </RootDocument>
+  beforeLoad: async ({ context }) => {
+    const { data } = await context.queryClient.ensureQueryData(
+      api.auth.getSession()
     );
+    return {
+      user: data?.user,
+      session: data?.session
+    };
   },
-  notFoundComponent: () => <NotFound />,
-  component: RootComponent
+  shellComponent: RootDocument
 });
-
-function RootComponent() {
-  return (
-    <RootDocument>
-      <Outlet />
-    </RootDocument>
-  );
-}
 
 function RootDocument({ children }: { children: React.ReactNode }) {
   return (
@@ -82,11 +58,20 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       <head>
         <HeadContent />
       </head>
-      <body className="flex min-h-screen flex-col">
-        <Header />
+      <body>
         {children}
-        <TanStackRouterDevtools position="bottom-right" />
-        <ReactQueryDevtools buttonPosition="bottom-left" />
+        <TanStackDevtools
+          config={{
+            position: "bottom-right"
+          }}
+          plugins={[
+            {
+              name: "Tanstack Router",
+              render: <TanStackRouterDevtoolsPanel />
+            },
+            TanStackQueryDevtools
+          ]}
+        />
         <Scripts />
       </body>
     </html>

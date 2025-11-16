@@ -1,23 +1,65 @@
-import { GalleryVerticalEnd } from "lucide-react"
+import { GalleryVerticalEnd } from "lucide-react";
 
-import { cn } from "~/lib/utils"
-import { Button } from "~/components/ui/button"
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 import {
   Field,
   FieldDescription,
+  FieldError,
   FieldGroup,
   FieldLabel,
-  FieldSeparator,
-} from "~/components/ui/field"
-import { Input } from "~/components/ui/input"
+  FieldSeparator
+} from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { api } from "@/lib/api";
+import { z } from "zod";
+import { useForm } from "@tanstack/react-form";
+
+const formSchema = z.object({
+  email: z.email()
+});
+
+interface LoginFormProps extends React.ComponentProps<"div"> {
+  setValidateEmailOtp: (email: string) => void;
+}
 
 export function LoginForm({
   className,
+  setValidateEmailOtp,
   ...props
-}: React.ComponentProps<"div">) {
+}: LoginFormProps) {
+  const queryClient = useQueryClient();
+
+  const form = useForm({
+    defaultValues: {
+      email: "test@test.com"
+    },
+    validators: {
+      onSubmit: formSchema
+    },
+    onSubmit: ({ value }) => {
+      loginMutation.mutate(value.email);
+      setValidateEmailOtp(value.email);
+    }
+  });
+
+  const loginMutation = useMutation({
+    mutationFn: (email: string) => api.auth.sendSignInOtp(email),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries();
+    }
+  });
+
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
-      <form>
+      <form
+        onSubmit={e => {
+          console.log("submit");
+          e.preventDefault();
+          form.handleSubmit();
+        }}
+      >
         <FieldGroup>
           <div className="flex flex-col items-center gap-2 text-center">
             <a
@@ -34,15 +76,30 @@ export function LoginForm({
               Don&apos;t have an account? <a href="#">Sign up</a>
             </FieldDescription>
           </div>
-          <Field>
-            <FieldLabel htmlFor="email">Email</FieldLabel>
-            <Input
-              id="email"
-              type="email"
-              placeholder="m@example.com"
-              required
-            />
-          </Field>
+
+          <form.Field
+            name="email"
+            children={field => {
+              const isInvalid =
+                field.state.meta.isTouched && !field.state.meta.isValid;
+              return (
+                <Field data-invalid={isInvalid}>
+                  <FieldLabel htmlFor={field.name}>Email</FieldLabel>
+                  <Input
+                    id={field.name}
+                    name={field.name}
+                    value={field.state.value}
+                    onBlur={field.handleBlur}
+                    onChange={e => field.handleChange(e.target.value)}
+                    aria-invalid={isInvalid}
+                    placeholder="m@example.com"
+                    autoComplete="off"
+                  />
+                  {isInvalid && <FieldError errors={field.state.meta.errors} />}
+                </Field>
+              );
+            }}
+          />
           <Field>
             <Button type="submit">Login</Button>
           </Field>
@@ -74,5 +131,5 @@ export function LoginForm({
         and <a href="#">Privacy Policy</a>.
       </FieldDescription>
     </div>
-  )
+  );
 }
