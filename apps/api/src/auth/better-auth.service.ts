@@ -119,6 +119,7 @@ export class BetterAuthService {
                 to: email,
                 props: {
                   otpCode: otp,
+                  expiresInSeconds: 300,
                 },
               });
             }

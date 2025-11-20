@@ -1,6 +1,5 @@
 import { api } from "@/lib/api";
-import { useQuery } from "@tanstack/react-query";
-import { createFileRoute, useRouteContext } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import {
   Zap,
   Server,

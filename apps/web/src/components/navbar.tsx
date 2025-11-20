@@ -23,7 +23,6 @@ import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { createAvatar } from "@dicebear/core";
 import { funEmoji } from "@dicebear/collection";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { $apiClient } from "@/lib/api-client";
 import { api } from "@/lib/api";
 
 // Navigation links array to be used in both desktop and mobile menus

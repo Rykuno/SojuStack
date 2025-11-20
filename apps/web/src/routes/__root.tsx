@@ -10,10 +10,8 @@ import TanStackQueryDevtools from "../integrations/tanstack-query/devtools";
 
 import appCss from "../styles.css?url";
 
-import { useSuspenseQuery, type QueryClient } from "@tanstack/react-query";
+import { type QueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
-import { createAuthClient } from "better-auth/react";
-import { $authClient } from "@/lib/auth-client";
 
 interface MyRouterContext {
   queryClient: QueryClient;

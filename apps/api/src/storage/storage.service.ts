@@ -37,7 +37,7 @@ export class StorageService implements OnModuleInit {
       name: file.originalname,
       mimeType: file.mimetype,
       sizeBytes: file.size,
-      storageKey: createId(),
+      storageKey: `${createId()}.${file.mimetype.split('/')[1] ?? 'bin'}`,
     });
 
     // Upload the file to the bucket
