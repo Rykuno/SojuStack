@@ -3,7 +3,6 @@ import { $authClient } from "../auth-client";
 
 export class AuthApi {
   private readonly queryKeys = ["auth"];
-  constructor() {}
 
   getSession() {
     return queryOptions({

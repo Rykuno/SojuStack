@@ -109,7 +109,7 @@ export default function Component({ user }: NavbarProps) {
           </Popover>
           {/* Main nav */}
           <div className="flex items-center gap-6">
-            <a href="#" className="text-primary hover:text-primary/90">
+            <a href="/" className="text-primary hover:text-primary/90">
               <Rainbow className="size-10" />
             </a>
             {/* Navigation menu */}

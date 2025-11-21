@@ -93,7 +93,9 @@ async function generateSingleSpec(spec: OpenApiSpec): Promise<void> {
     console.log(chalk.green(`  ✅ ${fileName} updated`));
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    throw new Error(`Failed to generate ${fileName}: ${errorMessage}`);
+    throw new Error(`Failed to generate ${fileName}: ${errorMessage}`, {
+      cause: error,
+    });
   }
 }
 

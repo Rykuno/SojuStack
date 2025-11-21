@@ -19,7 +19,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 import { useNavigate } from "@tanstack/react-router";
 import { useForm } from "@tanstack/react-form";
-import z from "zod";
+import { z } from "zod";
 
 interface OTPFormProps extends React.ComponentProps<"div"> {
   email: string;
@@ -62,7 +62,7 @@ export function OTPForm({ className, email, ...props }: OTPFormProps) {
         <FieldGroup>
           <div className="flex flex-col items-center gap-2 text-center">
             <a
-              href="#"
+              href="/"
               className="flex flex-col items-center gap-2 font-medium"
             >
               <div className="flex size-8 items-center justify-center rounded-md">
@@ -111,7 +111,7 @@ export function OTPForm({ className, email, ...props }: OTPFormProps) {
                     </InputOTPGroup>
                   </InputOTP>
                   <FieldDescription className="text-center">
-                    Didn&apos;t receive the code? <a href="#">Resend</a>
+                    Didn&apos;t receive the code? <a href="/resend">Resend</a>
                   </FieldDescription>
                   {isInvalid && <FieldError errors={field.state.meta.errors} />}
                 </Field>
@@ -124,8 +124,9 @@ export function OTPForm({ className, email, ...props }: OTPFormProps) {
         </FieldGroup>
       </form>
       <FieldDescription className="px-6 text-center">
-        By clicking continue, you agree to our <a href="#">Terms of Service</a>{" "}
-        and <a href="#">Privacy Policy</a>.
+        By clicking continue, you agree to our{" "}
+        <a href="/terms">Terms of Service</a> and{" "}
+        <a href="/privacy">Privacy Policy</a>.
       </FieldDescription>
     </div>
   );
