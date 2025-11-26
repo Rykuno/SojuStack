@@ -10,7 +10,6 @@ import { TransactionHost } from '@nestjs-cls/transactional';
 import * as schema from 'src/databases/drizzle.schema';
 import { AuthConfig } from 'src/common/config/auth.config';
 import { AppConfig } from 'src/common/config/app.config';
-import { emailOTPClient } from 'better-auth/client/plugins';
 
 @Injectable()
 export class BetterAuthService {
