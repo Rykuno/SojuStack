@@ -1,30 +1,26 @@
 import { TransactionHost } from '@nestjs-cls/transactional';
+import { TransactionalAdapterPrisma } from '@nestjs-cls/transactional-adapter-prisma';
 import { Injectable } from '@nestjs/common';
-import { eq, InferInsertModel } from 'drizzle-orm';
-import { DatabaseTransactionAdapter } from 'src/databases/database.provider';
-import { files } from 'src/databases/drizzle.schema';
-import { takeFirstOrThrow } from 'src/databases/drizzle.utils';
-
-type Create = Pick<
-  InferInsertModel<typeof files>,
-  'name' | 'storageKey' | 'mimeType' | 'sizeBytes'
->;
+import { FileCreateInput } from 'generated/prisma/models';
+import { PrismaService } from 'src/databases/prisma.service';
 
 @Injectable()
 export class FilesWriteRepository {
   constructor(
-    private readonly db: TransactionHost<DatabaseTransactionAdapter>,
+    private readonly txHost: TransactionHost<
+      TransactionalAdapterPrisma<PrismaService>
+    >,
   ) {}
 
-  async create(values: Create) {
-    return this.db.tx
-      .insert(files)
-      .values(values)
-      .returning()
-      .then(takeFirstOrThrow);
+  async create(values: FileCreateInput) {
+    return this.txHost.tx.file.create({
+      data: values,
+    });
   }
 
   delete(id: string) {
-    return this.db.tx.delete(files).where(eq(files.id, id));
+    return this.txHost.tx.file.delete({
+      where: { id },
+    });
   }
 }

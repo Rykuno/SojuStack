@@ -3,13 +3,12 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { DatabasesModule } from './databases/databases.module';
 import { AuthModule } from './auth/auth.module';
-import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
+import { APP_GUARD } from '@nestjs/core';
 import { AuthGuard } from './auth/guards/auth.guard';
 import { NotificationsModule } from './notifications/notifications.module';
 import { CacheModule } from '@nestjs/cache-manager';
 import { createKeyv, Keyv } from '@keyv/redis';
 import { CacheableMemory } from 'cacheable';
-import { BrowserSessionInterceptor } from './common/guards/browser-session.interceptor';
 import { UsersModule } from './users/users.module';
 import { MulterModule } from '@nestjs/platform-express';
 import { StorageModule } from './storage/storage.module';
@@ -17,10 +16,10 @@ import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { ThrottlerStorageRedisService } from '@nest-lab/throttler-storage-redis';
 import { ClsPluginTransactional } from '@nestjs-cls/transactional';
 import { ClsModule } from 'nestjs-cls';
-import { TransactionalAdapterDrizzleOrm } from '@nestjs-cls/transactional-adapter-drizzle-orm';
-import { DB_PROVIDER } from './databases/database.provider';
 import { ConfigifyModule } from '@itgorillaz/configify';
 import { CacheConfig } from './common/config/cache.config';
+import { TransactionalAdapterPrisma } from '@nestjs-cls/transactional-adapter-prisma';
+import { PrismaService } from './databases/prisma.service';
 
 @Module({
   imports: [
@@ -40,8 +39,9 @@ import { CacheConfig } from './common/config/cache.config';
       plugins: [
         new ClsPluginTransactional({
           imports: [DatabasesModule],
-          adapter: new TransactionalAdapterDrizzleOrm({
-            drizzleInstanceToken: DB_PROVIDER,
+          adapter: new TransactionalAdapterPrisma({
+            prismaInjectionToken: PrismaService,
+            sqlFlavor: 'postgresql',
           }),
         }),
       ],

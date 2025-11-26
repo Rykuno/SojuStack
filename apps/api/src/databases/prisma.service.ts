@@ -1,0 +1,30 @@
+import { Injectable, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
+import { PrismaClient } from '../../generated/prisma/client';
+import { PrismaPg } from '@prisma/adapter-pg';
+import { DatabaseConfig } from 'src/common/config/database.config';
+// import { TransactionHost } from '@nestjs-cls/transactional';
+// import { TransactionalAdapterPrisma } from '@nestjs-cls/transactional-adapter-prisma';
+
+// export type PrismaTransactionClient = TransactionHost<
+//   TransactionalAdapterPrisma<PrismaService>
+// >;
+
+@Injectable()
+export class PrismaService
+  extends PrismaClient
+  implements OnModuleInit, OnModuleDestroy
+{
+  constructor(protected readonly databaseConfig: DatabaseConfig) {
+    super({
+      adapter: new PrismaPg({ connectionString: databaseConfig.url }),
+    });
+  }
+
+  async onModuleInit() {
+    await this.$connect();
+  }
+
+  async onModuleDestroy() {
+    await this.$disconnect();
+  }
+}

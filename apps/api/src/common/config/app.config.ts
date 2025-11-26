@@ -32,12 +32,14 @@ export class AppConfig {
   @IsObject()
   @IsNotEmpty()
   cors: CorsOptions = {
-    origin: process.env['WEB_URL']!,
+    origin: process.env['APP_WEB_URL']!,
+    credentials: true,
     methods: ['GET', 'PATCH', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'HEAD'],
     allowedHeaders: [
       'Content-Type',
       'Authorization',
       'X-Requested-With',
+      'user-agent',
       'Accept',
     ],
   };

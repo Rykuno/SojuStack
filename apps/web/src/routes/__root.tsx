@@ -10,8 +10,13 @@ import TanStackQueryDevtools from "../integrations/tanstack-query/devtools";
 
 import appCss from "../styles.css?url";
 
-import { type QueryClient } from "@tanstack/react-query";
+import {
+  useQuery,
+  useSuspenseQuery,
+  type QueryClient
+} from "@tanstack/react-query";
 import { api } from "@/lib/api";
+import { Suspense } from "react";
 
 interface MyRouterContext {
   queryClient: QueryClient;
@@ -57,7 +62,9 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <HeadContent />
       </head>
       <body>
-        {children}
+        <Suspense fallback={<div>Loading...</div>}>
+          <RootDocumentContent>{children}</RootDocumentContent>
+        </Suspense>
         <TanStackDevtools
           config={{
             position: "bottom-right"
@@ -74,4 +81,9 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       </body>
     </html>
   );
+}
+
+function RootDocumentContent({ children }: { children: React.ReactNode }) {
+  useSuspenseQuery(api.auth.getSession());
+  return children;
 }

@@ -22,6 +22,7 @@ export class AuthModule {
     private readonly authConfig: AuthConfig,
   ) {
     // this.adapter.httpAdapter.use(cors(this.appConfig.cors as CorsOptions));
+    console.log(this.appConfig.cors);
     this.adapter.httpAdapter.use(
       cors({
         origin: 'http://localhost:3000',
@@ -32,9 +33,10 @@ export class AuthModule {
           'Authorization',
           'X-Requested-With',
           'Accept',
+          'user-agent'
         ],
         credentials: true,
-      }),
+      }) as CorsOptions,
     );
     this.adapter.httpAdapter.all(
       `${this.authConfig.basePath}/{*any}`,
