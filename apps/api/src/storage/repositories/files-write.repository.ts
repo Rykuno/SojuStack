@@ -1,14 +1,14 @@
 import { TransactionHost } from '@nestjs-cls/transactional';
 import { TransactionalAdapterPrisma } from '@nestjs-cls/transactional-adapter-prisma';
 import { Injectable } from '@nestjs/common';
-import { FileCreateInput } from 'generated/prisma/models';
-import { PrismaService } from 'src/databases/prisma.service';
+import { FileCreateInput } from 'src/generated/prisma/models';
+import { PrismaClient } from 'src/generated/prisma/client';
 
 @Injectable()
 export class FilesWriteRepository {
   constructor(
     private readonly txHost: TransactionHost<
-      TransactionalAdapterPrisma<PrismaService>
+      TransactionalAdapterPrisma<PrismaClient>
     >,
   ) {}
 
