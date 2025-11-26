@@ -10,11 +10,7 @@ import TanStackQueryDevtools from "../integrations/tanstack-query/devtools";
 
 import appCss from "../styles.css?url";
 
-import {
-  useQuery,
-  useSuspenseQuery,
-  type QueryClient
-} from "@tanstack/react-query";
+import { useSuspenseQuery, type QueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 import { Suspense } from "react";
 
