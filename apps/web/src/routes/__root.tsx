@@ -63,7 +63,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       </head>
       <body>
         <Suspense fallback={<div>Loading...</div>}>
-          <RootDocumentContent>{children}</RootDocumentContent>
+          <RootDocumentContent children={children} />
         </Suspense>
         <TanStackDevtools
           config={{
