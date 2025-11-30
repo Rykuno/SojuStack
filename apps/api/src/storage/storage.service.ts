@@ -7,7 +7,7 @@ import {
   PutObjectCommand,
   DeleteObjectCommand,
 } from '@aws-sdk/client-s3';
-import { policy } from './storage.policy';
+// import { policy } from './storage.policy';
 import { createId } from '@paralleldrive/cuid2';
 import { FilesWriteRepository } from './repositories/files-write.repository';
 import { FilesReadRepository } from './repositories/files-read.repository';
@@ -24,7 +24,7 @@ export class StorageService implements OnModuleInit {
     private readonly storageConfig: StorageConfig,
   ) {
     this.client = new S3Client({
-      endpoint: this.storageConfig.endpoint,
+      endpoint: this.storageConfig.url,
       region: this.storageConfig.region,
       credentials: {
         accessKeyId: this.storageConfig.accessKey,
@@ -53,12 +53,12 @@ export class StorageService implements OnModuleInit {
     }
 
     // Set bucket policy
-    await this.client.send(
-      new PutBucketPolicyCommand({
-        Bucket: this.bucket,
-        Policy: policy,
-      }),
-    );
+    // await this.client.send(
+    //   new PutBucketPolicyCommand({
+    //     Bucket: this.bucket,
+    //     Policy: policy,
+    //   }),
+    // );
   }
 
   async create(file: Express.Multer.File) {

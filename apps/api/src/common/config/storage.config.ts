@@ -5,8 +5,8 @@ import { IsNotEmpty, IsString } from 'class-validator';
 export class StorageConfig {
   @IsString()
   @IsNotEmpty()
-  @Value('STORAGE_ENDPOINT')
-  endpoint!: string;
+  @Value('STORAGE_URL')
+  url!: string;
 
   @IsString()
   @IsNotEmpty()
