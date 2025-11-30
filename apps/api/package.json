@@ -27,6 +27,7 @@
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.940.0",
+    "@aws-sdk/s3-request-presigner": "^3.940.0",
     "@itgorillaz/configify": "^4.0.1",
     "@keyv/redis": "^5.1.4",
     "@keyv/valkey": "^1.0.11",
