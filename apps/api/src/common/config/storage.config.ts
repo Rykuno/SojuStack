@@ -1,17 +1,17 @@
 import { Configuration, Value } from '@itgorillaz/configify';
-import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import { IsNotEmpty, IsString } from 'class-validator';
 
 @Configuration()
 export class StorageConfig {
   @IsString()
   @IsNotEmpty()
-  @Value('STORAGE_HOST')
-  host!: string;
+  @Value('STORAGE_URL')
+  url!: string;
 
-  @IsNumber()
+  @IsString()
   @IsNotEmpty()
-  @Value('STORAGE_PORT', { parse: parseInt })
-  port!: number;
+  @Value('STORAGE_REGION', { default: 'us-east-1' })
+  region!: string;
 
   @IsString()
   @IsNotEmpty()

@@ -1,18 +1,21 @@
 import { Module } from '@nestjs/common';
-import { StorageService } from './storage.service';
-import { FilesWriteRepository } from './repositories/files-write.repository';
-import { FileStorageService } from './file-storage.service';
-import { ImageStorageService } from './image-storage.service';
-import { FilesReadRepository } from './repositories/files-read.repository';
+import { FileStorageService } from './services/file-storage.service';
+import { ImageStorageService } from './services/image-storage.service';
+import { FileMetadataService } from './services/file-metadata.service';
+import { BucketConfigService } from './services/bucket-config.service';
+import { S3StorageProvider } from './providers/s3-storage.provider';
 
 @Module({
   providers: [
-    StorageService,
-    FilesWriteRepository,
-    FilesReadRepository,
+    S3StorageProvider,
+    BucketConfigService,
+    FileMetadataService,
     FileStorageService,
     ImageStorageService,
   ],
-  exports: [FileStorageService, ImageStorageService],
+  exports: [
+    FileStorageService,
+    ImageStorageService,
+  ],
 })
 export class StorageModule {}
