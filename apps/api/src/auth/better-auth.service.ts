@@ -1,37 +1,33 @@
 import { Injectable } from '@nestjs/common';
-import { betterAuth } from 'better-auth';
+import { Auth, betterAuth, BetterAuthOptions } from 'better-auth';
 import { emailOTP, openAPI } from 'better-auth/plugins';
 import { MailService } from 'src/notifications/mail.service';
 import { Cache } from '@nestjs/cache-manager';
-import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import { seconds } from '@nestjs/throttler';
-import { DatabaseTransactionAdapter } from 'src/databases/database.provider';
-import { TransactionHost } from '@nestjs-cls/transactional';
-import * as schema from 'src/databases/drizzle.schema';
 import { AuthConfig } from 'src/common/config/auth.config';
 import { AppConfig } from 'src/common/config/app.config';
+import { prismaAdapter } from 'better-auth/adapters/prisma';
+import { TransactionHost } from '@nestjs-cls/transactional';
+import { TransactionalAdapterPrisma } from '@nestjs-cls/transactional-adapter-prisma';
+import { PrismaClient } from 'src/generated/prisma/client';
 
 @Injectable()
 export class BetterAuthService {
-  readonly client: ReturnType<typeof betterAuth>;
+  readonly client: Auth<BetterAuthOptions>;
 
   constructor(
-    private readonly db: TransactionHost<DatabaseTransactionAdapter>,
-    private mailService: MailService,
-    private cache: Cache,
+    private readonly txHost: TransactionHost<
+      TransactionalAdapterPrisma<PrismaClient>
+    >,
+    private readonly mailService: MailService,
+    private readonly cache: Cache,
     private readonly appConfig: AppConfig,
     private readonly authConfig: AuthConfig,
   ) {
     this.client = betterAuth({
-      database: drizzleAdapter(this.db.tx, {
-        provider: 'pg',
-        schema: {
-          ...schema,
-          user: schema.users,
-          session: schema.sessions,
-          account: schema.accounts,
-          verification: schema.verifications,
-        },
+      experimental: { joins: true },
+      database: prismaAdapter(this.txHost.tx, {
+        provider: 'postgresql',
       }),
       advanced: {
         database: {
