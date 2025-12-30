@@ -7,7 +7,6 @@ import { generateOpenApiSpecs } from './utils/openapi';
 import chalk from 'chalk';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { AppConfig } from './common/config/app.config';
-import { CorsOptions } from '@nestjs/common/interfaces/external/cors-options.interface';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -28,10 +27,10 @@ async function bootstrap() {
   /*                                   OpenAPI                                  */
   /* -------------------------------------------------------------------------- */
   const config = new DocumentBuilder()
-    .setTitle('Cats example')
-    .setDescription('The cats API description')
+    .setTitle('SojuStack API')
+    .setDescription('The SojuStack API')
     .setVersion('1.0')
-    .addTag('cats')
+    .addTag('SojuStack')
     .build();
 
   const document = SwaggerModule.createDocument(app, config);

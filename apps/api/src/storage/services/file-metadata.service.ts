@@ -1,9 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { createId } from '@paralleldrive/cuid2';
-import { TransactionHost } from '@nestjs-cls/transactional';
-import { TransactionalAdapterPrisma } from '@nestjs-cls/transactional-adapter-prisma';
-import { PrismaClient } from 'src/generated/prisma/client';
 import { FileNotFoundException } from '../exceptions/storage.exception';
+import { DatabaseTransactionHost } from 'src/databases/database.provider';
+import { files } from 'src/databases/database.schema';
+import { eq } from 'drizzle-orm';
+import { takeFirstOrThrow } from 'src/databases/database.utils';
 
 export interface CreateFileMetadataParams {
   name: string;
@@ -14,11 +15,7 @@ export interface CreateFileMetadataParams {
 
 @Injectable()
 export class FileMetadataService {
-  constructor(
-    private readonly txHost: TransactionHost<
-      TransactionalAdapterPrisma<PrismaClient>
-    >,
-  ) {}
+  constructor(private readonly txHost: DatabaseTransactionHost) {}
 
   /**
    * Generate a storage key from file metadata
@@ -32,24 +29,29 @@ export class FileMetadataService {
    * Create a file metadata record
    */
   async create(params: CreateFileMetadataParams) {
-    const storageKey = params.storageKey ?? this.generateStorageKey(params.mimeType);
+    const storageKey =
+      params.storageKey ?? this.generateStorageKey(params.mimeType);
 
-    return this.txHost.tx.file.create({
-      data: {
+    return this.txHost.tx
+      .insert(files)
+      .values({
         name: params.name,
         mimeType: params.mimeType,
         sizeBytes: params.sizeBytes,
         storageKey,
-      },
-    });
+      })
+      .returning()
+      .then(takeFirstOrThrow);
   }
 
   /**
    * Get file metadata by ID
    */
   async findById(id: string) {
-    const file = await this.txHost.tx.file.findUnique({
-      where: { id },
+    const file = await this.txHost.tx.query.files.findFirst({
+      where: {
+        id,
+      },
     });
 
     if (!file) {
@@ -63,8 +65,10 @@ export class FileMetadataService {
    * Get file metadata by storage key
    */
   async findByStorageKey(storageKey: string) {
-    return this.txHost.tx.file.findFirst({
-      where: { storageKey },
+    return this.txHost.tx.query.files.findFirst({
+      where: {
+        storageKey,
+      },
     });
   }
 
@@ -73,18 +77,20 @@ export class FileMetadataService {
    * Used for reference counting before deleting files
    */
   async countReferencesByStorageKey(storageKey: string): Promise<number> {
-    return this.txHost.tx.file.count({
-      where: { storageKey },
-    });
+    return this.txHost.tx.query.files
+      .findMany({
+        where: {
+          storageKey,
+        },
+      })
+      .then((files) => files.length);
   }
 
   /**
    * Delete a file metadata record
    */
   async delete(id: string) {
-    return this.txHost.tx.file.delete({
-      where: { id },
-    });
+    return this.txHost.tx.delete(files).where(eq(files.id, id));
   }
 
   /**
@@ -96,4 +102,3 @@ export class FileMetadataService {
     return count <= 1;
   }
 }
-

@@ -21,6 +21,7 @@ export class AuthModule {
     private readonly appConfig: AppConfig,
     private readonly authConfig: AuthConfig,
   ) {
+    if (!this.adapter.httpAdapter?.use) return;
     this.adapter.httpAdapter.use(cors(this.appConfig.cors as CorsOptions));
     this.adapter.httpAdapter.all(
       `${this.authConfig.basePath}/{*any}`,

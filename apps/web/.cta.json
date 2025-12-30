@@ -1,20 +1,16 @@
 {
-  "projectName": "web",
+  "projectName": "start-app",
   "mode": "file-router",
   "typescript": true,
   "tailwind": true,
   "packageManager": "pnpm",
   "addOnOptions": {},
-  "git": false,
+  "git": true,
   "version": 1,
   "framework": "react-cra",
   "chosenAddOns": [
+    "eslint",
     "nitro",
-    "start",
-    "shadcn",
-    "mcp",
-    "tanstack-query",
-    "compiler",
-    "form"
+    "start"
   ]
 }

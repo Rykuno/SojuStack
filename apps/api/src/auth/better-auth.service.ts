@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { faker } from '@faker-js/faker';
 import { Auth, betterAuth, BetterAuthOptions } from 'better-auth';
 import { emailOTP, openAPI } from 'better-auth/plugins';
 import { MailService } from 'src/notifications/mail.service';
@@ -6,19 +7,16 @@ import { Cache } from '@nestjs/cache-manager';
 import { seconds } from '@nestjs/throttler';
 import { AuthConfig } from 'src/common/config/auth.config';
 import { AppConfig } from 'src/common/config/app.config';
-import { prismaAdapter } from 'better-auth/adapters/prisma';
-import { TransactionHost } from '@nestjs-cls/transactional';
-import { TransactionalAdapterPrisma } from '@nestjs-cls/transactional-adapter-prisma';
-import { PrismaClient } from 'src/generated/prisma/client';
+import { drizzleAdapter } from 'better-auth/adapters/drizzle';
+import { DatabaseTransactionHost } from 'src/databases/database.provider';
+import * as schema from 'src/databases/database.schema';
 
 @Injectable()
 export class BetterAuthService {
   readonly client: Auth<BetterAuthOptions>;
 
   constructor(
-    private readonly txHost: TransactionHost<
-      TransactionalAdapterPrisma<PrismaClient>
-    >,
+    private readonly txHost: DatabaseTransactionHost,
     private readonly mailService: MailService,
     private readonly cache: Cache,
     private readonly appConfig: AppConfig,
@@ -26,8 +24,15 @@ export class BetterAuthService {
   ) {
     this.client = betterAuth({
       experimental: { joins: true },
-      database: prismaAdapter(this.txHost.tx, {
-        provider: 'postgresql',
+      database: drizzleAdapter(this.txHost.tx, {
+        provider: 'pg',
+        schema: {
+          ...schema,
+          user: schema.users,
+          session: schema.sessions,
+          account: schema.accounts,
+          verification: schema.verifications,
+        },
       }),
       advanced: {
         database: {
@@ -125,5 +130,16 @@ export class BetterAuthService {
         }),
       ],
     });
+  }
+
+  async createUser() {
+    const response = await this.client.api.signUpEmail({
+      body: {
+        email: faker.internet.email(),
+        name: faker.person.fullName(),
+        password: 'testing123!',
+      },
+    });
+    return response;
   }
 }

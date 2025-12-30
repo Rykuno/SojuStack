@@ -33,29 +33,23 @@ services:
       MP_SMTP_AUTH_ALLOW_INSECURE: 1
     networks:
       - app-network
-  localstack:
-    image: localstack/localstack:latest
+  rustfs:
+    image: rustfs/rustfs:latest
     networks:
       - app-network
-    ports:
-      - 4566:4566 # LocalStack Gateway
-      - 4510-4559:4510-4559 # External services port range
     environment:
-      - DEBUG=0
-      - SERVICES=s3
-      - LOCALSTACK_HOST=localstack
-      - PERSISTENCE=1
-      - LOCALSTACK_HOSTNAME=localstack
-      - EDGE_PORT=4566
+      - RUSTFS_ACCESS_KEY=admin
+      - RUSTFS_SECRET_KEY=admin
+    ports:
+      - 9000:9000
+      - 9001:9001
     volumes:
-      - localstack_data:/var/lib/localstack
-      - "/var/run/docker.sock:/var/run/docker.sock"
+      - rustfs_data:/data
 volumes:
   postgres_data:
   valkey_data:
   mailpit_data:
-  imgproxy_data:
-  localstack_data:
+  rustfs_data:
 
 networks:
   app-network:
