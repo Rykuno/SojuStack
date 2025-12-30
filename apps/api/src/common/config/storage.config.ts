@@ -15,6 +15,10 @@ export class StorageConfig {
 
   @IsString()
   @IsNotEmpty()
+  bucketName = 'public';
+
+  @IsString()
+  @IsNotEmpty()
   @Value('STORAGE_ACCESS_KEY')
   accessKey!: string;
 

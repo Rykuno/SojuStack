@@ -14,5 +14,5 @@ export class AuthConfig {
 
   @IsString({ each: true })
   @IsNotEmpty()
-  trustedOrigins = ['http://localhost:3000'];
+  trustedOrigins = [process.env['APP_WEB_URL']!];
 }
