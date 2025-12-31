@@ -54,6 +54,7 @@ export class BetterAuthService {
         },
       },
       secret: this.authConfig.secret,
+      appName: this.appConfig.name,
       baseURL: this.appConfig.url,
       basePath: this.authConfig.basePath,
       trustedOrigins: this.authConfig.trustedOrigins,
