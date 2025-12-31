@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { S3Service } from './s3.service';
 import { createId } from '@paralleldrive/cuid2';
-import { DatabaseTransactionClient } from 'src/databases/database.provider';
+import { DrizzleTransactionClient } from 'src/databases/drizzle.provider';
 import { files } from 'src/databases/database.schema';
 import { takeFirstOrThrow } from 'src/databases/database.utils';
 import { eq } from 'drizzle-orm';
@@ -12,7 +12,7 @@ import { TransactionHost } from '@nestjs-cls/transactional';
 export class FilesService {
   constructor(
     private readonly s3Service: S3Service,
-    private readonly txHost: TransactionHost<DatabaseTransactionClient>,
+    private readonly txHost: TransactionHost<DrizzleTransactionClient>,
     private readonly storageConfig: StorageConfig,
   ) {}
 

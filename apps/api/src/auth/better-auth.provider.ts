@@ -5,7 +5,7 @@ import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import { Cache } from '@nestjs/cache-manager';
 import { seconds } from '@nestjs/throttler';
 import { TransactionHost } from '@nestjs-cls/transactional';
-import { DatabaseTransactionClient } from 'src/databases/database.provider';
+import { DrizzleTransactionClient } from 'src/databases/drizzle.provider';
 import * as schema from 'src/databases/database.schema';
 import { MailService } from 'src/notifications/mail.service';
 import { AuthConfig } from 'src/common/config/auth.config';
@@ -19,7 +19,7 @@ export const BetterAuthProvider = {
   provide: BETTER_AUTH,
   inject: [TransactionHost, MailService, Cache, AppConfig, AuthConfig],
   useFactory: (
-    txHost: TransactionHost<DatabaseTransactionClient>,
+    txHost: TransactionHost<DrizzleTransactionClient>,
     mailService: MailService,
     cache: Cache,
     appConfig: AppConfig,

@@ -5,15 +5,15 @@ import { TransactionalAdapterDrizzleOrm } from '@nestjs-cls/transactional-adapte
 import * as schema from './database.schema';
 import { relations } from './database.relations';
 
-export const DB_PROVIDER = 'DB_PROVIDER';
-export const InjectDb = () => Inject(DB_PROVIDER);
+export const DRIZZLE_PROVIDER = 'DRIZZLE_PROVIDER';
+export const InjectDrizzle = () => Inject(DRIZZLE_PROVIDER);
 
-export type DatabaseClient = ReturnType<typeof dbProvider.useFactory>;
-export type DatabaseTransactionClient =
-  TransactionalAdapterDrizzleOrm<DatabaseClient>;
+type DrizzleClient = ReturnType<typeof drizzleProvider.useFactory>;
+export type DrizzleTransactionClient =
+  TransactionalAdapterDrizzleOrm<DrizzleClient>;
 
-export const dbProvider = {
-  provide: DB_PROVIDER,
+export const drizzleProvider = {
+  provide: DRIZZLE_PROVIDER,
   inject: [DatabaseConfig],
   useFactory: (databaseConfig: DatabaseConfig) => {
     return drizzle(databaseConfig.url, { schema, relations });

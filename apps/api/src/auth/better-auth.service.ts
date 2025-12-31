@@ -8,7 +8,7 @@ import { seconds } from '@nestjs/throttler';
 import { AuthConfig } from 'src/common/config/auth.config';
 import { AppConfig } from 'src/common/config/app.config';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
-import { DatabaseTransactionClient } from 'src/databases/database.provider';
+import { DrizzleTransactionClient } from 'src/databases/drizzle.provider';
 import * as schema from 'src/databases/database.schema';
 import { TransactionHost } from '@nestjs-cls/transactional';
 
@@ -17,7 +17,7 @@ export class BetterAuthService {
   readonly client: Auth<BetterAuthOptions>;
 
   constructor(
-    private readonly txHost: TransactionHost<DatabaseTransactionClient>,
+    private readonly txHost: TransactionHost<DrizzleTransactionClient>,
     private readonly mailService: MailService,
     private readonly cache: Cache,
     private readonly appConfig: AppConfig,

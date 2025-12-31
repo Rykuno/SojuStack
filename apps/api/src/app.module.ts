@@ -19,7 +19,7 @@ import { ClsModule } from 'nestjs-cls';
 import { ConfigifyModule } from '@itgorillaz/configify';
 import { CacheConfig } from './common/config/cache.config';
 import { TransactionalAdapterDrizzleOrm } from '@nestjs-cls/transactional-adapter-drizzle-orm';
-import { DB_PROVIDER } from './databases/database.provider';
+import { DRIZZLE_PROVIDER } from './databases/drizzle.provider';
 
 @Module({
   imports: [
@@ -39,7 +39,7 @@ import { DB_PROVIDER } from './databases/database.provider';
         new ClsPluginTransactional({
           imports: [DatabasesModule],
           adapter: new TransactionalAdapterDrizzleOrm({
-            drizzleInstanceToken: DB_PROVIDER,
+            drizzleInstanceToken: DRIZZLE_PROVIDER,
           }),
         }),
       ],
