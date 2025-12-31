@@ -122,9 +122,5 @@
     "moduleNameMapper": {
       "^src/(.*)$": "<rootDir>/$1"
     }
-  },
-  "packageManager": "pnpm@10.13.1",
-  "engines": {
-    "node": ">=22.17.1"
   }
 }
