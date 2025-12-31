@@ -1,31 +1,12 @@
 import { Module } from '@nestjs/common';
-import { BetterAuthService } from './better-auth.service';
 import { AuthController } from './auth.controller';
-import { HttpAdapterHost } from '@nestjs/core';
-import { toNodeHandler } from 'better-auth/node';
 import { NotificationsModule } from 'src/notifications/notifications.module';
-import cors, { CorsOptions } from 'cors';
-import { AppConfig } from 'src/common/config/app.config';
-import { AuthConfig } from 'src/common/config/auth.config';
+import { BetterAuthProvider } from './better-auth.provider';
 
 @Module({
   imports: [NotificationsModule],
-  providers: [BetterAuthService],
+  providers: [BetterAuthProvider],
   controllers: [AuthController],
-  exports: [BetterAuthService],
+  exports: [BetterAuthProvider],
 })
-export class AuthModule {
-  constructor(
-    private readonly adapter: HttpAdapterHost,
-    private readonly betterAuthService: BetterAuthService,
-    private readonly appConfig: AppConfig,
-    private readonly authConfig: AuthConfig,
-  ) {
-    if (!this.adapter.httpAdapter?.use) return;
-    this.adapter.httpAdapter.use(cors(this.appConfig.cors as CorsOptions));
-    this.adapter.httpAdapter.all(
-      `${this.authConfig.basePath}/{*any}`,
-      toNodeHandler(this.betterAuthService.client),
-    );
-  }
-}
+export class AuthModule {}
