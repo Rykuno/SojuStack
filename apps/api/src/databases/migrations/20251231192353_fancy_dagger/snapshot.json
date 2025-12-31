@@ -1,7 +1,7 @@
 {
   "version": "8",
   "dialect": "postgres",
-  "id": "eec473b0-4851-4a89-a4c8-9571c5df5a4a",
+  "id": "5fd5ba53-a402-494f-8ac2-abb46387b710",
   "prevIds": [
     "00000000-0000-0000-0000-000000000000"
   ],
@@ -778,6 +778,17 @@
       "name": "sessions_token_key",
       "schema": "public",
       "table": "sessions",
+      "entityType": "uniques"
+    },
+    {
+      "nameExplicit": false,
+      "columns": [
+        "storage_key"
+      ],
+      "nullsNotDistinct": false,
+      "name": "files_storage_key_key",
+      "schema": "public",
+      "table": "files",
       "entityType": "uniques"
     }
   ],

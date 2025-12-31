@@ -48,7 +48,7 @@ CREATE TABLE "verifications" (
 --> statement-breakpoint
 CREATE TABLE "files" (
 	"id" text PRIMARY KEY,
-	"storage_key" text NOT NULL,
+	"storage_key" text NOT NULL UNIQUE,
 	"name" text NOT NULL,
 	"mime_type" text NOT NULL,
 	"size_bytes" bigint NOT NULL,
