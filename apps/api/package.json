@@ -93,7 +93,6 @@
     "jest": "^30.2.0",
     "openapi-typescript": "^7.10.1",
     "pnpm": "^10.27.0",
-    "prisma": "^7.2.0",
     "react-email": "5.1.1",
     "source-map-support": "^0.5.21",
     "supertest": "^7.1.4",

@@ -1,33 +1,60 @@
-import { HeadContent, Scripts, createRootRoute } from '@tanstack/react-router'
+import {
+  HeadContent,
+  Outlet,
+  Scripts,
+  createRootRouteWithContext,
+} from '@tanstack/react-router'
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
+import { ReactQueryDevtoolsPanel } from '@tanstack/react-query-devtools'
 import { TanStackDevtools } from '@tanstack/react-devtools'
-
+import { FormDevtoolsPanel } from '@tanstack/react-form-devtools'
 import appCss from '../styles.css?url'
+import { QueryClient } from '@tanstack/react-query'
+import { DefaultCatchBoundary } from '@/components/default-catch-boundry'
+import { NotFound } from '@/components/not-found'
 
-export const Route = createRootRoute({
-  head: () => ({
-    meta: [
-      {
-        charSet: 'utf-8',
-      },
-      {
-        name: 'viewport',
-        content: 'width=device-width, initial-scale=1',
-      },
-      {
-        title: 'TanStack Start Starter',
-      },
-    ],
-    links: [
-      {
-        rel: 'stylesheet',
-        href: appCss,
-      },
-    ],
-  }),
+export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
+  {
+    head: () => ({
+      meta: [
+        {
+          charSet: 'utf-8',
+        },
+        {
+          name: 'viewport',
+          content: 'width=device-width, initial-scale=1',
+        },
+        {
+          title: 'TanStack Start Starter',
+        },
+      ],
+      links: [
+        {
+          rel: 'stylesheet',
+          href: appCss,
+        },
+      ],
+    }),
+    errorComponent: (props) => {
+      return (
+        <RootDocument>
+          <DefaultCatchBoundary {...props} />
+        </RootDocument>
+      )
+    },
+    notFoundComponent: () => <NotFound />,
+    shellComponent: RootDocument,
+    component: RootComponent,
+  },
+)
 
-  shellComponent: RootDocument,
-})
+function RootComponent() {
+  return (
+    <RootDocument>
+      <Outlet />
+    </RootDocument>
+  )
+}
 
 function RootDocument({ children }: { children: React.ReactNode }) {
   return (
@@ -45,6 +72,14 @@ function RootDocument({ children }: { children: React.ReactNode }) {
             {
               name: 'Tanstack Router',
               render: <TanStackRouterDevtoolsPanel />,
+            },
+            {
+              name: 'React Query',
+              render: <ReactQueryDevtoolsPanel />,
+            },
+            {
+              name: 'TanStack Form',
+              render: <FormDevtoolsPanel />,
             },
           ]}
         />
