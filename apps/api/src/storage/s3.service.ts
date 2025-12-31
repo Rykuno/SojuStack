@@ -119,9 +119,13 @@ export class S3Service {
     // get object content
     if (response.Body) {
       const chunks: Buffer[] = [];
-      for await (const chunk of response.Body as any) {
+      // AWS SDK v3 Body is a Readable stream in Node.js
+      const body = response.Body as NodeJS.ReadableStream;
+      
+      for await (const chunk of body) {
         chunks.push(chunk as Buffer);
       }
+      
       return Buffer.concat(chunks).toString('utf-8');
     }
     throw new Error('Object not found');

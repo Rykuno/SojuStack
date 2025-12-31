@@ -14,6 +14,9 @@ export class TransformDataInterceptor implements NestInterceptor {
   intercept(_context: ExecutionContext, next: CallHandler) {
     return next.handle().pipe(
       map((data) => {
+        if (data === null || data === undefined) {
+          return data;
+        }
         return plainToInstance(this.classToUse, data);
       }),
     );

@@ -1,6 +1,6 @@
 import { createId } from '@paralleldrive/cuid2';
 import { bigint, pgTable, text } from 'drizzle-orm/pg-core';
-import { timestampz } from '../database.utils';
+import { timestampz } from '../drizzle.utils';
 
 export const files = pgTable('files', {
   id: text('id')

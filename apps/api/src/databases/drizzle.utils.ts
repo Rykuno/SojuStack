@@ -16,12 +16,12 @@ export const timestampz = (name: string) =>
 
 // get the first element of an array or return undefined
 export const takeFirst = <T>(values: T[]): T | undefined => {
-  return values.shift();
+  return values[0];
 };
 
 // get the first element of an array or throw a 404 error
 export const takeFirstOrThrow = <T>(values: T[]): T => {
-  const value = values.shift();
+  const value = values[0];
   if (value === undefined)
     throw new NotFoundException('The requested resource was not found.');
   return value;

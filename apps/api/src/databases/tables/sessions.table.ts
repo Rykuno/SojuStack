@@ -1,7 +1,7 @@
 import { createId } from '@paralleldrive/cuid2';
 import { index, pgTable, text } from 'drizzle-orm/pg-core';
 import { users } from './users.table';
-import { timestampz } from '../database.utils';
+import { timestampz } from '../drizzle.utils';
 
 export const sessions = pgTable(
   'sessions',

@@ -1,5 +1,5 @@
 import { defineRelations } from 'drizzle-orm/relations';
-import * as schema from './database.schema';
+import * as schema from './drizzle.schema';
 
 export const relations = defineRelations(schema, (r) => ({
   files: {},

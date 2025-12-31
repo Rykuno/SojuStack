@@ -2,8 +2,8 @@ import { Inject } from '@nestjs/common';
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { DatabaseConfig } from 'src/common/config/database.config';
 import { TransactionalAdapterDrizzleOrm } from '@nestjs-cls/transactional-adapter-drizzle-orm';
-import * as schema from './database.schema';
-import { relations } from './database.relations';
+import * as schema from './drizzle.schema';
+import { relations } from './drizzle.relations';
 
 export const DRIZZLE_PROVIDER = 'DRIZZLE_PROVIDER';
 export const InjectDrizzle = () => Inject(DRIZZLE_PROVIDER);

@@ -2,8 +2,8 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { S3Service } from './s3.service';
 import { createId } from '@paralleldrive/cuid2';
 import { DrizzleTransactionClient } from 'src/databases/drizzle.provider';
-import { files } from 'src/databases/database.schema';
-import { takeFirstOrThrow } from 'src/databases/database.utils';
+import { files } from 'src/databases/drizzle.schema';
+import { takeFirstOrThrow } from 'src/databases/drizzle.utils';
 import { eq } from 'drizzle-orm';
 import { StorageConfig } from 'src/common/config/storage.config';
 import { TransactionHost } from '@nestjs-cls/transactional';
@@ -16,49 +16,51 @@ export class FilesService {
     private readonly storageConfig: StorageConfig,
   ) {}
 
-  create(file: Express.Multer.File) {
-    return this.txHost.tx.transaction(async (tx) => {
-      const fileRecord = await tx
-        .insert(files)
-        .values({
-          name: file.originalname,
-          mimeType: file.mimetype,
-          sizeBytes: file.size,
-          storageKey: createId(),
-        })
-        .returning()
-        .then(takeFirstOrThrow);
+  async create(file: Express.Multer.File) {
+    const fileRecord = await this.txHost.tx
+      .insert(files)
+      .values({
+        name: file.originalname,
+        mimeType: file.mimetype,
+        sizeBytes: file.size,
+        storageKey: createId(),
+      })
+      .returning()
+      .then(takeFirstOrThrow);
 
-      await this.s3Service.putObject({
-        bucketName: this.storageConfig.bucketName,
-        key: fileRecord.storageKey,
-        file: file.buffer,
-      });
-
-      return fileRecord;
+    await this.s3Service.putObject({
+      bucketName: this.storageConfig.bucketName,
+      key: fileRecord.storageKey,
+      file: file.buffer,
     });
+
+    return fileRecord;
   }
 
   async update(key: string, file: Express.Multer.File) {
-    return this.txHost.tx.transaction(async (tx) => {
-      const fileRecord = await tx.query.files.findFirst({
-        where: {
-          storageKey: key,
-        },
-      });
-      if (!fileRecord) throw new NotFoundException('File not found');
-      await this.delete(key);
-      return this.create(file);
+    const fileRecord = await this.txHost.tx.query.files.findFirst({
+      where: {
+        storageKey: key,
+      },
     });
+    if (!fileRecord) throw new NotFoundException('File not found');
+
+    // Delete old file record and S3 object
+    await this.txHost.tx.delete(files).where(eq(files.storageKey, key));
+    await this.s3Service.deleteObject({
+      bucketName: this.storageConfig.bucketName,
+      key,
+    });
+
+    // Create new file record and upload to S3
+    return this.create(file);
   }
 
-  delete(key: string) {
-    return this.txHost.tx.transaction(async (tx) => {
-      await tx.delete(files).where(eq(files.storageKey, key));
-      await this.s3Service.deleteObject({
-        bucketName: this.storageConfig.bucketName,
-        key,
-      });
+  async delete(key: string) {
+    await this.txHost.tx.delete(files).where(eq(files.storageKey, key));
+    await this.s3Service.deleteObject({
+      bucketName: this.storageConfig.bucketName,
+      key,
     });
   }
 }

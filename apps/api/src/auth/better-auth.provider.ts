@@ -6,7 +6,7 @@ import { Cache } from '@nestjs/cache-manager';
 import { seconds } from '@nestjs/throttler';
 import { TransactionHost } from '@nestjs-cls/transactional';
 import { DrizzleTransactionClient } from 'src/databases/drizzle.provider';
-import * as schema from 'src/databases/database.schema';
+import * as schema from 'src/databases/drizzle.schema';
 import { MailService } from 'src/notifications/mail.service';
 import { AuthConfig } from 'src/common/config/auth.config';
 import { AppConfig } from 'src/common/config/app.config';
@@ -45,7 +45,7 @@ export const BetterAuthProvider = {
       secondaryStorage: {
         get: async (key) => {
           const value = await cache.get<string>(key);
-          return value ? value : null;
+          return value ?? null;
         },
         set: async (key, value, ttl) => {
           if (ttl) await cache.set(key, value, seconds(ttl));

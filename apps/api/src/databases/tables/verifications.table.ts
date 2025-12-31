@@ -1,6 +1,6 @@
 import { createId } from '@paralleldrive/cuid2';
 import { index, pgTable, text } from 'drizzle-orm/pg-core';
-import { timestampz } from '../database.utils';
+import { timestampz } from '../drizzle.utils';
 
 export const verifications = pgTable(
   'verifications',

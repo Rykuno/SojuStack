@@ -3,7 +3,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { Transactional, TransactionHost } from '@nestjs-cls/transactional';
 import { DrizzleTransactionClient } from 'src/databases/drizzle.provider';
 import { eq } from 'drizzle-orm';
-import { users } from 'src/databases/database.schema';
+import { users } from 'src/databases/drizzle.schema';
 
 @Injectable()
 export class UsersService {
@@ -12,13 +12,14 @@ export class UsersService {
   ) {}
 
   @Transactional()
-  async update(id: string, updateUserDto: UpdateUserDto) {
-    this.txHost.tx
+  update(id: string, updateUserDto: UpdateUserDto) {
+    return this.txHost.tx
       .update(users)
       .set({
         name: updateUserDto.name,
       })
-      .where(eq(users.id, id));
+      .where(eq(users.id, id))
+      .returning();
   }
 
   findMany() {
