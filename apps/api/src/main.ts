@@ -2,15 +2,16 @@ import 'dotenv/config';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
-import { ValidationPipe } from '@nestjs/common';
+import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { generateOpenApiSpecs } from './utils/openapi';
 import chalk from 'chalk';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { AppConfig } from './common/config/app.config';
+import { apiReference } from '@scalar/nestjs-api-reference';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
-  const { cors, port } = app.get(AppConfig);
+  const { cors, port, isProduction } = app.get(AppConfig);
 
   /* -------------------------------------------------------------------------- */
   /*                                 Middlewares                                */
@@ -26,20 +27,10 @@ async function bootstrap() {
   /* -------------------------------------------------------------------------- */
   /*                                   OpenAPI                                  */
   /* -------------------------------------------------------------------------- */
-  const config = new DocumentBuilder()
-    .setTitle('SojuStack API')
-    .setDescription('The SojuStack API')
-    .setVersion('1.0')
-    .addTag('SojuStack')
-    .build();
-
-  const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('/openapi', app, document, {
-    jsonDocumentUrl: 'openapi/json',
-    yamlDocumentUrl: 'openapi/yaml',
-  });
-
-  void generateOpenApiSpecs([{ document }]);
+  if (!isProduction) {
+    const document = setupSwagger(app);
+    void generateOpenApiSpecs([{ document }]);
+  }
 
   /* -------------------------------------------------------------------------- */
   /*                                   Server                                   */
@@ -50,3 +41,28 @@ async function bootstrap() {
 }
 
 void bootstrap();
+
+function setupSwagger(app: INestApplication) {
+  const { name } = app.get(AppConfig);
+
+  const config = new DocumentBuilder()
+    .setTitle(`${name} API`)
+    .setDescription(`The ${name} API`)
+    .setVersion('1.0')
+    .addTag(name)
+    .build();
+
+  const document = SwaggerModule.createDocument(app, config);
+
+  app.use(
+    '/openapi',
+    apiReference({
+      sources: [
+        { content: document, title: `${name} API` },
+        { url: '/auth/client/open-api/generate-schema', title: 'BetterAuth' },
+      ],
+    }),
+  );
+
+  return document;
+}

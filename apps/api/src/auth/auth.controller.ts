@@ -1,7 +1,9 @@
 import {
   Controller,
   Get,
+  Req,
   Request,
+  Res,
   SerializeOptions,
   UseInterceptors,
 } from '@nestjs/common';
@@ -10,7 +12,7 @@ import { Auth, AuthType } from './decorators/auth.decorator';
 import { ActiveUserDto } from './dtos/active-user.dto';
 import { BetterAuthService } from './better-auth.service';
 import { Request as ExpressRequest } from 'express';
-import { fromNodeHeaders } from 'better-auth/node';
+import { fromNodeHeaders, toNodeHandler } from 'better-auth/node';
 import { ActiveSession } from './decorators/active-session.decorator';
 import { ActiveSessionDto } from './dtos/active-session.dto';
 import { TransformDataInterceptor } from 'src/common/interceptors/transform-data.interceptor';
@@ -33,12 +35,6 @@ export class AuthController {
   session(@ActiveSession() session: ActiveSessionDto) {
     console.log(session);
     return session;
-  }
-
-  @Get('/test')
-  @Auth(AuthType.Public)
-  test() {
-    return { test: 'test' };
   }
 
   @Get('/sessions')

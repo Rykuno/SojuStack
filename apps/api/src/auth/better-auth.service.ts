@@ -128,7 +128,7 @@ export class BetterAuthService {
           },
         }),
         openAPI({
-          path: '/reference',
+          disableDefaultReference: true,
         }),
       ],
     });

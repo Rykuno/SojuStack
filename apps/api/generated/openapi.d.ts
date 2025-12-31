@@ -47,22 +47,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/auth/test": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["AuthController_test"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/auth/sessions": {
         parameters: {
             query?: never;
@@ -189,23 +173,6 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["ActiveSessionDto"];
                 };
-            };
-        };
-    };
-    AuthController_test: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
             };
         };
     };
