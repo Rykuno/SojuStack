@@ -1,5 +1,6 @@
 services:
   postgres:
+    container_name: sojustack-postgres
     image: postgres:18.0
     environment:
       POSTGRES_USER: postgres
@@ -12,6 +13,7 @@ services:
     networks:
       - app-network
   valkey:
+    container_name: sojustack-valkey
     image: valkey/valkey:9.0
     ports:
       - "6379:6379"
@@ -20,6 +22,7 @@ services:
     networks:
       - app-network
   mailpit:
+    container_name: sojustack-mailpit
     image: axllent/mailpit
     volumes:
       - mailpit_data:/data
@@ -34,6 +37,7 @@ services:
     networks:
       - app-network
   rustfs:
+    container_name: sojustack-rustfs
     image: rustfs/rustfs:latest
     networks:
       - app-network
