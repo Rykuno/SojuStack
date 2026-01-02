@@ -107,7 +107,7 @@ export function OTPForm({ email, ...props }: OTPFormProps) {
               {verifyOtpMutation.isPending ? 'Verifying...' : 'Verify'}
             </Button>
             <FieldDescription className="text-center">
-              Didn&apos;t receive the code? <a href="#">Resend</a>
+              Didn&apos;t receive the code? Resend
             </FieldDescription>
           </FieldGroup>
         </FieldGroup>
