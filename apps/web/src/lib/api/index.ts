@@ -1,3 +1,5 @@
-// export const api = {
-//   auth:
-// }
+import { AuthApi } from './auth'
+
+export const api = {
+  auth: new AuthApi(),
+}

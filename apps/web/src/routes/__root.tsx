@@ -1,3 +1,4 @@
+import { Suspense } from 'react'
 import {
   HeadContent,
   Outlet,
@@ -12,6 +13,9 @@ import appCss from '../styles.css?url'
 import { QueryClient } from '@tanstack/react-query'
 import { DefaultCatchBoundary } from '@/components/default-catch-boundry'
 import { NotFound } from '@/components/not-found'
+
+import { AuthProvider } from '@/contexts/auth'
+import { Spinner } from '@/components/ui/spinner'
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   {
@@ -44,17 +48,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     },
     notFoundComponent: () => <NotFound />,
     shellComponent: RootDocument,
-    component: RootComponent,
   },
 )
-
-function RootComponent() {
-  return (
-    <RootDocument>
-      <Outlet />
-    </RootDocument>
-  )
-}
 
 function RootDocument({ children }: { children: React.ReactNode }) {
   return (
@@ -63,7 +58,15 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <HeadContent />
       </head>
       <body>
-        {children}
+        <Suspense
+          fallback={
+            <div className="flex min-h-screen items-center justify-center">
+              <Spinner className="h-10 w-10" />
+            </div>
+          }
+        >
+          <AuthProvider>{children}</AuthProvider>
+        </Suspense>
         <TanStackDevtools
           config={{
             position: 'bottom-right',

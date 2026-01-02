@@ -26,7 +26,6 @@ export const BetterAuthProvider = {
     authConfig: AuthConfig,
   ) => {
     return betterAuth({
-      experimental: { joins: true },
       database: drizzleAdapter(txHost.tx, {
         provider: 'pg',
         schema: {
@@ -38,6 +37,7 @@ export const BetterAuthProvider = {
         },
       }),
       advanced: {
+        cookiePrefix: appConfig.name,
         database: {
           generateId: false,
         },

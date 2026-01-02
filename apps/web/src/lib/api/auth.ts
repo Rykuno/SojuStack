@@ -1,11 +1,31 @@
+import { queryOptions } from '@tanstack/react-query'
 import { authClient } from '../auth-client'
 
-interface ApiHandler {
-  queryKeys: string[]
-}
+export class AuthApi {
+  private queryKeys = ['auth'] as const
 
-export class AuthApi implements ApiHandler {
-  readonly queryKeys = ['auth']
+  sessionQueryOptions() {
+    return queryOptions({
+      queryKey: [...this.queryKeys, 'session'],
+      queryFn: async () => {
+        const res = await authClient.getSession()
+        return res.data
+      },
+    })
+  }
 
-  async getUserQueryOptions() {}
+  signOut() {
+    return authClient.signOut()
+  }
+
+  sendSignInOtp(email: string) {
+    return authClient.emailOtp.sendVerificationOtp({ email, type: 'sign-in' })
+  }
+
+  signInWithOtp(email: string, otp: string) {
+    return authClient.signIn.emailOtp({
+      email,
+      otp,
+    })
+  }
 }
