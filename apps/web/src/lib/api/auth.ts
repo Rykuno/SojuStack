@@ -1,31 +1,31 @@
-import { queryOptions } from "@tanstack/react-query";
-import { $authClient } from "../auth-client";
+import { queryOptions } from '@tanstack/react-query'
+import { authClient } from '../auth-client'
 
 export class AuthApi {
-  private readonly queryKeys = ["auth"];
+  private queryKeys = ['auth'] as const
 
-  getSession() {
+  sessionQueryOptions() {
     return queryOptions({
-      queryKey: [...this.queryKeys, "session"],
-      queryFn: () => $authClient.getSession()
-    });
+      queryKey: [...this.queryKeys, 'session'],
+      queryFn: async () => {
+        const res = await authClient.getSession()
+        return res.data
+      },
+    })
   }
 
   signOut() {
-    return $authClient.signOut();
+    return authClient.signOut()
   }
 
   sendSignInOtp(email: string) {
-    return $authClient.emailOtp.sendVerificationOtp({
-      email: email,
-      type: "sign-in"
-    });
+    return authClient.emailOtp.sendVerificationOtp({ email, type: 'sign-in' })
   }
 
-  verifySignInOtp(email: string, code: string) {
-    return $authClient.signIn.emailOtp({
-      email: email,
-      otp: code
-    });
+  signInWithOtp(email: string, otp: string) {
+    return authClient.signIn.emailOtp({
+      email,
+      otp,
+    })
   }
 }

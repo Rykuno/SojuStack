@@ -1,28 +1,19 @@
-import { LoginForm } from "@/components/login-form";
-import { OTPForm } from "@/components/otp-form";
+import { Container } from '@/components/container'
+import { Login } from '@/components/login'
+import { isNotAuthenticated } from '@/middleware/auth'
+import { createFileRoute } from '@tanstack/react-router'
 
-import { createFileRoute, redirect } from "@tanstack/react-router";
-import { useState } from "react";
-
-export const Route = createFileRoute("/login")({
-  loader: async ({ context }) => {
-    if (context.user) throw redirect({ to: "/" });
+export const Route = createFileRoute('/login')({
+  component: RouteComponent,
+  server: {
+    middleware: [isNotAuthenticated],
   },
-  component: RouteComponent
-});
+})
 
 function RouteComponent() {
-  const [validateEmailOtp, setValidateEmailOtp] = useState<string | undefined>(
-    undefined
-  );
-
   return (
-    <div className="flex items-center justify-center h-screen">
-      {validateEmailOtp ? (
-        <OTPForm email={validateEmailOtp} />
-      ) : (
-        <LoginForm setValidateEmailOtp={setValidateEmailOtp} />
-      )}
-    </div>
-  );
+    <Container className="max-w-md mt-[10vh]">
+      <Login />
+    </Container>
+  )
 }

@@ -1,31 +1,28 @@
-import { createRouter } from "@tanstack/react-router";
-import { setupRouterSsrQueryIntegration } from "@tanstack/react-router-ssr-query";
-import * as TanstackQuery from "./integrations/tanstack-query/root-provider";
+import { QueryClient } from '@tanstack/react-query'
+import { createRouter } from '@tanstack/react-router'
+import { setupRouterSsrQueryIntegration } from '@tanstack/react-router-ssr-query'
+import { NotFound } from './components/not-found'
 
 // Import the generated route tree
-import { routeTree } from "./routeTree.gen";
+import { routeTree } from './routeTree.gen'
+import { DefaultCatchBoundary } from './components/default-catch-boundry'
 
 // Create a new router instance
 export const getRouter = () => {
-  const rqContext = TanstackQuery.getContext();
+  const queryClient = new QueryClient()
 
   const router = createRouter({
     routeTree,
-    context: { ...rqContext },
-    defaultPreload: "intent",
-    Wrap: (props: { children: React.ReactNode }) => {
-      return (
-        <TanstackQuery.Provider {...rqContext}>
-          {props.children}
-        </TanstackQuery.Provider>
-      );
-    }
-  });
-
+    context: { queryClient },
+    scrollRestoration: true,
+    defaultPreloadStaleTime: 0,
+    defaultErrorComponent: DefaultCatchBoundary,
+    defaultNotFoundComponent: () => <NotFound />,
+  })
   setupRouterSsrQueryIntegration({
     router,
-    queryClient: rqContext.queryClient
-  });
+    queryClient,
+  })
 
-  return router;
-};
+  return router
+}

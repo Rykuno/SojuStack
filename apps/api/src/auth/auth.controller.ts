@@ -1,23 +1,26 @@
 import {
   Controller,
   Get,
-  Request,
+  Req,
+  Res,
   SerializeOptions,
   UseInterceptors,
+  All,
 } from '@nestjs/common';
 import { ActiveUser } from './decorators/active-user.decorator';
 import { Auth, AuthType } from './decorators/auth.decorator';
 import { ActiveUserDto } from './dtos/active-user.dto';
-import { BetterAuthService } from './better-auth.service';
-import { Request as ExpressRequest } from 'express';
-import { fromNodeHeaders } from 'better-auth/node';
+import type { Request, Response } from 'express';
+import { toNodeHandler } from 'better-auth/node';
 import { ActiveSession } from './decorators/active-session.decorator';
 import { ActiveSessionDto } from './dtos/active-session.dto';
 import { TransformDataInterceptor } from 'src/common/interceptors/transform-data.interceptor';
+import { Auth as BetterAuth } from 'better-auth';
+import { InjectBetterAuth } from './better-auth.provider';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly betterAuthService: BetterAuthService) {}
+  constructor(@InjectBetterAuth() private readonly betterAuth: BetterAuth) {}
 
   @Get('/user')
   @UseInterceptors(new TransformDataInterceptor(ActiveUserDto))
@@ -31,22 +34,21 @@ export class AuthController {
   @Auth(AuthType.Public)
   @SerializeOptions({ type: ActiveSessionDto })
   session(@ActiveSession() session: ActiveSessionDto) {
-    console.log(session);
     return session;
   }
 
-  @Get('/test')
-  @Auth(AuthType.Public)
-  test() {
-    return { test: 'test' };
-  }
+  // @Get('/sessions')
+  // @UseInterceptors(new TransformDataInterceptor(ActiveSessionDto))
+  // @Auth(AuthType.Required)
+  // sessions(@Request() req: ExpressRequest) {
+  //   return this.betterAuth.api.listSessions({
+  //     headers: fromNodeHeaders(req.headers),
+  //   });
+  // }
 
-  @Get('/sessions')
-  @UseInterceptors(new TransformDataInterceptor(ActiveSessionDto))
-  @Auth(AuthType.Required)
-  sessions(@Request() req: ExpressRequest) {
-    return this.betterAuthService.client.api.listSessions({
-      headers: fromNodeHeaders(req.headers),
-    });
+  @All('/client/*path')
+  @Auth(AuthType.Public)
+  async handler(@Req() req: Request, @Res() res: Response) {
+    return toNodeHandler(this.betterAuth)(req, res);
   }
 }

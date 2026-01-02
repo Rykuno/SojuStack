@@ -1,9 +1,9 @@
 import { Global, Module } from '@nestjs/common';
-import { PrismaService } from './prisma.service';
+import { drizzleProvider } from './drizzle.provider';
 
 @Global()
 @Module({
-  providers: [PrismaService],
-  exports: [PrismaService],
+  providers: [drizzleProvider],
+  exports: [drizzleProvider],
 })
 export class DatabasesModule {}

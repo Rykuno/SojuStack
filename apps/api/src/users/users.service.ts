@@ -1,27 +1,28 @@
 import { Injectable } from '@nestjs/common';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { TransactionalAdapterPrisma } from '@nestjs-cls/transactional-adapter-prisma';
-import { TransactionHost } from '@nestjs-cls/transactional';
-import { PrismaClient } from 'src/generated/prisma/client';
+import { Transactional, TransactionHost } from '@nestjs-cls/transactional';
+import { DrizzleTransactionClient } from 'src/databases/drizzle.provider';
+import { eq } from 'drizzle-orm';
+import { users } from 'src/databases/drizzle.schema';
 
 @Injectable()
 export class UsersService {
   constructor(
-    private readonly txHost: TransactionHost<
-      TransactionalAdapterPrisma<PrismaClient>
-    >,
+    private readonly txHost: TransactionHost<DrizzleTransactionClient>,
   ) {}
 
-  async update(id: string, updateUserDto: UpdateUserDto) {
-    return this.txHost.tx.user.update({
-      where: { id },
-      data: {
+  @Transactional()
+  update(id: string, updateUserDto: UpdateUserDto) {
+    return this.txHost.tx
+      .update(users)
+      .set({
         name: updateUserDto.name,
-      },
-    });
+      })
+      .where(eq(users.id, id))
+      .returning();
   }
 
   findMany() {
-    return this.txHost.tx.user.findMany();
+    return this.txHost.tx.query.users.findMany();
   }
 }

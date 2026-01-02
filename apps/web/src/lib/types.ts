@@ -1,0 +1,3 @@
+interface ApiHandler {
+  queryKeys: string[]
+}

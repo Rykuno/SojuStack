@@ -5,11 +5,16 @@ import {
   IsNotEmpty,
   IsNumber,
   IsObject,
+  IsString,
   IsUrl,
 } from 'class-validator';
 
 @Configuration()
 export class AppConfig {
+  @IsString()
+  @Value('APP_NAME')
+  name!: string;
+
   @IsNumber()
   @IsNotEmpty()
   @Value('APP_PORT', { parse: (value) => +value })

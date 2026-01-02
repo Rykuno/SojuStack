@@ -1,28 +1,28 @@
-import { createIsomorphicFn } from "@tanstack/react-start";
-import { getRequest } from "@tanstack/react-start/server";
-import { emailOTPClient } from "better-auth/client/plugins";
-import { createAuthClient } from "better-auth/react";
+import { createIsomorphicFn } from '@tanstack/react-start'
+import { getRequest } from '@tanstack/react-start/server'
+import { emailOTPClient, organizationClient } from 'better-auth/client/plugins'
+import { createAuthClient } from 'better-auth/react'
 
-export const $authClient = createIsomorphicFn()
+export const authClient = createIsomorphicFn()
   .server(() => {
-    const { headers } = getRequest();
+    const { headers } = getRequest()
     return createAuthClient({
       baseURL: import.meta.env.VITE_API_URL,
-      basePath: "/auth/client",
-      plugins: [emailOTPClient()],
+      basePath: '/auth/client',
+      plugins: [emailOTPClient(), organizationClient()],
       fetchOptions: {
         headers: Object.fromEntries(headers),
-        credentials: "include"
-      }
-    });
+        credentials: 'include',
+      },
+    })
   })
   .client(() => {
     return createAuthClient({
       baseURL: import.meta.env.VITE_API_URL,
-      basePath: "/auth/client",
-      plugins: [emailOTPClient()],
+      basePath: '/auth/client',
+      plugins: [emailOTPClient(), organizationClient()],
       fetchOptions: {
-        credentials: "include"
-      }
-    });
-  })();
+        credentials: 'include',
+      },
+    })
+  })()

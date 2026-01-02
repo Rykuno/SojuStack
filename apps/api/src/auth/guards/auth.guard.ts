@@ -3,11 +3,12 @@ import {
   ExecutionContext,
   Injectable,
   UnauthorizedException,
+  Inject,
 } from '@nestjs/common';
-import { BetterAuthService } from '../better-auth.service';
 import { AUTH_TYPE_KEY, AuthType } from '../decorators/auth.decorator';
 import { Reflector } from '@nestjs/core';
 import { Session, User } from 'better-auth/*';
+import { BetterAuth, InjectBetterAuth } from '../better-auth.provider';
 
 export interface AuthGuardRequest extends Request {
   session?: Session;
@@ -19,7 +20,7 @@ export class AuthGuard implements CanActivate {
   private static readonly defaultAuthType = AuthType.Required;
 
   constructor(
-    private readonly betterAuthService: BetterAuthService,
+    @InjectBetterAuth() private readonly betterAuth: BetterAuth,
     private readonly reflector: Reflector,
   ) {}
 
@@ -34,7 +35,7 @@ export class AuthGuard implements CanActivate {
     const request: AuthGuardRequest = context.switchToHttp().getRequest();
 
     // get session from better-auth
-    const session = await this.betterAuthService.client.api.getSession({
+    const session = await this.betterAuth.api.getSession({
       headers: request.headers,
     });
 

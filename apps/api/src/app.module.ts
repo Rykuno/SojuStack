@@ -18,8 +18,8 @@ import { ClsPluginTransactional } from '@nestjs-cls/transactional';
 import { ClsModule } from 'nestjs-cls';
 import { ConfigifyModule } from '@itgorillaz/configify';
 import { CacheConfig } from './common/config/cache.config';
-import { TransactionalAdapterPrisma } from '@nestjs-cls/transactional-adapter-prisma';
-import { PrismaService } from './databases/prisma.service';
+import { TransactionalAdapterDrizzleOrm } from '@nestjs-cls/transactional-adapter-drizzle-orm';
+import { DRIZZLE_PROVIDER } from './databases/drizzle.provider';
 
 @Module({
   imports: [
@@ -35,13 +35,11 @@ import { PrismaService } from './databases/prisma.service';
       },
     }),
     ClsModule.forRoot({
-      global: true,
       plugins: [
         new ClsPluginTransactional({
           imports: [DatabasesModule],
-          adapter: new TransactionalAdapterPrisma({
-            prismaInjectionToken: PrismaService,
-            sqlFlavor: 'postgresql',
+          adapter: new TransactionalAdapterDrizzleOrm({
+            drizzleInstanceToken: DRIZZLE_PROVIDER,
           }),
         }),
       ],
