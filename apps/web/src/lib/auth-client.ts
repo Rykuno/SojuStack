@@ -5,7 +5,7 @@ import { createAuthClient } from 'better-auth/react';
 
 function initAuthClient(fetchOptions: RequestInit) {
   return createAuthClient({
-    baseURL: import.meta.env.VITE_API_URL,
+    baseURL: String(import.meta.env.VITE_API_URL),
     basePath: '/auth/client',
     plugins: [emailOTPClient(), organizationClient()],
     fetchOptions,

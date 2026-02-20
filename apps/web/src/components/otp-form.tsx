@@ -23,8 +23,8 @@ export function OTPForm({ email, ...props }: OTPFormProps) {
     mutationFn: async (otp: string) => api.auth.signInWithOtp(email, otp),
     onSuccess: async () => {
       await queryClient.invalidateQueries();
-      router.invalidate();
-      navigate({ to: '/' });
+      await router.invalidate();
+      await navigate({ to: '/' });
     },
   });
 

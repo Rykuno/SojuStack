@@ -15,11 +15,11 @@ function HomePage() {
   const queryClient = useQueryClient();
   const router = useRouter();
   const logoutMutation = useMutation({
-    mutationFn: api.auth.signOut,
+    mutationFn: () => api.auth.signOut(),
     onSuccess: async () => {
       queryClient.clear();
-      router.invalidate();
-      router.navigate({ to: '/login' });
+      await router.invalidate();
+      await router.navigate({ to: '/login' });
     },
   });
 

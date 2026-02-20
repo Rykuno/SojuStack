@@ -18,8 +18,11 @@ function toHeaderObject(headers?: HeadersInit) {
 async function getErrorMessage(response: Response) {
   let message = `${response.status} ${response.statusText}`;
   try {
-    const body = await response.clone().json();
-    message = body?.message ?? body?.error ?? message;
+    const body = (await response.clone().json()) as {
+      message?: string;
+      error?: string;
+    };
+    message = body.message ?? body.error ?? message;
   } catch {
     // non-JSON body, keep default message
   }
@@ -44,7 +47,7 @@ const clientFetch: FetchImpl = (input, init) =>
 
 function initApiClient(opts?: { headers?: HeadersInit; fetch?: FetchImpl }) {
   const client = createClient<paths>({
-    baseUrl: import.meta.env.VITE_API_URL,
+    baseUrl: String(import.meta.env.VITE_API_URL),
     credentials: 'include',
     headers: opts?.headers,
     fetch: opts?.fetch,

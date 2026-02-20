@@ -1,4 +1,10 @@
-import { Controller, UseInterceptors, UploadedFile, Body, Patch } from '@nestjs/common';
+import {
+  Controller,
+  UseInterceptors,
+  UploadedFile,
+  Body,
+  Patch,
+} from '@nestjs/common';
 import { UsersService } from './users.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiConsumes } from '@nestjs/swagger';
@@ -24,7 +30,7 @@ export class UsersController {
     @ActiveUser() activeUser: ActiveUserDto,
   ) {
     return this.usersService.update(activeUser.id, {
-      ...updateUserDto,
+      name: updateUserDto.name,
       image,
     });
   }
