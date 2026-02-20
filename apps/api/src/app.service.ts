@@ -1,8 +1,4 @@
-import {
-  Injectable,
-  OnApplicationBootstrap,
-  OnApplicationShutdown,
-} from '@nestjs/common';
+import { Injectable, OnApplicationBootstrap, OnApplicationShutdown } from '@nestjs/common';
 import { S3Service } from './storage/s3.service';
 import { StorageConfig } from './common/config/storage.config';
 
@@ -18,9 +14,7 @@ export class AppService implements OnApplicationBootstrap {
   }
 
   private async setupStorage() {
-    const bucketExists = await this.s3Service.bucketExists(
-      this.storageConfig.bucketName,
-    );
+    const bucketExists = await this.s3Service.bucketExists(this.storageConfig.bucketName);
 
     if (bucketExists) return;
     await this.s3Service.createBucket(this.storageConfig.bucketName);

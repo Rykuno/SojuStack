@@ -12,10 +12,10 @@ Plan partitioning upfront for tables expected to grow large. Retrofitting later 
 
 Partitioning benefits maintenance (vacuum, index builds) and data retention more than pure query speed.
 
-| Table Type | Size Threshold | Row Threshold |
-| --- | --- | --- |
-| General tables | >100 GB (or >RAM) | >20M rows |
-| Time-series / logs | >50 GB | >10M rows |
+| Table Type         | Size Threshold    | Row Threshold |
+| ------------------ | ----------------- | ------------- |
+| General tables     | >100 GB (or >RAM) | >20M rows     |
+| Time-series / logs | >50 GB            | >10M rows     |
 
 Use the lower thresholds for append-heavy, time-ordered data with retention needs (logs, events, audit trails, metrics).
 

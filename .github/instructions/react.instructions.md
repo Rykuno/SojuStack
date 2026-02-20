@@ -1,5 +1,5 @@
 ---
-applyTo: "**/*.ts,**/*.tsx,**/*.js,**/*.jsx"
+applyTo: '**/*.ts,**/*.tsx,**/*.js,**/*.jsx'
 ---
 
 # React Development Standards
@@ -156,10 +156,10 @@ export const UserList = ({ teamId }: UserListProps) => {
   // Handle all states: loading, error, empty, success
   if (error) throw error;
   if (isLoading) return <Loading />;
-  if (!data?.length) return <ZeroState message="No team members" />;
+  if (!data?.length) return <ZeroState message='No team members' />;
 
   return (
-    <ul className="space-y-2">
+    <ul className='space-y-2'>
       {data.map((user) => (
         <UserListItem key={user.id} user={user} />
       ))}

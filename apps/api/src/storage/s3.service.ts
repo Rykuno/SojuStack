@@ -14,9 +14,7 @@ import {
 import { Injectable } from '@nestjs/common';
 import { StorageConfig } from 'src/common/config/storage.config';
 
-type PublicBucketPolicy = Awaited<
-  ReturnType<S3Service['getPublicBucketPolicy']>
->;
+type PublicBucketPolicy = Awaited<ReturnType<S3Service['getPublicBucketPolicy']>>;
 
 export type BucketPolicy = PublicBucketPolicy | undefined;
 
@@ -81,15 +79,7 @@ export class S3Service {
     );
   }
 
-  putObject({
-    bucketName,
-    key,
-    file,
-  }: {
-    bucketName: string;
-    key: string;
-    file: Buffer;
-  }) {
+  putObject({ bucketName, key, file }: { bucketName: string; key: string; file: Buffer }) {
     return this.client.send(
       new PutObjectCommand({
         Bucket: bucketName,
@@ -121,11 +111,11 @@ export class S3Service {
       const chunks: Buffer[] = [];
       // AWS SDK v3 Body is a Readable stream in Node.js
       const body = response.Body as NodeJS.ReadableStream;
-      
+
       for await (const chunk of body) {
         chunks.push(chunk as Buffer);
       }
-      
+
       return Buffer.concat(chunks).toString('utf-8');
     }
     throw new Error('Object not found');

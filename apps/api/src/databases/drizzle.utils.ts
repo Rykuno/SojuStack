@@ -22,7 +22,6 @@ export const takeFirst = <T>(values: T[]): T | undefined => {
 // get the first element of an array or throw a 404 error
 export const takeFirstOrThrow = <T>(values: T[]): T => {
   const value = values[0];
-  if (value === undefined)
-    throw new NotFoundException('The requested resource was not found.');
+  if (value === undefined) throw new NotFoundException('The requested resource was not found.');
   return value;
 };

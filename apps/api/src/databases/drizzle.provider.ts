@@ -9,8 +9,7 @@ export const DRIZZLE_PROVIDER = 'DRIZZLE_PROVIDER';
 export const InjectDrizzle = () => Inject(DRIZZLE_PROVIDER);
 
 type DrizzleClient = ReturnType<typeof drizzleProvider.useFactory>;
-export type DrizzleTransactionClient =
-  TransactionalAdapterDrizzleOrm<DrizzleClient>;
+export type DrizzleTransactionClient = TransactionalAdapterDrizzleOrm<DrizzleClient>;
 
 export const drizzleProvider = {
   provide: DRIZZLE_PROVIDER,

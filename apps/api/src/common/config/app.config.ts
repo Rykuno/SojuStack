@@ -1,13 +1,6 @@
 import { Configuration, Value } from '@itgorillaz/configify';
 import { CorsOptions } from '@nestjs/common/interfaces/external/cors-options.interface';
-import {
-  IsBoolean,
-  IsNotEmpty,
-  IsNumber,
-  IsObject,
-  IsString,
-  IsUrl,
-} from 'class-validator';
+import { IsBoolean, IsNotEmpty, IsNumber, IsObject, IsString, IsUrl } from 'class-validator';
 
 @Configuration()
 export class AppConfig {
@@ -40,12 +33,6 @@ export class AppConfig {
     origin: process.env['APP_WEB_URL']!,
     credentials: true,
     methods: ['GET', 'PATCH', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'HEAD'],
-    allowedHeaders: [
-      'Content-Type',
-      'Authorization',
-      'X-Requested-With',
-      'user-agent',
-      'Accept',
-    ],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'user-agent', 'Accept'],
   };
 }

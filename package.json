@@ -2,15 +2,15 @@
   "name": "SojuStack",
   "private": true,
   "description": "Starter kit for building scalable web, backend, and mobile applications",
-  "author": "rykuno",
   "license": "UNLICENSED",
+  "author": "rykuno",
   "scripts": {
     "build": "turbo run build",
     "dev": "turbo run dev",
     "dev:setup": "pnpm dlx tsx setup.ts",
     "fix": "oxlint --fix --fix-suggestions --fix-dangerously .",
     "lint": "oxlint .",
-    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "format": "oxfmt .",
     "check-types": "turbo run check-types",
     "typecheck": "turbo run typecheck",
     "clean": "rimraf dist node_modules pnpm-lock.yaml"
@@ -18,16 +18,16 @@
   "devDependencies": {
     "chalk": "^5.6.2",
     "lefthook": "^2.1.1",
+    "oxfmt": "^0.34.0",
     "oxlint": "^1.49.0",
-    "prettier": "^3.8.1",
     "rimraf": "^6.1.3",
     "turbo": "^2.8.10",
     "typescript": "5.9.3"
   },
-  "packageManager": "pnpm@10.27.0",
   "engines": {
     "node": ">=25.2.1"
   },
+  "packageManager": "pnpm@10.27.0",
   "pnpm": {
     "overrides": {
       "react": "^19.2.0",

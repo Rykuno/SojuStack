@@ -3,14 +3,14 @@
   "version": "0.0.0",
   "private": true,
   "license": "PROPRIETARY",
-  "publishConfig": {
-    "access": "public"
-  },
   "exports": {
     "./base.json": "./base.json",
     "./nestjs.json": "./nestjs.json",
     "./node.json": "./node.json",
     "./react-library.json": "./react-library.json",
     "./vite.json": "./vite.json"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }

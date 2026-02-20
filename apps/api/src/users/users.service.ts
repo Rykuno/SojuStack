@@ -7,9 +7,7 @@ import { users } from 'src/databases/drizzle.schema';
 
 @Injectable()
 export class UsersService {
-  constructor(
-    private readonly txHost: TransactionHost<DrizzleTransactionClient>,
-  ) {}
+  constructor(private readonly txHost: TransactionHost<DrizzleTransactionClient>) {}
 
   @Transactional()
   update(id: string, updateUserDto: UpdateUserDto) {

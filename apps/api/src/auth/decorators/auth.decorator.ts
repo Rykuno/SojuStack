@@ -6,5 +6,4 @@ export enum AuthType {
   Public = 'public',
 }
 
-export const Auth = (...authTypes: AuthType[]) =>
-  SetMetadata(AUTH_TYPE_KEY, authTypes);
+export const Auth = (...authTypes: AuthType[]) => SetMetadata(AUTH_TYPE_KEY, authTypes);

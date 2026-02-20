@@ -37,10 +37,10 @@ Use `pg_activity` for interactive top-like monitoring. Alert at 80% connection u
 
 ## Common Problems
 
-| Problem | Fix |
-| ------- | --- |
-| `too many clients already` | Implement pooling; find idle connections; check for connection leaks |
-| High memory / OOM | Reduce `work_mem`; add pooling; set `statement_timeout` |
-| Stuck process | `SELECT pg_cancel_backend(pid);` then `SELECT pg_terminate_backend(pid);` — **always confirm with a human before terminating backends**, as this may abort in-flight transactions and cause data issues for the application |
+| Problem                    | Fix                                                                                                                                                                                                                         |
+| -------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `too many clients already` | Implement pooling; find idle connections; check for connection leaks                                                                                                                                                        |
+| High memory / OOM          | Reduce `work_mem`; add pooling; set `statement_timeout`                                                                                                                                                                     |
+| Stuck process              | `SELECT pg_cancel_backend(pid);` then `SELECT pg_terminate_backend(pid);` — **always confirm with a human before terminating backends**, as this may abort in-flight transactions and cause data issues for the application |
 
 Prefer pooling + conservative `max_connections` over raising limits reactively.

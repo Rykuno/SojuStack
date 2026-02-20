@@ -1,8 +1,8 @@
-import { queryOptions } from '@tanstack/react-query'
-import { authClient } from '../auth-client'
+import { queryOptions } from '@tanstack/react-query';
+import { authClient } from '../auth-client';
 
 export class AuthApi {
-  private queryKeys = ['auth'] as const
+  private queryKeys = ['auth'] as const;
 
   sessionQueryOptions() {
     return queryOptions({
@@ -11,19 +11,19 @@ export class AuthApi {
         authClient()
           .getSession()
           .then((res) => res.data),
-    })
+    });
   }
 
   async signOut() {
     return authClient()
       .signOut()
-      .then((res) => res.data)
+      .then((res) => res.data);
   }
 
   async sendSignInOtp(email: string) {
     return authClient()
       .emailOtp.sendVerificationOtp({ email, type: 'sign-in' })
-      .then((res) => res.data)
+      .then((res) => res.data);
   }
 
   async signInWithOtp(email: string, otp: string) {
@@ -32,6 +32,6 @@ export class AuthApi {
         email,
         otp,
       })
-      .then((res) => res.data)
+      .then((res) => res.data);
   }
 }

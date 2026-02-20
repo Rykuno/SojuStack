@@ -23,7 +23,7 @@ A dirty page is modified in shared_buffers but not yet written to data files. A 
 
 ## WAL Disk Management
 
-Replication slots prevent WAL deletion even when standbys are offline — they can fill disk. WAL archiving failures also block recycling. `max_wal_size` is a *soft* limit; WAL can grow beyond it under heavy load.
+Replication slots prevent WAL deletion even when standbys are offline — they can fill disk. WAL archiving failures also block recycling. `max_wal_size` is a _soft_ limit; WAL can grow beyond it under heavy load.
 
 WAL size: `SELECT count(*) AS files, pg_size_pretty(sum(size)) AS total FROM pg_ls_waldir();`
 

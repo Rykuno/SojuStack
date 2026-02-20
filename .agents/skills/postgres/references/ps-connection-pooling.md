@@ -24,11 +24,11 @@ All OLTP application workloads: web apps, APIs, high-concurrency read/write oper
 
 PlanetScale offers three PgBouncer options. All use port `6432`.
 
-| Type | Runs On | Routes To | Key Trait |
-| ---- | ------- | --------- | --------- |
-| **Local** | Same node as primary | Primary only | Included with every database; no replica routing |
-| **Dedicated Primary** | Separate node | Primary | Connections persist through resizes, upgrades, and most failovers |
-| **Dedicated Replica** | Separate node | Replicas | Read-only traffic; supports AZ affinity for lower latency |
+| Type                  | Runs On              | Routes To    | Key Trait                                                         |
+| --------------------- | -------------------- | ------------ | ----------------------------------------------------------------- |
+| **Local**             | Same node as primary | Primary only | Included with every database; no replica routing                  |
+| **Dedicated Primary** | Separate node        | Primary      | Connections persist through resizes, upgrades, and most failovers |
+| **Dedicated Replica** | Separate node        | Replicas     | Read-only traffic; supports AZ affinity for lower latency         |
 
 - **Local PgBouncer** — use same credentials as direct, just change port to `6432`. Always routes to primary regardless of username.
 - **Dedicated Primary** — runs off-server for improved HA. Use for production OLTP write traffic.

@@ -1,3 +1,3 @@
 interface ApiHandler {
-  queryKeys: string[]
+  queryKeys: string[];
 }

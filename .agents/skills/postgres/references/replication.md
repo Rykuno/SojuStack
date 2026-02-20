@@ -22,13 +22,13 @@ Drop inactive slot: `SELECT pg_drop_replication_slot('slot_name');`
 
 ## Synchronous Commit Levels
 
-| Level | Behavior | Use Case |
-|-------|----------|----------|
-| `off` | Returns immediately, no wait | Non-critical writes; risks losing ~600ms of commits on crash (no inconsistency) |
-| `local` | Waits for local WAL fsync only | Local durability only; no standby wait |
-| `remote_write` | Waits for standby OS buffer | Data loss on standby OS crash |
-| `on` | Waits for standby WAL to disk when `synchronous_standby_names` is set; otherwise same as `local` | **Default. This level or higher recommended for HA** |
-| `remote_apply` | Waits for standby to apply WAL | Strongest; read-your-writes |
+| Level          | Behavior                                                                                         | Use Case                                                                        |
+| -------------- | ------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------- |
+| `off`          | Returns immediately, no wait                                                                     | Non-critical writes; risks losing ~600ms of commits on crash (no inconsistency) |
+| `local`        | Waits for local WAL fsync only                                                                   | Local durability only; no standby wait                                          |
+| `remote_write` | Waits for standby OS buffer                                                                      | Data loss on standby OS crash                                                   |
+| `on`           | Waits for standby WAL to disk when `synchronous_standby_names` is set; otherwise same as `local` | **Default. This level or higher recommended for HA**                            |
+| `remote_apply` | Waits for standby to apply WAL                                                                   | Strongest; read-your-writes                                                     |
 
 Configure with `synchronous_standby_names`. Use `ANY N` for quorum or `FIRST N` for priority-based sync.
 

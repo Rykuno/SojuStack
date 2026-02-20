@@ -1,5 +1,5 @@
 ---
-applyTo: "**/*.ts,**/*.tsx,**/*.d.ts"
+applyTo: '**/*.ts,**/*.tsx,**/*.d.ts'
 ---
 
 # TypeScript Best Practices
@@ -146,15 +146,15 @@ export function formatUserInfo({ name, age }: UserData) {
 ```typescript
 // Good: Discriminated union with type guards
 type ApiResponse<T> =
-  | { status: "success"; data: T }
-  | { status: "error"; error: string }
-  | { status: "loading" };
+  | { status: 'success'; data: T }
+  | { status: 'error'; error: string }
+  | { status: 'loading' };
 
 function handleResponse<T>(response: ApiResponse<T>): string {
-  if (response.status === "loading") {
-    return "Loading...";
+  if (response.status === 'loading') {
+    return 'Loading...';
   }
-  if (response.status === "error") {
+  if (response.status === 'error') {
     return `Error: ${response.error}`;
   }
   return `Success: ${JSON.stringify(response.data)}`;
@@ -162,7 +162,7 @@ function handleResponse<T>(response: ApiResponse<T>): string {
 
 // Bad: Using any or loose typing
 function handleResponse(response: any) {
-  if (response.loading) return "Loading...";
+  if (response.loading) return 'Loading...';
   if (response.error) return response.error;
   return response.data;
 }
@@ -173,18 +173,18 @@ function handleResponse(response: any) {
 ```typescript
 // Good: const assertion for literal types
 const STATUS = {
-  ACTIVE: "active",
-  INACTIVE: "inactive",
-  PENDING: "pending",
+  ACTIVE: 'active',
+  INACTIVE: 'inactive',
+  PENDING: 'pending',
 } as const;
 
 type Status = (typeof STATUS)[keyof typeof STATUS]; // 'active' | 'inactive' | 'pending'
 
 // Bad: Using enum
 enum Status {
-  ACTIVE = "active",
-  INACTIVE = "inactive",
-  PENDING = "pending",
+  ACTIVE = 'active',
+  INACTIVE = 'inactive',
+  PENDING = 'pending',
 }
 ```
 
@@ -193,17 +193,17 @@ enum Status {
 ```typescript
 // Good: Safe navigation and defaults
 const userName = user?.profile?.name;
-const displayName = userName ?? "Anonymous"; // Only replaces null/undefined
-const result = api.query(workspaceId ?? "");
+const displayName = userName ?? 'Anonymous'; // Only replaces null/undefined
+const result = api.query(workspaceId ?? '');
 
 // Bad: Unsafe access and wrong defaults
 const userName = user.profile.name; // Crashes if null
-const displayName = userName || "Anonymous"; // Replaces empty string
+const displayName = userName || 'Anonymous'; // Replaces empty string
 const result = api.query(workspaceId!); // Runtime crash if null
 
 // Type guards for null checking
 function processUser(user: User | null): string {
-  if (user == null) return "No user available";
+  if (user == null) return 'No user available';
   return user.name; // TypeScript knows user is non-null
 }
 ```
@@ -251,37 +251,32 @@ const form = useForm<CreateUserInput>({
 ```typescript
 // satisfies operator - maintain literal types with type checking
 const routes = {
-  home: "/",
-  about: "/about",
-  contact: "/contact",
+  home: '/',
+  about: '/about',
+  contact: '/contact',
 } satisfies Record<string, string>;
 type Route = keyof typeof routes; // 'home' | 'about' | 'contact'
 
 // Template literal types
-type HttpMethod = "GET" | "POST" | "PUT" | "DELETE";
+type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE';
 type ApiEndpoint = `/api/${string}`;
 type ApiRoute = `${HttpMethod} ${ApiEndpoint}`;
-const route: ApiRoute = "GET /api/users"; // Type-safe!
+const route: ApiRoute = 'GET /api/users'; // Type-safe!
 
 // Const type parameters - preserve literal types
 function getConfig<const T>(config: T): T {
   return config;
 }
-const config = getConfig({ port: 3000, host: "localhost" });
+const config = getConfig({ port: 3000, host: 'localhost' });
 // Type is { readonly port: 3000; readonly host: 'localhost' }
 
 // Const assertions on arrays
-const COLORS = ["red", "green", "blue"] as const;
+const COLORS = ['red', 'green', 'blue'] as const;
 type Color = (typeof COLORS)[number]; // 'red' | 'green' | 'blue'
 
 // Type predicate functions
 function isUser(value: unknown): value is User {
-  return (
-    typeof value === "object" &&
-    value !== null &&
-    "id" in value &&
-    "name" in value
-  );
+  return typeof value === 'object' && value !== null && 'id' in value && 'name' in value;
 }
 
 // Usage with type narrowing
@@ -290,16 +285,16 @@ if (isUser(data)) {
 }
 
 // Exhaustive checks with never
-type Status = "pending" | "success" | "error";
+type Status = 'pending' | 'success' | 'error';
 
 function handleStatus(status: Status): string {
   switch (status) {
-    case "pending":
-      return "Loading...";
-    case "success":
-      return "Done!";
-    case "error":
-      return "Failed!";
+    case 'pending':
+      return 'Loading...';
+    case 'success':
+      return 'Done!';
+    case 'error':
+      return 'Failed!';
     default:
       // This ensures all cases are handled
       const _exhaustive: never = status;

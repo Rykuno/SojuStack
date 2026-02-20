@@ -4,9 +4,7 @@ import ChangeEmailVerification, {
   ChangeEmailVerificationProps,
 } from './emails/change-email-verification';
 import PasswordReset, { PasswordResetProps } from './emails/password-reset';
-import EmailVerification, {
-  EmailVerificationProps,
-} from './emails/email-verification';
+import EmailVerification, { EmailVerificationProps } from './emails/email-verification';
 import { MailConfig } from 'src/common/config/mail.config';
 import { AppConfig } from 'src/common/config/app.config';
 import SignInOtp, { SignInOtpProps } from './emails/sign-in-otp.email';
@@ -60,10 +58,7 @@ export class MailService {
       }),
     };
 
-    const response = await fetch(
-      `${this.mailConfig.mailpit.url}/api/v1/send`,
-      options,
-    );
+    const response = await fetch(`${this.mailConfig.mailpit.url}/api/v1/send`, options);
     const data = (await response.json()) as { ID: string };
     console.log(`${this.mailConfig.mailpit.url}/view/${data.ID}`);
   }
@@ -92,10 +87,7 @@ export class MailService {
     });
   }
 
-  sendChangeEmailVerificationEmail({
-    to,
-    props,
-  }: Email<ChangeEmailVerificationProps>) {
+  sendChangeEmailVerificationEmail({ to, props }: Email<ChangeEmailVerificationProps>) {
     return this.send({
       email: to,
       subject: 'Email change verification',

@@ -3,9 +3,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { IsArray } from 'class-validator';
 
-export default function Paginated<TItem>(
-  TItemClass: ClassReference<TItem>,
-) {
+export default function Paginated<TItem>(TItemClass: ClassReference<TItem>) {
   abstract class PaginatedOptions {
     @ApiProperty()
     nextCursor!: string;

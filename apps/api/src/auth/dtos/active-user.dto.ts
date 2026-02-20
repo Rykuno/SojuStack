@@ -8,8 +8,6 @@ export class ActiveUserDto implements User {
   email!: string;
   createdAt!: Date;
   updatedAt!: Date;
-  @Transform(({ value }) =>
-    value ? `http://localhost:9000/dev/${value}` : null,
-  )
+  @Transform(({ value }) => (value ? `http://localhost:9000/dev/${value}` : null))
   image?: string | null;
 }

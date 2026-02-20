@@ -1,5 +1,5 @@
 ---
-applyTo: "**/*.ts,**/*.tsx,**/*.js,**/*.jsx"
+applyTo: '**/*.ts,**/*.tsx,**/*.js,**/*.jsx'
 ---
 
 # JSDoc Documentation Guidelines

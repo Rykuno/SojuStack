@@ -26,10 +26,10 @@ export class AuthGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     // get auth type from reflector
-    const [authType] = this.reflector.getAllAndOverride<AuthType[]>(
-      AUTH_TYPE_KEY,
-      [context.getHandler(), context.getClass()],
-    ) ?? [AuthGuard.defaultAuthType];
+    const [authType] = this.reflector.getAllAndOverride<AuthType[]>(AUTH_TYPE_KEY, [
+      context.getHandler(),
+      context.getClass(),
+    ]) ?? [AuthGuard.defaultAuthType];
 
     // get request
     const request: AuthGuardRequest = context.switchToHttp().getRequest();

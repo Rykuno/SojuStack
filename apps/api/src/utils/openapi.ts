@@ -13,9 +13,7 @@ interface OpenApiSpec {
   fileName?: string;
 }
 
-export async function generateOpenApiSpecs(
-  specs: OpenApiSpec[],
-): Promise<void> {
+export async function generateOpenApiSpecs(specs: OpenApiSpec[]): Promise<void> {
   if (specs.length === 0) {
     console.log(chalk.yellow('⚠️  No OpenAPI specs provided'));
     return;
@@ -24,17 +22,11 @@ export async function generateOpenApiSpecs(
   console.log(chalk.blue(`🔄 Generating ${specs.length} OpenAPI spec(s)...`));
 
   // Generate all specs in parallel
-  const results = await Promise.allSettled(
-    specs.map((spec) => generateSingleSpec(spec)),
-  );
+  const results = await Promise.allSettled(specs.map((spec) => generateSingleSpec(spec)));
 
   // Process results
-  const successful = results.filter(
-    (result) => result.status === 'fulfilled',
-  ).length;
-  const failed = results.filter(
-    (result) => result.status === 'rejected',
-  ).length;
+  const successful = results.filter((result) => result.status === 'fulfilled').length;
+  const failed = results.filter((result) => result.status === 'rejected').length;
 
   if (failed > 0) {
     console.log(chalk.yellow(`⚠️  ${failed} spec(s) failed to generate`));
@@ -50,9 +42,7 @@ export async function generateOpenApiSpecs(
   }
 
   if (successful > 0) {
-    console.log(
-      chalk.green(`✅ ${successful} OpenAPI spec(s) generated successfully`),
-    );
+    console.log(chalk.green(`✅ ${successful} OpenAPI spec(s) generated successfully`));
   }
 
   if (failed === specs.length) {
@@ -64,9 +54,7 @@ async function generateSingleSpec(spec: OpenApiSpec): Promise<void> {
   const fileName = spec.fileName || DEFAULT_FILENAME;
   const filePath = `${DEFAULT_OUTPUT_DIR}/${fileName}`;
 
-  const BLOB = ts.factory.createTypeReferenceNode(
-    ts.factory.createIdentifier('Blob'),
-  ); // `Blob`
+  const BLOB = ts.factory.createTypeReferenceNode(ts.factory.createIdentifier('Blob')); // `Blob`
   const NULL = ts.factory.createLiteralTypeNode(ts.factory.createNull()); // `null`
 
   try {
@@ -74,9 +62,7 @@ async function generateSingleSpec(spec: OpenApiSpec): Promise<void> {
     const ast = await openapiTS(spec.document as OpenAPI3, {
       transform(schemaObject) {
         if (schemaObject.format === 'binary') {
-          return schemaObject.nullable
-            ? ts.factory.createUnionTypeNode([BLOB, NULL])
-            : BLOB;
+          return schemaObject.nullable ? ts.factory.createUnionTypeNode([BLOB, NULL]) : BLOB;
         }
         return undefined; // Use default transformation for other schema objects
       },
@@ -99,10 +85,7 @@ async function generateSingleSpec(spec: OpenApiSpec): Promise<void> {
   }
 }
 
-async function hasContentChanged(
-  filePath: string,
-  newContents: string,
-): Promise<boolean> {
+async function hasContentChanged(filePath: string, newContents: string): Promise<boolean> {
   if (!fsSync.existsSync(filePath)) {
     return true;
   }
@@ -115,10 +98,7 @@ async function hasContentChanged(
   }
 }
 
-async function writeOpenApiFile(
-  filePath: string,
-  contents: string,
-): Promise<void> {
+async function writeOpenApiFile(filePath: string, contents: string): Promise<void> {
   // Ensure directory exists
   await fs.mkdir(DEFAULT_OUTPUT_DIR, { recursive: true });
 
