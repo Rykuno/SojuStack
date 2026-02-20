@@ -5,6 +5,9 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { createFileRoute, useRouter } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/')({
+  loader: async ({ context }) => {
+    await context.queryClient.ensureQueryData(api.auth.sessionQueryOptions());
+  },
   component: HomePage,
   server: {
     middleware: [isAuthenticated],
@@ -14,10 +17,11 @@ export const Route = createFileRoute('/')({
 function HomePage() {
   const queryClient = useQueryClient();
   const router = useRouter();
+  const sessionQueryKey = [...api.auth.queryKeys, 'session'];
   const logoutMutation = useMutation({
     mutationFn: () => api.auth.signOut(),
     onSuccess: async () => {
-      queryClient.clear();
+      queryClient.removeQueries({ queryKey: sessionQueryKey });
       await router.invalidate();
       await router.navigate({ to: '/login' });
     },

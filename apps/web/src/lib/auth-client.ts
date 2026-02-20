@@ -3,9 +3,17 @@ import { getRequest } from '@tanstack/react-start/server';
 import { emailOTPClient, organizationClient } from 'better-auth/client/plugins';
 import { createAuthClient } from 'better-auth/react';
 
+function getRequiredApiUrl() {
+  const apiUrl = import.meta.env.VITE_API_URL;
+  if (!apiUrl) {
+    throw new Error('VITE_API_URL is required');
+  }
+  return apiUrl;
+}
+
 function initAuthClient(fetchOptions: RequestInit) {
   return createAuthClient({
-    baseURL: String(import.meta.env.VITE_API_URL),
+    baseURL: getRequiredApiUrl(),
     basePath: '/auth/client',
     plugins: [emailOTPClient(), organizationClient()],
     fetchOptions,

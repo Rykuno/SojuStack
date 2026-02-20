@@ -15,7 +15,8 @@ export class StorageConfig {
 
   @IsString()
   @IsNotEmpty()
-  bucketName = 'public';
+  @Value('STORAGE_BUCKET_NAME', { default: 'public' })
+  bucketName!: string;
 
   @IsString()
   @IsNotEmpty()

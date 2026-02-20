@@ -8,6 +8,14 @@ type FetchImpl = (input: RequestInfo | URL, init?: RequestInit) => Promise<Respo
 
 let browserClient: ApiClient | undefined;
 
+function getRequiredApiUrl() {
+  const apiUrl = import.meta.env.VITE_API_URL;
+  if (!apiUrl) {
+    throw new Error('VITE_API_URL is required');
+  }
+  return apiUrl;
+}
+
 function toHeaderObject(headers?: HeadersInit) {
   if (!headers) return undefined;
   if (headers instanceof Headers) return Object.fromEntries(headers.entries());
@@ -47,7 +55,7 @@ const clientFetch: FetchImpl = (input, init) =>
 
 function initApiClient(opts?: { headers?: HeadersInit; fetch?: FetchImpl }) {
   const client = createClient<paths>({
-    baseUrl: String(import.meta.env.VITE_API_URL),
+    baseUrl: getRequiredApiUrl(),
     credentials: 'include',
     headers: opts?.headers,
     fetch: opts?.fetch,

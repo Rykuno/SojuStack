@@ -22,7 +22,9 @@ export function OTPForm({ email, ...props }: OTPFormProps) {
   const verifyOtpMutation = useMutation({
     mutationFn: async (otp: string) => api.auth.signInWithOtp(email, otp),
     onSuccess: async () => {
-      await queryClient.invalidateQueries();
+      await queryClient.invalidateQueries({
+        queryKey: [...api.auth.queryKeys, 'session'],
+      });
       await router.invalidate();
       await navigate({ to: '/' });
     },
