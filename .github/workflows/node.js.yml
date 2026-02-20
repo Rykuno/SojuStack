@@ -5,9 +5,9 @@ name: Node.js CI
 
 on:
   push:
-    branches: ['main', 'develop']
+    branches: ["main", "develop"]
   pull_request:
-    branches: ['main', 'develop']
+    branches: ["main", "develop"]
 
 jobs:
   build:
@@ -35,6 +35,9 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+
+      - name: Generate OpenAPI types
+        run: pnpm api:openapi:generate
 
       - name: Check Types
         run: pnpm typecheck
