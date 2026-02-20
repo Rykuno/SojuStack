@@ -3,10 +3,10 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { IsArray } from 'class-validator';
 
-export default function PaginationResponse<TItem>(
+export default function Paginated<TItem>(
   TItemClass: ClassReference<TItem>,
 ) {
-  abstract class PaginationResponse {
+  abstract class PaginatedOptions {
     @ApiProperty()
     nextCursor!: string;
 
@@ -17,16 +17,16 @@ export default function PaginationResponse<TItem>(
     limit!: number;
   }
 
-  abstract class PaginatedType {
+  abstract class PaginatedResponse {
     @ApiProperty({ type: [TItemClass] })
     @IsArray()
     @Type(() => TItemClass)
     results!: Array<TItem>;
 
-    @ApiProperty({ type: PaginationResponse })
-    @Type(() => PaginationResponse)
-    pagination!: PaginationResponse;
+    @ApiProperty({ type: PaginatedOptions })
+    @Type(() => PaginatedResponse)
+    pagination!: PaginatedOptions;
   }
 
-  return PaginatedType;
+  return PaginatedResponse;
 }

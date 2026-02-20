@@ -7,25 +7,31 @@ export class AuthApi {
   sessionQueryOptions() {
     return queryOptions({
       queryKey: [...this.queryKeys, 'session'],
-      queryFn: async () => {
-        const res = await authClient.getSession()
-        return res.data
-      },
+      queryFn: async () =>
+        authClient()
+          .getSession()
+          .then((res) => res.data),
     })
   }
 
-  signOut() {
-    return authClient.signOut()
+  async signOut() {
+    return authClient()
+      .signOut()
+      .then((res) => res.data)
   }
 
-  sendSignInOtp(email: string) {
-    return authClient.emailOtp.sendVerificationOtp({ email, type: 'sign-in' })
+  async sendSignInOtp(email: string) {
+    return authClient()
+      .emailOtp.sendVerificationOtp({ email, type: 'sign-in' })
+      .then((res) => res.data)
   }
 
-  signInWithOtp(email: string, otp: string) {
-    return authClient.signIn.emailOtp({
-      email,
-      otp,
-    })
+  async signInWithOtp(email: string, otp: string) {
+    return authClient()
+      .signIn.emailOtp({
+        email,
+        otp,
+      })
+      .then((res) => res.data)
   }
 }

@@ -6,7 +6,7 @@ import { authClient } from '@/lib/auth-client'
 export const isNotAuthenticated = createMiddleware().server(
   async ({ next }) => {
     const headers = getRequestHeaders()
-    const session = await authClient.getSession({ fetchOptions: { headers } })
+    const session = await authClient().getSession({ fetchOptions: { headers } })
     if (session.data?.session) throw redirect({ to: '/' })
 
     return await next()
@@ -15,7 +15,7 @@ export const isNotAuthenticated = createMiddleware().server(
 
 export const isAuthenticated = createMiddleware().server(async ({ next }) => {
   const headers = getRequestHeaders()
-  const session = await authClient.getSession({ fetchOptions: { headers } })
+  const session = await authClient().getSession({ fetchOptions: { headers } })
 
   if (!session.data?.session) throw redirect({ to: '/login' })
 

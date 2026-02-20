@@ -41,6 +41,7 @@
 
     "react/jsx-filename-extension": "off",
     "react/react-in-jsx-scope": "off",
+    
 
     "import/no-namespace": "off",
     "import/group-exports": "off",
@@ -87,7 +88,7 @@
   "ignorePatterns": ["apps/web/src/components/ui/**/*.tsx", "**/*.gen.ts"],
   "settings": {
     "react": {
-      "version": "detect"
+      "version": "19"
     }
   }
 }

@@ -23,7 +23,6 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useForm } from '@tanstack/react-form'
 import { z } from 'zod'
 import { useNavigate, useRouter } from '@tanstack/react-router'
-import { router } from 'better-auth/api'
 
 const otpSchema = z.string().length(6, 'Please enter the 6-digit code')
 

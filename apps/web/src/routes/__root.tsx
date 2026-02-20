@@ -1,21 +1,59 @@
-import { Suspense } from 'react'
+import { lazy, Suspense } from 'react'
 import {
   HeadContent,
-  Outlet,
   Scripts,
   createRootRouteWithContext,
 } from '@tanstack/react-router'
-import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
-import { ReactQueryDevtoolsPanel } from '@tanstack/react-query-devtools'
-import { TanStackDevtools } from '@tanstack/react-devtools'
-import { FormDevtoolsPanel } from '@tanstack/react-form-devtools'
 import appCss from '../styles.css?url'
 import { QueryClient } from '@tanstack/react-query'
 import { DefaultCatchBoundary } from '@/components/default-catch-boundry'
 import { NotFound } from '@/components/not-found'
-
 import { AuthProvider } from '@/contexts/auth'
 import { Spinner } from '@/components/ui/spinner'
+
+// Lazy load devtools - only loaded in development
+const TanStackDevtools = lazy(() =>
+  import('@tanstack/react-devtools').then((m) => ({
+    default: m.TanStackDevtools,
+  })),
+)
+const TanStackRouterDevtoolsPanel = lazy(() =>
+  import('@tanstack/react-router-devtools').then((m) => ({
+    default: m.TanStackRouterDevtoolsPanel,
+  })),
+)
+const ReactQueryDevtoolsPanel = lazy(() =>
+  import('@tanstack/react-query-devtools').then((m) => ({
+    default: m.ReactQueryDevtoolsPanel,
+  })),
+)
+const FormDevtoolsPanel = lazy(() =>
+  import('@tanstack/react-form-devtools').then((m) => ({
+    default: m.FormDevtoolsPanel,
+  })),
+)
+
+const MailpitDevtoolsPanel = lazy(() =>
+  import('@/lib/devtools/mailpit-devtools-panel').then((m) => ({
+    default: m.MailpitDevtoolsPanel,
+  })),
+)
+const RustFSDevtoolsPanel = lazy(() =>
+  import('@/lib/devtools/rustfs-devtools-panel').then((m) => ({
+    default: m.RustFSDevtoolsPanel,
+  })),
+)
+const ReactEmailDevtoolsPanel = lazy(() =>
+  import('@/lib/devtools/react-email-devtools-panel').then((m) => ({
+    default: m.ReactEmailDevtoolsPanel,
+  })),
+)
+
+const DrizzleStudioDevtoolsPanel = lazy(() =>
+  import('@/lib/devtools/drizzle-studio-devtools.panel').then((m) => ({
+    default: m.DrizzleStudioDevtoolsPanel,
+  })),
+)
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   {
@@ -70,6 +108,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <TanStackDevtools
           config={{
             position: 'bottom-right',
+            // openHotkey: ['Control', '~'],
           }}
           plugins={[
             {
@@ -83,6 +122,22 @@ function RootDocument({ children }: { children: React.ReactNode }) {
             {
               name: 'TanStack Form',
               render: <FormDevtoolsPanel />,
+            },
+            {
+              name: 'RustFS',
+              render: <RustFSDevtoolsPanel />,
+            },
+            {
+              name: 'Mailpit',
+              render: <MailpitDevtoolsPanel />,
+            },
+            {
+              name: 'React Email',
+              render: <ReactEmailDevtoolsPanel />,
+            },
+            {
+              name: 'Drizzle Studio',
+              render: <DrizzleStudioDevtoolsPanel />,
             },
           ]}
         />
