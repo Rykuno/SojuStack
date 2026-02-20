@@ -1,3 +1,3 @@
 export abstract class ApiHandler {
-  abstract queryKeys: string[]
+  abstract queryKeys: string[];
 }

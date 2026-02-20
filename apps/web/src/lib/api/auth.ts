@@ -1,9 +1,9 @@
-import { queryOptions } from '@tanstack/react-query'
-import { authClient } from '../auth-client'
-import { ApiHandler } from '../types'
+import { queryOptions } from '@tanstack/react-query';
+import { authClient } from '../auth-client';
+import { ApiHandler } from '../types';
 
 export class AuthApi implements ApiHandler {
-  queryKeys = ['auth']
+  queryKeys = ['auth'];
 
   sessionQueryOptions() {
     return queryOptions({
@@ -12,19 +12,19 @@ export class AuthApi implements ApiHandler {
         authClient()
           .getSession()
           .then((res) => res.data),
-    })
+    });
   }
 
   async signOut() {
     return authClient()
       .signOut()
-      .then((res) => res.data)
+      .then((res) => res.data);
   }
 
   async sendSignInOtp(email: string) {
     return authClient()
       .emailOtp.sendVerificationOtp({ email, type: 'sign-in' })
-      .then((res) => res.data)
+      .then((res) => res.data);
   }
 
   async signInWithOtp(email: string, otp: string) {
@@ -33,6 +33,6 @@ export class AuthApi implements ApiHandler {
         email,
         otp,
       })
-      .then((res) => res.data)
+      .then((res) => res.data);
   }
 }
