@@ -1,5 +1,5 @@
 import { Inject } from '@nestjs/common';
-import { betterAuth, BetterAuthOptions } from 'better-auth';
+import { betterAuth } from 'better-auth';
 import { emailOTP, openAPI } from 'better-auth/plugins';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import { Cache } from '@nestjs/cache-manager';

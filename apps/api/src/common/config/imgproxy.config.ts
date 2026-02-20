@@ -1,5 +1,5 @@
 import { Configuration, Value } from '@itgorillaz/configify';
-import { IsNotEmpty, IsString, IsUrl } from 'class-validator';
+import { IsNotEmpty, IsUrl } from 'class-validator';
 
 @Configuration()
 export class ImgProxyConfig {

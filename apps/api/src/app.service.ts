@@ -1,4 +1,4 @@
-import { Injectable, OnApplicationBootstrap, OnApplicationShutdown } from '@nestjs/common';
+import { Injectable, OnApplicationBootstrap } from '@nestjs/common';
 import { S3Service } from './storage/s3.service';
 import { StorageConfig } from './common/config/storage.config';
 

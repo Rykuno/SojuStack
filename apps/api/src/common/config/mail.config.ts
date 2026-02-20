@@ -1,5 +1,4 @@
 import { Configuration, Value } from '@itgorillaz/configify';
-import { Type } from 'class-transformer';
 import { IsNotEmpty, IsString } from 'class-validator';
 
 @Configuration()

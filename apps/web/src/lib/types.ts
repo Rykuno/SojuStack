@@ -1,3 +1,3 @@
-interface ApiHandler {
-  queryKeys: string[];
+export abstract class ApiHandler {
+  abstract queryKeys: string[]
 }
