@@ -19,6 +19,7 @@
   "devDependencies": {
     "chalk": "^5.6.2",
     "lefthook": "^2.1.1",
+    "lint-staged": "^16.2.7",
     "oxfmt": "^0.34.0",
     "oxlint": "^1.49.0",
     "oxlint-tsgolint": "^0.14.1",
@@ -50,5 +51,8 @@
       "esbuild",
       "unrs-resolver"
     ]
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx,mjs,cjs}": "pnpm run lint"
   }
 }
