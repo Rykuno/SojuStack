@@ -13,7 +13,8 @@
     "format": "oxfmt .",
     "check-types": "turbo run check-types",
     "typecheck": "turbo run typecheck",
-    "clean": "rimraf dist node_modules pnpm-lock.yaml"
+    "clean": "rimraf dist node_modules pnpm-lock.yaml",
+    "api:openapi:generate": "pnpm -C apps/api openapi:generate"
   },
   "devDependencies": {
     "chalk": "^5.6.2",
