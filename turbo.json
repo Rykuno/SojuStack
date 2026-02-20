@@ -10,12 +10,25 @@
       "cache": false,
       "persistent": true
     },
+    "lint": {
+      "dependsOn": ["^lint"],
+      "inputs": ["**/*.{js,jsx,ts,tsx,mjs,cjs}", ".oxlintrc.json"]
+    },
+    "lint:fix": {
+      "dependsOn": ["^lint:fix"],
+      "inputs": ["**/*.{js,jsx,ts,tsx,mjs,cjs}", ".oxlintrc.json"]
+    },
+    "format": {
+      "dependsOn": ["^format"],
+      "inputs": ["**/*.{js,jsx,ts,tsx,mjs,cjs}", ".oxfmtrc.json"]
+    },
+    "format:fix": {
+      "dependsOn": ["^format:fix"],
+      "inputs": ["**/*.{js,jsx,ts,tsx,mjs,cjs}", ".oxfmtrc.json"]
+    },
     "debug": {
       "cache": false,
       "persistent": true
-    },
-    "//#lint": {
-      "inputs": ["**/*.{js,jsx,ts,tsx,mjs,cjs}", ".oxlintrc.json"]
     },
     "start": {
       "cache": true,

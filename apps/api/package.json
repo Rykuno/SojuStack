@@ -28,8 +28,10 @@
     "test:watch": "jest --watch",
     "typecheck": "tsc --noEmit",
     "openapi:generate": "tsx src/utils/openapi.ts",
-    "lint": "oxlint",
-    "depcheck": "depcheck"
+    "depcheck": "depcheck",
+    "format": "oxfmt",
+    "lint:fix": "oxlint --fix --fix-suggestions --fix-dangerously .",
+    "lint": "oxlint --type-aware --type-check ."
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.994.0",

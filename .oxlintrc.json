@@ -9,10 +9,5 @@
     "typescript/no-floating-promises": "error",
     "typescript/no-unsafe-assignment": "warn"
   },
-  "ignorePatterns": [
-    "*.spec.ts",
-    "*.test.ts",
-    "apps/api/test/**",
-    "apps/api/eslint.config.mjs"
-  ]
+  "ignorePatterns": ["*.spec.ts", "*.test.ts", "apps/api/test/**", "apps/api/eslint.config.mjs"]
 }

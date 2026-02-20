@@ -1,30 +1,29 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
-import { S3Service } from "./s3.service";
-import { createId } from "@paralleldrive/cuid2";
-import { DrizzleTransactionClient } from "src/databases/drizzle.provider";
-import { files } from "src/databases/drizzle.schema";
-import { takeFirstOrThrow } from "src/databases/drizzle.utils";
-import { eq } from "drizzle-orm";
-import { StorageConfig } from "src/common/config/storage.config";
-import { TransactionHost, Transactional } from "@nestjs-cls/transactional";
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { S3Service } from './s3.service';
+import { createId } from '@paralleldrive/cuid2';
+import { DrizzleTransactionClient } from 'src/databases/drizzle.provider';
+import { files } from 'src/databases/drizzle.schema';
+import { takeFirstOrThrow } from 'src/databases/drizzle.utils';
+import { eq } from 'drizzle-orm';
+import { StorageConfig } from 'src/common/config/storage.config';
+import { TransactionHost, Transactional } from '@nestjs-cls/transactional';
 
 @Injectable()
 export class FilesService {
   constructor(
     private readonly s3Service: S3Service,
     private readonly txHost: TransactionHost<DrizzleTransactionClient>,
-    private readonly storageConfig: StorageConfig
+    private readonly storageConfig: StorageConfig,
   ) {}
 
   @Transactional()
   async create(file: Express.Multer.File) {
     const storageKey = createId();
-    const test = "test";
 
     await this.s3Service.putObject({
       bucketName: this.storageConfig.bucketName,
       key: storageKey,
-      file: file.buffer
+      file: file.buffer,
     });
 
     try {
@@ -34,7 +33,7 @@ export class FilesService {
           name: file.originalname,
           mimeType: file.mimetype,
           sizeBytes: file.size,
-          storageKey
+          storageKey,
         })
         .returning()
         .then(takeFirstOrThrow);
@@ -42,7 +41,7 @@ export class FilesService {
       // Compensate uploaded object if the DB write fails.
       await this.s3Service.deleteObject({
         bucketName: this.storageConfig.bucketName,
-        key: storageKey
+        key: storageKey,
       });
       throw error;
     }
@@ -52,16 +51,16 @@ export class FilesService {
   async update(key: string, file: Express.Multer.File) {
     const fileRecord = await this.txHost.tx.query.files.findFirst({
       where: {
-        storageKey: key
-      }
+        storageKey: key,
+      },
     });
-    if (!fileRecord) throw new NotFoundException("File not found");
+    if (!fileRecord) throw new NotFoundException('File not found');
 
     // Keep the storage key stable and replace object contents/metadata in-place.
     await this.s3Service.putObject({
       bucketName: this.storageConfig.bucketName,
       key,
-      file: file.buffer
+      file: file.buffer,
     });
 
     return this.txHost.tx
@@ -69,7 +68,7 @@ export class FilesService {
       .set({
         name: file.originalname,
         mimeType: file.mimetype,
-        sizeBytes: file.size
+        sizeBytes: file.size,
       })
       .where(eq(files.storageKey, key))
       .returning()
@@ -80,7 +79,7 @@ export class FilesService {
   async delete(key: string) {
     await this.s3Service.deleteObject({
       bucketName: this.storageConfig.bucketName,
-      key
+      key,
     });
     await this.txHost.tx.delete(files).where(eq(files.storageKey, key));
   }

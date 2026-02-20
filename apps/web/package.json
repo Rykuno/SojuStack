@@ -7,8 +7,10 @@
     "build": "vite build",
     "preview": "vite preview",
     "test": "vitest run",
-    "lint": "oxlint",
-    "typecheck": "tsc --noEmit"
+    "lint": "oxlint --type-aware --type-check .",
+    "lint:fix": "oxlint --fix --fix-suggestions --fix-dangerously .",
+    "typecheck": "tsc --noEmit",
+    "format": "oxfmt"
   },
   "dependencies": {
     "@base-ui/react": "^1.2.0",
