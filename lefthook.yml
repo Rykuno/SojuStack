@@ -5,3 +5,5 @@ pre-push:
       run: pnpm lint
     - name: typecheck
       run: pnpm typecheck
+    - name: format
+      run: pnpm format

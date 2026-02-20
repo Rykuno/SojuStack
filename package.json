@@ -8,7 +8,7 @@
     "build": "turbo run build",
     "dev": "turbo run dev",
     "dev:setup": "pnpm dlx tsx setup.ts",
-    "fix": "oxlint --fix --fix-suggestions --fix-dangerously .",
+    "lint:fix": "oxlint --fix --fix-suggestions --fix-dangerously .",
     "lint": "oxlint .",
     "format": "oxfmt .",
     "check-types": "turbo run check-types",
