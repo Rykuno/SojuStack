@@ -2,6 +2,8 @@
 
 Opinionated, production-minded full-stack starter with strong TypeScript ergonomics and end-to-end type safety.
 
+Human-first by design: this stack is built for developers to lead decisions, with AI used as an accelerator for implementation, iteration, and review.
+
 ## Tech Stack
 
 ### Monorepo and Tooling
