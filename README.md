@@ -1,4 +1,3 @@
-
 ![logo](./stack-logo.png)
 
 # SojuStack
