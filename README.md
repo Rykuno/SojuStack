@@ -1,5 +1,5 @@
 
-![logo](./stack-logo.png)
+![logo](./logo.png)
 
 # SojuStack
 
