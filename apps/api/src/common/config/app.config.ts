@@ -25,14 +25,21 @@ export class AppConfig {
 
   @IsBoolean()
   @IsNotEmpty()
-  isProduction: boolean = process.env['NODE_ENV'] === 'production';
+  @Value('NODE_ENV', {
+    default: 'development',
+    parse: (value) => value === 'production',
+  })
+  isProduction!: boolean;
 
   @IsObject()
   @IsNotEmpty()
-  cors: CorsOptions = {
-    origin: process.env['APP_WEB_URL']!,
-    credentials: true,
-    methods: ['GET', 'PATCH', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'HEAD'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'user-agent', 'Accept'],
-  };
+  @Value('APP_WEB_URL', {
+    parse: (origin: string): CorsOptions => ({
+      origin,
+      credentials: true,
+      methods: ['GET', 'PATCH', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'HEAD'],
+      allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'user-agent', 'Accept'],
+    }),
+  })
+  cors!: CorsOptions;
 }

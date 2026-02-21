@@ -5,7 +5,7 @@ import { NotFound } from './components/not-found';
 
 // Import the generated route tree
 import { routeTree } from './routeTree.gen';
-import { DefaultCatchBoundary } from './components/default-catch-boundry';
+import { DefaultCatchBoundary } from './components/default-catch-boundary';
 
 // Create a new router instance
 export const getRouter = () => {

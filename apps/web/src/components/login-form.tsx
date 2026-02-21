@@ -40,30 +40,35 @@ export function LoginForm({ className, onOtpSent, ...props }: LoginFormProps) {
           <CardDescription>Enter your email below to login to your account</CardDescription>
         </CardHeader>
         <CardContent>
-          <FieldGroup>
-            <form.Field name='email'>
-              {(field) => (
-                <Field data-invalid={field.state.meta.errors.length > 0}>
-                  <FieldLabel htmlFor={field.name}>Email</FieldLabel>
-                  <Input
-                    id={field.name}
-                    type='email'
-                    value={field.state.value}
-                    onChange={(e) => field.handleChange(e.target.value)}
-                    onBlur={field.handleBlur}
-                    autoComplete='email'
-                  />
-                  <FieldError />
-                </Field>
-              )}
-            </form.Field>
-            <Button
-              onClick={() => form.handleSubmit()}
-              disabled={sendOtpMutation.isPending || !form.state.canSubmit}
-            >
-              {sendOtpMutation.isPending ? 'Sending...' : 'Sign in'}
-            </Button>
-          </FieldGroup>
+          <form
+            onSubmit={(event) => {
+              event.preventDefault();
+              event.stopPropagation();
+              void form.handleSubmit();
+            }}
+          >
+            <FieldGroup>
+              <form.Field name='email'>
+                {(field) => (
+                  <Field data-invalid={field.state.meta.errors.length > 0}>
+                    <FieldLabel htmlFor={field.name}>Email</FieldLabel>
+                    <Input
+                      id={field.name}
+                      type='email'
+                      value={field.state.value}
+                      onChange={(e) => field.handleChange(e.target.value)}
+                      onBlur={field.handleBlur}
+                      autoComplete='email'
+                    />
+                    <FieldError />
+                  </Field>
+                )}
+              </form.Field>
+              <Button type='submit' disabled={sendOtpMutation.isPending || !form.state.canSubmit}>
+                {sendOtpMutation.isPending ? 'Sending...' : 'Sign in'}
+              </Button>
+            </FieldGroup>
+          </form>
         </CardContent>
       </Card>
     </div>

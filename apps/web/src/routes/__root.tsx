@@ -1,7 +1,7 @@
 import { lazy, Suspense } from 'react';
 import { HeadContent, Scripts, createRootRouteWithContext } from '@tanstack/react-router';
 import { QueryClient } from '@tanstack/react-query';
-import { DefaultCatchBoundary } from '@/components/default-catch-boundry';
+import { DefaultCatchBoundary } from '@/components/default-catch-boundary';
 import { NotFound } from '@/components/not-found';
 import { AuthProvider } from '@/contexts/auth';
 import { Spinner } from '@/components/ui/spinner';
@@ -29,7 +29,7 @@ export const Route = createRootRouteWithContext<{
         content: 'width=device-width, initial-scale=1',
       },
       {
-        title: 'TanStack Start Starter',
+        title: 'SojuStack',
       },
     ],
     links: [

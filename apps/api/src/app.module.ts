@@ -24,12 +24,21 @@ import { DRIZZLE_PROVIDER } from './databases/drizzle.provider';
 @Module({
   imports: [
     ConfigifyModule.forRootAsync(),
-    MulterModule,
+    MulterModule.register({
+      limits: {
+        fileSize: 5 * 1024 * 1024,
+      },
+    }),
     ThrottlerModule.forRootAsync({
       inject: [CacheConfig],
       useFactory: (cacheConfig: CacheConfig) => {
         return {
-          throttlers: [],
+          throttlers: [
+            {
+              ttl: 60_000,
+              limit: 100,
+            },
+          ],
           storage: new ThrottlerStorageRedisService(cacheConfig.url),
         };
       },

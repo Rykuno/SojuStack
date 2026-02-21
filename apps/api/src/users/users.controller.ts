@@ -20,8 +20,8 @@ export class UsersController {
   @UseInterceptors(FileInterceptor('image'))
   update(
     @Body() updateUserDto: UpdateUserDto,
-    @UploadedFile() image: Express.Multer.File,
     @ActiveUser() activeUser: ActiveUserDto,
+    @UploadedFile() image?: Express.Multer.File,
   ) {
     return this.usersService.update(activeUser.id, {
       name: updateUserDto.name,

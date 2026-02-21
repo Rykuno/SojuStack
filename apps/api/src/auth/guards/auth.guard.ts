@@ -2,7 +2,10 @@ import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from
 import { AUTH_TYPE_KEY, AuthType } from '../decorators/auth.decorator';
 import { Reflector } from '@nestjs/core';
 import { Session, User } from 'better-auth';
+import type { Request } from 'express';
 import { BetterAuth, InjectBetterAuth } from '../better-auth.provider';
+import { StorageConfig } from 'src/common/config/storage.config';
+import { toPublicStorageUrl } from 'src/storage/storage.utils';
 
 export interface AuthGuardRequest extends Request {
   session?: Session;
@@ -16,6 +19,7 @@ export class AuthGuard implements CanActivate {
   constructor(
     @InjectBetterAuth() private readonly betterAuth: BetterAuth,
     private readonly reflector: Reflector,
+    private readonly storageConfig: StorageConfig,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -35,7 +39,12 @@ export class AuthGuard implements CanActivate {
 
     // set session and user on request
     request.session = session?.session;
-    request.user = session?.user;
+    request.user = session?.user
+      ? {
+          ...session.user,
+          image: toPublicStorageUrl(this.storageConfig, session.user.image),
+        }
+      : undefined;
 
     // if auth type is required, check if session exists
     if (authType === AuthType.Required) {

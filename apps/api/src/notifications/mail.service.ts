@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { render } from '@react-email/render';
 import ChangeEmailVerification, {
   ChangeEmailVerificationProps,
@@ -21,11 +21,19 @@ interface Email<T> {
 }
 
 @Injectable()
-export class MailService {
+export class MailService implements OnModuleInit {
+  private readonly logger = new Logger(MailService.name);
+
   constructor(
     private readonly mailConfig: MailConfig,
     private readonly appConfig: AppConfig,
   ) {}
+
+  onModuleInit() {
+    if (this.appConfig.isProduction) {
+      throw new Error('Production email provider is not configured.');
+    }
+  }
 
   private send({ email, subject, template }: SendMailConfiguration) {
     return this.appConfig.isProduction
@@ -34,8 +42,7 @@ export class MailService {
   }
 
   private async sendProd(_props: SendMailConfiguration) {
-    // TODO: Implement production email sending.
-    // Maybe start with `resend` and switch to ses later?
+    throw new Error('Production email provider is not configured.');
   }
 
   private async sendDev({ email, subject, template }: SendMailConfiguration) {
@@ -58,9 +65,14 @@ export class MailService {
       }),
     };
 
-    const response = await fetch(`${this.mailConfig.mailpit.url}/api/v1/send`, options);
+    const response = await fetch(`${this.mailConfig.mailpitUrl}/api/v1/send`, options);
+
+    if (!response.ok) {
+      throw new Error(`Mailpit request failed with ${response.status} ${response.statusText}.`);
+    }
+
     const data = (await response.json()) as { ID: string };
-    console.log(`${this.mailConfig.mailpit.url}/view/${data.ID}`);
+    this.logger.log(`${this.mailConfig.mailpitUrl}/view/${data.ID}`);
   }
 
   sendVerificationEmail({ to, props }: Email<EmailVerificationProps>) {

@@ -22,7 +22,7 @@ const EmailVerification = (props: EmailVerificationProps) => {
   const {
     userEmail = 'me@rykuno.com',
     verificationUrl = 'https://example.com/verify',
-    expirationHours = 24,
+    expirationHours = 1,
   } = props;
 
   return (
@@ -79,8 +79,9 @@ const EmailVerification = (props: EmailVerificationProps) => {
                 <strong>Security Notice:</strong>
               </Text>
               <Text className='text-[14px] text-gray-600 m-0'>
-                This verification link will expire in {expirationHours} hours. If you didn't create
-                an account, you can safely ignore this email.
+                This verification link will expire in {expirationHours} hour
+                {expirationHours !== 1 ? 's' : ''}. If you didn't create an account, you can safely
+                ignore this email.
               </Text>
             </Section>
           </Container>
@@ -93,7 +94,7 @@ const EmailVerification = (props: EmailVerificationProps) => {
 EmailVerification.PreviewProps = {
   userEmail: 'me@rykuno.com',
   verificationUrl: 'https://example.com/verify?token=abc123xyz789',
-  expirationHours: 24,
+  expirationHours: 1,
 } as EmailVerificationProps;
 
 export default EmailVerification;

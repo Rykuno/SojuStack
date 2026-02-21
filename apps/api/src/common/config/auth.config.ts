@@ -14,5 +14,8 @@ export class AuthConfig {
 
   @IsString({ each: true })
   @IsNotEmpty()
-  trustedOrigins = [process.env['APP_WEB_URL']!];
+  @Value('APP_WEB_URL', {
+    parse: (origin: string) => [origin],
+  })
+  trustedOrigins!: string[];
 }

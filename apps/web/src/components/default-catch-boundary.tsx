@@ -8,7 +8,9 @@ export function DefaultCatchBoundary({ error }: ErrorComponentProps) {
     select: (state) => state.id === rootRouteId,
   });
 
-  console.error(error);
+  if (import.meta.env.DEV) {
+    console.error(error);
+  }
 
   return (
     <div className='min-w-0 flex-1 p-4 flex flex-col items-center justify-center gap-6'>
@@ -18,21 +20,21 @@ export function DefaultCatchBoundary({ error }: ErrorComponentProps) {
           onClick={() => {
             void router.invalidate();
           }}
-          className={`px-2 py-1 bg-gray-600 dark:bg-gray-700 rounded-sm text-white uppercase font-extrabold`}
+          className='px-2 py-1 bg-gray-600 dark:bg-gray-700 rounded-sm text-white uppercase font-extrabold'
         >
           Try Again
         </button>
         {isRoot ? (
           <Link
             to='/'
-            className={`px-2 py-1 bg-gray-600 dark:bg-gray-700 rounded-sm text-white uppercase font-extrabold`}
+            className='px-2 py-1 bg-gray-600 dark:bg-gray-700 rounded-sm text-white uppercase font-extrabold'
           >
             Home
           </Link>
         ) : (
           <Link
             to='/'
-            className={`px-2 py-1 bg-gray-600 dark:bg-gray-700 rounded-sm text-white uppercase font-extrabold`}
+            className='px-2 py-1 bg-gray-600 dark:bg-gray-700 rounded-sm text-white uppercase font-extrabold'
             onClick={(e) => {
               e.preventDefault();
               window.history.back();

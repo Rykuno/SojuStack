@@ -22,9 +22,7 @@ export function OTPForm({ email, ...props }: OTPFormProps) {
   const verifyOtpMutation = useMutation({
     mutationFn: async (otp: string) => api.auth.signInWithOtp(email, otp),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({
-        queryKey: [...api.auth.queryKeys, 'session'],
-      });
+      await queryClient.invalidateQueries();
       await router.invalidate();
       await navigate({ to: '/' });
     },
@@ -42,56 +40,61 @@ export function OTPForm({ email, ...props }: OTPFormProps) {
         <CardDescription>We sent a 6-digit code to {email}.</CardDescription>
       </CardHeader>
       <CardContent>
-        <FieldGroup>
-          <form.Field
-            name='otp'
-            validators={{
-              onBlur: ({ value }) => {
-                const result = otpSchema.safeParse(value);
-                return result.success ? undefined : result.error.issues[0]?.message;
-              },
-            }}
-          >
-            {(field) => (
-              <Field data-invalid={field.state.meta.errors.length > 0}>
-                <FieldLabel htmlFor={field.name}>Verification code</FieldLabel>
-                <InputOTP
-                  maxLength={6}
-                  id={field.name}
-                  value={field.state.value}
-                  onChange={(value) => field.handleChange(value)}
-                  onBlur={field.handleBlur}
-                >
-                  <InputOTPGroup className='gap-2.5 *:data-[slot=input-otp-slot]:rounded-md *:data-[slot=input-otp-slot]:border'>
-                    <InputOTPSlot index={0} />
-                    <InputOTPSlot index={1} />
-                    <InputOTPSlot index={2} />
-                    <InputOTPSlot index={3} />
-                    <InputOTPSlot index={4} />
-                    <InputOTPSlot index={5} />
-                  </InputOTPGroup>
-                </InputOTP>
-                <FieldError
-                  errors={field.state.meta.errors.map((e) => ({
-                    message: typeof e === 'string' ? e : undefined,
-                  }))}
-                />
-                <FieldDescription>Enter the 6-digit code sent to your email.</FieldDescription>
-              </Field>
-            )}
-          </form.Field>
+        <form
+          onSubmit={(event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            void form.handleSubmit();
+          }}
+        >
           <FieldGroup>
-            <Button
-              onClick={() => form.handleSubmit()}
-              disabled={verifyOtpMutation.isPending || !form.state.canSubmit}
+            <form.Field
+              name='otp'
+              validators={{
+                onBlur: ({ value }) => {
+                  const result = otpSchema.safeParse(value);
+                  return result.success ? undefined : result.error.issues[0]?.message;
+                },
+              }}
             >
-              {verifyOtpMutation.isPending ? 'Verifying...' : 'Verify'}
-            </Button>
-            <FieldDescription className='text-center'>
-              Didn&apos;t receive the code? Resend
-            </FieldDescription>
+              {(field) => (
+                <Field data-invalid={field.state.meta.errors.length > 0}>
+                  <FieldLabel htmlFor={field.name}>Verification code</FieldLabel>
+                  <InputOTP
+                    maxLength={6}
+                    id={field.name}
+                    value={field.state.value}
+                    onChange={(value) => field.handleChange(value)}
+                    onBlur={field.handleBlur}
+                  >
+                    <InputOTPGroup className='gap-2.5 *:data-[slot=input-otp-slot]:rounded-md *:data-[slot=input-otp-slot]:border'>
+                      <InputOTPSlot index={0} />
+                      <InputOTPSlot index={1} />
+                      <InputOTPSlot index={2} />
+                      <InputOTPSlot index={3} />
+                      <InputOTPSlot index={4} />
+                      <InputOTPSlot index={5} />
+                    </InputOTPGroup>
+                  </InputOTP>
+                  <FieldError
+                    errors={field.state.meta.errors.map((e) => ({
+                      message: typeof e === 'string' ? e : undefined,
+                    }))}
+                  />
+                  <FieldDescription>Enter the 6-digit code sent to your email.</FieldDescription>
+                </Field>
+              )}
+            </form.Field>
+            <FieldGroup>
+              <Button type='submit' disabled={verifyOtpMutation.isPending || !form.state.canSubmit}>
+                {verifyOtpMutation.isPending ? 'Verifying...' : 'Verify'}
+              </Button>
+              <FieldDescription className='text-center'>
+                Didn&apos;t receive the code? Resend
+              </FieldDescription>
+            </FieldGroup>
           </FieldGroup>
-        </FieldGroup>
+        </form>
       </CardContent>
     </Card>
   );

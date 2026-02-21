@@ -1,5 +1,5 @@
 import { Configuration, Value } from '@itgorillaz/configify';
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsNotEmpty, IsString, IsUrl } from 'class-validator';
 
 @Configuration()
 export class MailConfig {
@@ -8,8 +8,10 @@ export class MailConfig {
   @Value('MAIL_DOMAIN')
   domain!: string;
 
+  @IsUrl({ require_tld: false })
   @IsNotEmpty()
-  mailpit = {
-    url: 'http://localhost:8025',
-  };
+  @Value('MAILPIT_URL', {
+    default: 'http://localhost:8025',
+  })
+  mailpitUrl!: string;
 }

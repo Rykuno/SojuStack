@@ -19,6 +19,21 @@ export class FilesService {
   @Transactional()
   async create(file: Express.Multer.File) {
     const storageKey = createId();
+    return this.createWithStorageKey(storageKey, file);
+  }
+
+  @Transactional()
+  async createWithStorageKey(storageKey: string, file: Express.Multer.File) {
+    const createdFile = await this.txHost.tx
+      .insert(files)
+      .values({
+        name: file.originalname,
+        mimeType: file.mimetype,
+        sizeBytes: file.size,
+        storageKey,
+      })
+      .returning()
+      .then(takeFirstOrThrow);
 
     await this.s3Service.putObject({
       bucketName: this.storageConfig.bucketName,
@@ -26,25 +41,7 @@ export class FilesService {
       file: file.buffer,
     });
 
-    try {
-      return await this.txHost.tx
-        .insert(files)
-        .values({
-          name: file.originalname,
-          mimeType: file.mimetype,
-          sizeBytes: file.size,
-          storageKey,
-        })
-        .returning()
-        .then(takeFirstOrThrow);
-    } catch (error) {
-      // Compensate uploaded object if the DB write fails.
-      await this.s3Service.deleteObject({
-        bucketName: this.storageConfig.bucketName,
-        key: storageKey,
-      });
-      throw error;
-    }
+    return createdFile;
   }
 
   @Transactional()
@@ -56,14 +53,7 @@ export class FilesService {
     });
     if (!fileRecord) throw new NotFoundException('File not found');
 
-    // Keep the storage key stable and replace object contents/metadata in-place.
-    await this.s3Service.putObject({
-      bucketName: this.storageConfig.bucketName,
-      key,
-      file: file.buffer,
-    });
-
-    return this.txHost.tx
+    const updatedFile = await this.txHost.tx
       .update(files)
       .set({
         name: file.originalname,
@@ -73,6 +63,15 @@ export class FilesService {
       .where(eq(files.storageKey, key))
       .returning()
       .then(takeFirstOrThrow);
+
+    // Keep the storage key stable and replace object contents/metadata in-place.
+    await this.s3Service.putObject({
+      bucketName: this.storageConfig.bucketName,
+      key,
+      file: file.buffer,
+    });
+
+    return updatedFile;
   }
 
   @Transactional()

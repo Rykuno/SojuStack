@@ -1,9 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString } from 'class-validator';
+import { IsOptional, IsString } from 'class-validator';
 
 export class UpdateUserDto {
+  @IsOptional()
   @IsString()
   name?: string;
-  @ApiProperty({ type: 'string', format: 'binary', required: true })
+
+  @ApiProperty({ type: 'string', format: 'binary', required: false })
   image?: Express.Multer.File;
 }

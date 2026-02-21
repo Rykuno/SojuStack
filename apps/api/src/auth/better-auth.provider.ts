@@ -86,7 +86,7 @@ export const BetterAuthProvider = {
           return mailService.sendVerificationEmail({
             to: user.email,
             props: {
-              expirationHours: 24,
+              expirationHours: 1,
               userEmail: user.email,
               verificationUrl: url,
             },
