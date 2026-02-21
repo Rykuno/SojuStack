@@ -72,9 +72,13 @@ Use this skill to keep changes idiomatic and safe in this repository.
 
 1. Read nearby code and existing module patterns.
 2. Implement the smallest correct change.
-3. Run relevant checks/tests for touched files.
-4. Ensure unrelated files are not modified.
-5. Report what changed, why, and how it was validated.
+3. Run repository validation commands from the repo root:
+   - `pnpm typecheck`
+   - `pnpm format`
+   - `pnpm lint`
+4. If any of those commands fail, fix the issues and re-run until they pass.
+5. Ensure unrelated files are not modified.
+6. Report what changed, why, and how it was validated.
 
 ## Do / Don't
 
