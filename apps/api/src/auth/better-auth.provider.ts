@@ -10,6 +10,7 @@ import * as schema from 'src/databases/drizzle.schema';
 import { MailService } from 'src/notifications/mail.service';
 import { AuthConfig } from 'src/common/config/auth.config';
 import { AppConfig } from 'src/common/config/app.config';
+import { hoursToSeconds, minutesToSeconds } from 'date-fns';
 
 const BETTER_AUTH = Symbol('BETTER_AUTH');
 export const InjectBetterAuth = () => Inject(BETTER_AUTH);
@@ -61,10 +62,7 @@ export const BetterAuthProvider = {
       basePath: authConfig.basePath,
       trustedOrigins: authConfig.trustedOrigins,
       session: {
-        cookieCache: {
-          enabled: true,
-          maxAge: 60 * 5,
-        },
+        storeSessionInDatabase: true,
       },
       user: {
         changeEmail: {
@@ -86,17 +84,17 @@ export const BetterAuthProvider = {
           return mailService.sendVerificationEmail({
             to: user.email,
             props: {
-              expirationHours: 1,
+              expirationHours: 24,
               userEmail: user.email,
               verificationUrl: url,
             },
           });
         },
         autoSignInAfterVerification: true,
-        expiresIn: 3600, // 1 hour
+        expiresIn: hoursToSeconds(24), // 1 hour
       },
       emailAndPassword: {
-        resetPasswordTokenExpiresIn: 3600, // 1 hour
+        resetPasswordTokenExpiresIn: hoursToSeconds(1), // 1 hour
         enabled: true,
         autoSignIn: true,
         sendResetPassword: async ({ user, url }) => {
@@ -114,7 +112,7 @@ export const BetterAuthProvider = {
         emailOTP({
           overrideDefaultEmailVerification: true,
           otpLength: 6,
-          expiresIn: 300,
+          expiresIn: minutesToSeconds(5),
           allowedAttempts: 5,
           sendVerificationOTP: async ({ email, otp, type }) => {
             if (type === 'sign-in') {
@@ -122,7 +120,7 @@ export const BetterAuthProvider = {
                 to: email,
                 props: {
                   otpCode: otp,
-                  expiresInSeconds: 300,
+                  expiresInSeconds: minutesToSeconds(5),
                 },
               });
             }
