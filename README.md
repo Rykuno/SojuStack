@@ -1,3 +1,6 @@
+
+![logo](./stack-logo.png)
+
 # SojuStack
 
 Opinionated, production-minded full-stack starter with strong TypeScript ergonomics and end-to-end type safety.
