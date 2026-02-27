@@ -8,6 +8,8 @@ export class AuthApi implements ApiHandler {
   sessionQueryOptions() {
     return queryOptions({
       queryKey: [...this.queryKeys, 'session'],
+      staleTime: 30_000,
+      gcTime: 300_000,
       queryFn: async () =>
         authClient()
           .getSession()

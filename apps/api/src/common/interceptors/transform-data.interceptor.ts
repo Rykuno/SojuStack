@@ -12,7 +12,9 @@ export class TransformDataInterceptor implements NestInterceptor {
         if (data === null || data === undefined) {
           return data;
         }
-        return plainToInstance(this.classToUse, data);
+        return plainToInstance(this.classToUse, data, {
+          excludeExtraneousValues: true,
+        });
       }),
     );
   }

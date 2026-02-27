@@ -14,8 +14,13 @@ export class AuthConfig {
 
   @IsString({ each: true })
   @IsNotEmpty()
-  @Value('APP_WEB_URL', {
-    parse: (origin: string) => [origin],
+  @Value('AUTH_TRUSTED_ORIGINS', {
+    default: '',
+    parse: (value: string) =>
+      value
+        .split(',')
+        .map((origin) => origin.trim())
+        .filter(Boolean),
   })
   trustedOrigins!: string[];
 }

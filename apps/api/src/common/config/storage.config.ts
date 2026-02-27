@@ -1,5 +1,5 @@
 import { Configuration, Value } from '@itgorillaz/configify';
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsBoolean, IsNotEmpty, IsString } from 'class-validator';
 
 @Configuration()
 export class StorageConfig {
@@ -27,4 +27,10 @@ export class StorageConfig {
   @IsNotEmpty()
   @Value('STORAGE_SECRET_KEY')
   secretKey!: string;
+
+  @IsBoolean()
+  @Value('STORAGE_PUBLIC_READ', {
+    default: true,
+  })
+  isPublicReadEnabled!: boolean;
 }

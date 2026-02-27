@@ -1,3 +1,14 @@
-# TanStack Start + shadcn/ui
+# Web (`apps/web`)
 
-This is a template for a new TanStack Start project with React, TypeScript, and shadcn/ui.
+TanStack Start frontend for SojuStack.
+
+For full project setup and architecture, use the repository root README.
+
+## Common Commands
+
+```sh
+pnpm -C apps/web dev
+pnpm -C apps/web typecheck
+pnpm -C apps/web lint
+pnpm -C apps/web build
+```

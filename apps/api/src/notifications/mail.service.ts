@@ -31,7 +31,7 @@ export class MailService implements OnModuleInit {
 
   onModuleInit() {
     if (this.appConfig.isProduction) {
-      throw new Error('Production email provider is not configured.');
+      this.logger.warn('Production email provider is not configured. Email sends will fail.');
     }
   }
 

@@ -1,4 +1,12 @@
-import { PickType } from '@nestjs/swagger';
-import { ActiveUserDto } from 'src/auth/dtos/active-user.dto';
+import { Expose } from 'class-transformer';
 
-export class UserDto extends PickType(ActiveUserDto, ['id', 'name', 'image']) {}
+export class UserDto {
+  @Expose()
+  id!: string;
+
+  @Expose()
+  name!: string;
+
+  @Expose()
+  image!: string | null;
+}

@@ -1,5 +1,5 @@
 import { createId } from '@paralleldrive/cuid2';
-import { index, pgTable, text } from 'drizzle-orm/pg-core';
+import { index, pgTable, text, uniqueIndex } from 'drizzle-orm/pg-core';
 import { users } from './users.table';
 import { timestampz } from '../drizzle.utils';
 
@@ -27,5 +27,8 @@ export const accounts = pgTable(
       .defaultNow()
       .$onUpdateFn(() => new Date()),
   },
-  (table) => [index('accounts_user_id_idx').on(table.userId)],
+  (table) => [
+    index('accounts_user_id_idx').on(table.userId),
+    uniqueIndex('accounts_provider_account_id_idx').on(table.providerId, table.accountId),
+  ],
 );

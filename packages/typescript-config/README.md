@@ -1,6 +1,6 @@
 # `@package/typescript-config`
 
-Shared TypeScript configuration presets for the Partytrick monorepo.
+Shared TypeScript configuration presets for the SojuStack monorepo.
 
 ## Overview
 

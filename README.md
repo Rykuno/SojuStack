@@ -100,7 +100,7 @@ pnpm dev
 
 ```txt
 web:      http://localhost:3000
-api:      http://localhost:8080
+api:      http://localhost:8000
 mailpit:  http://localhost:8025
 postgres: postgres://postgres:postgres@localhost:5432/postgres
 valkey:   redis://localhost:6379

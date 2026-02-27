@@ -22,8 +22,5 @@ export const sessions = pgTable(
       .defaultNow()
       .$onUpdateFn(() => new Date()),
   },
-  (table) => [
-    index('sessions_user_id_idx').on(table.userId),
-    index('sessions_token_idx').on(table.token),
-  ],
+  (table) => [index('sessions_user_id_idx').on(table.userId)],
 );

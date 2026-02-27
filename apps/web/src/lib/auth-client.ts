@@ -1,7 +1,8 @@
 import { createIsomorphicFn } from '@tanstack/react-start';
 import { getRequest } from '@tanstack/react-start/server';
-import { emailOTPClient, organizationClient } from 'better-auth/client/plugins';
+import { emailOTPClient } from 'better-auth/client/plugins';
 import { createAuthClient } from 'better-auth/react';
+import { pickForwardHeaders } from './forwarded-headers';
 
 function getRequiredApiUrl() {
   const apiUrl = import.meta.env.VITE_API_URL;
@@ -15,7 +16,7 @@ function initAuthClient(fetchOptions: RequestInit) {
   return createAuthClient({
     baseURL: getRequiredApiUrl(),
     basePath: '/auth/client',
-    plugins: [emailOTPClient(), organizationClient()],
+    plugins: [emailOTPClient()],
     fetchOptions,
   });
 }
@@ -28,8 +29,9 @@ function getClientAuthClient() {
 
 function getServerAuthClient() {
   const { headers } = getRequest();
+
   return initAuthClient({
-    headers: Object.fromEntries(headers),
+    headers: pickForwardHeaders(headers),
     credentials: 'include',
   });
 }

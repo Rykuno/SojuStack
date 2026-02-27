@@ -2,6 +2,7 @@ import { createIsomorphicFn } from '@tanstack/react-start';
 import { getRequest } from '@tanstack/react-start/server';
 import { paths } from 'api/generated/openapi';
 import createClient, { Middleware } from 'openapi-fetch';
+import { pickForwardHeaders } from './forwarded-headers';
 
 type ApiClient = ReturnType<typeof createClient<paths>>;
 type FetchImpl = (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>;
@@ -66,7 +67,8 @@ function initApiClient(opts?: { headers?: HeadersInit; fetch?: FetchImpl }) {
 
 function getServerApiClient() {
   const { headers } = getRequest();
-  return initApiClient({ headers: Object.fromEntries(headers) });
+
+  return initApiClient({ headers: pickForwardHeaders(headers) });
 }
 
 function getClientApiClient() {

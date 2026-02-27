@@ -1,7 +1,7 @@
 import { Controller, UseInterceptors, UploadedFile, Body, Patch } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiConsumes } from '@nestjs/swagger';
+import { ApiConsumes, ApiOkResponse } from '@nestjs/swagger';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { Auth, AuthType } from 'src/auth/decorators/auth.decorator';
 import { ActiveUser } from 'src/auth/decorators/active-user.decorator';
@@ -17,6 +17,7 @@ export class UsersController {
   @UseInterceptors(new TransformDataInterceptor(UserDto))
   @ApiConsumes('multipart/form-data')
   @Auth(AuthType.Required)
+  @ApiOkResponse({ type: UserDto })
   @UseInterceptors(FileInterceptor('image'))
   update(
     @Body() updateUserDto: UpdateUserDto,

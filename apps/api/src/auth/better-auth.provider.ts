@@ -26,6 +26,8 @@ export const BetterAuthProvider = {
     appConfig: AppConfig,
     authConfig: AuthConfig,
   ) => {
+    const trustedOrigins = [...new Set([appConfig.webUrl, ...authConfig.trustedOrigins])];
+
     return betterAuth({
       database: drizzleAdapter(txHost.tx, {
         provider: 'pg',
@@ -60,9 +62,14 @@ export const BetterAuthProvider = {
       appName: appConfig.name,
       baseURL: appConfig.url,
       basePath: authConfig.basePath,
-      trustedOrigins: authConfig.trustedOrigins,
+      trustedOrigins,
+      rateLimit: {
+        enabled: true,
+        storage: 'secondary-storage',
+      },
       session: {
         storeSessionInDatabase: true,
+        freshAge: hoursToSeconds(1),
       },
       user: {
         changeEmail: {
@@ -91,7 +98,7 @@ export const BetterAuthProvider = {
           });
         },
         autoSignInAfterVerification: true,
-        expiresIn: hoursToSeconds(24), // 1 hour
+        expiresIn: hoursToSeconds(24), // 24 hours
       },
       emailAndPassword: {
         resetPasswordTokenExpiresIn: hoursToSeconds(1), // 1 hour

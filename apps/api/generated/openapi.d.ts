@@ -51,10 +51,19 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        HealthzDto: {
+            /** @example ok */
+            status: string;
+        };
         UpdateUserDto: {
             /** Format: binary */
-            image: Blob;
+            image?: Blob;
             name?: string;
+        };
+        UserDto: {
+            id: string;
+            name: string;
+            image: string | null;
         };
     };
     responses: never;
@@ -78,7 +87,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["HealthzDto"];
+                };
             };
         };
     };
@@ -219,7 +230,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": Record<string, never>;
+                    "application/json": components["schemas"]["UserDto"];
                 };
             };
         };
