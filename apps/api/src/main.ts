@@ -2,7 +2,7 @@ import 'dotenv/config';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
-import { INestApplication, ValidationPipe } from '@nestjs/common';
+import { INestApplication, Logger, ValidationPipe } from '@nestjs/common';
 import { generateOpenApiSpecs } from './utils/openapi';
 import chalk from 'chalk';
 import { NestExpressApplication } from '@nestjs/platform-express';
@@ -11,6 +11,7 @@ import { apiReference } from '@scalar/nestjs-api-reference';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  const logger = app.get(Logger);
   const { cors, port, isProduction } = app.get(AppConfig);
 
   /* -------------------------------------------------------------------------- */
@@ -37,7 +38,7 @@ async function bootstrap() {
   /*                                   Server                                   */
   /* -------------------------------------------------------------------------- */
   await app.listen(port, () => {
-    console.log(chalk.green(`🚀 Server is running on port ${port}`));
+    logger.log(chalk.green(`🚀 Server is running on port ${port}`));
   });
 }
 

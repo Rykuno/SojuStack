@@ -14,6 +14,7 @@ export class TransformDataInterceptor implements NestInterceptor {
         }
         return plainToInstance(this.classToUse, data, {
           excludeExtraneousValues: true,
+          enableImplicitConversion: true,
         });
       }),
     );
