@@ -1,21 +1,17 @@
 import { QueryClient } from '@tanstack/react-query';
 import { createRouter } from '@tanstack/react-router';
 import { setupRouterSsrQueryIntegration } from '@tanstack/react-router-ssr-query';
-import { NotFound } from './components/not-found';
-
-// Import the generated route tree
 import { routeTree } from './routeTree.gen';
 import { DefaultCatchBoundary } from './components/default-catch-boundary';
+import { NotFound } from './components/not-found';
 
-// Create a new router instance
-export const getRouter = () => {
+export function getRouter() {
   const queryClient = new QueryClient();
 
   const router = createRouter({
     routeTree,
     context: { queryClient },
-    scrollRestoration: true,
-    defaultPreloadStaleTime: 0,
+    defaultPreload: 'intent',
     defaultErrorComponent: DefaultCatchBoundary,
     defaultNotFoundComponent: () => <NotFound />,
   });
@@ -25,4 +21,10 @@ export const getRouter = () => {
   });
 
   return router;
-};
+}
+
+declare module '@tanstack/react-router' {
+  interface Register {
+    router: ReturnType<typeof getRouter>;
+  }
+}
