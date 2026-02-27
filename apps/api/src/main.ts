@@ -8,7 +8,6 @@ import chalk from 'chalk';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { AppConfig } from './common/config/app.config';
 import { apiReference } from '@scalar/nestjs-api-reference';
-// import { SecurityHeadersMiddleware } from './common/middlewares/security-headers.middleware';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
