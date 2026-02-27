@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { DatabasesModule } from './databases/databases.module';
@@ -20,6 +20,7 @@ import { ConfigifyModule } from '@itgorillaz/configify';
 import { CacheConfig } from './common/config/cache.config';
 import { TransactionalAdapterDrizzleOrm } from '@nestjs-cls/transactional-adapter-drizzle-orm';
 import { DRIZZLE_PROVIDER } from './databases/drizzle.provider';
+import { SecurityHeadersMiddleware } from './common/middlewares/security-headers.middleware';
 
 @Module({
   imports: [
@@ -86,4 +87,8 @@ import { DRIZZLE_PROVIDER } from './databases/drizzle.provider';
     },
   ],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer): void {
+    consumer.apply(SecurityHeadersMiddleware).forRoutes('*');
+  }
+}
