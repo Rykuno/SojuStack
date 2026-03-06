@@ -33,6 +33,13 @@ Use this skill to keep changes idiomatic and safe in this repository.
 - Use `invalidateQueries()` without parameters when broad refresh is intended.
 - Keep server-state logic in query/mutation hooks, not presentational components.
 
+### API Clients and Types
+
+- Prefer end-to-end types from `apps/api/generated/openapi.d.ts` instead of introducing parallel custom web types such as `apps/web/src/lib/types.ts`.
+- Prefer importing generated API types via `api/generated/openapi` (`paths`, `components`, etc.) when modeling request and response shapes in the web app.
+- Prefer `apps/web/src/lib/api-client.ts` for frontend API calls instead of native `fetch`.
+- Treat the shared API client as the default path for request behavior, credentials, forwarded headers, and error handling. Use raw `fetch` only when there is a clear reason the shared client cannot support the use case.
+
 ### UI (ShadCN + Base UI)
 
 - Prefer components from `apps/web/src/components/ui/`.
