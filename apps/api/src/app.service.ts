@@ -17,9 +17,11 @@ export class AppService implements OnApplicationBootstrap {
     const bucketExists = await this.s3Service.bucketExists(this.storageConfig.bucketName);
     if (bucketExists) return;
     await this.s3Service.createBucket(this.storageConfig.bucketName);
-    await this.s3Service.setBucketPolicy(
-      this.storageConfig.bucketName,
-      this.s3Service.getPublicBucketPolicy(this.storageConfig.bucketName),
-    );
+    if (this.storageConfig.publicReadEnabled) {
+      await this.s3Service.setBucketPolicy(
+        this.storageConfig.bucketName,
+        this.s3Service.getPublicBucketPolicy(this.storageConfig.bucketName),
+      );
+    }
   }
 }

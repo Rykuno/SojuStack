@@ -96,6 +96,8 @@ pnpm -C apps/api db:push
 pnpm dev
 ```
 
+If you want uploaded objects to be directly public, set `STORAGE_PUBLIC_READ_ENABLED=true` in `apps/api/.env`. Keep it `false` unless you intentionally want public bucket reads.
+
 ## Default Local Endpoints
 
 ```txt
@@ -128,6 +130,8 @@ SojuStack keeps API and frontend contracts aligned by default:
 - Typed API usage through `openapi-fetch`
 
 In practice: update a DTO/route in API and frontend compile errors surface immediately where contracts changed.
+
+`apps/api/generated/openapi.d.ts` is a committed generated artifact and the source of truth consumed by the web app. After changing API contracts, run `pnpm api:openapi:generate` and commit the updated file. CI verifies that the committed contract matches freshly generated output.
 
 ## Why This Stack
 

@@ -14,7 +14,8 @@
     "check-types": "turbo run check-types",
     "typecheck": "turbo run typecheck",
     "clean": "rimraf dist node_modules pnpm-lock.yaml",
-    "api:openapi:generate": "pnpm -C apps/api openapi:generate"
+    "api:openapi:generate": "pnpm -C apps/api openapi:generate",
+    "api:openapi:check": "pnpm api:openapi:generate && git diff --exit-code -- apps/api/generated/openapi.d.ts"
   },
   "devDependencies": {
     "chalk": "^5.6.2",

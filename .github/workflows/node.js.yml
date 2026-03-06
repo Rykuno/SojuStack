@@ -36,8 +36,8 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Generate OpenAPI types
-        run: pnpm api:openapi:generate
+      - name: Verify committed OpenAPI types
+        run: pnpm api:openapi:check
 
       - name: Check Types
         run: pnpm typecheck
