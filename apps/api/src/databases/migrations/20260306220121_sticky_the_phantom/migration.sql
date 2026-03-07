@@ -1,9 +1,9 @@
-CREATE EXTENSION IF NOT EXISTS "citext";
+CREATE EXTENSION IF NOT EXISTS citext;
 
 CREATE TABLE "users" (
 	"id" text PRIMARY KEY,
 	"name" text NOT NULL,
-	"email" text NOT NULL UNIQUE,
+	"email" citext NOT NULL UNIQUE,
 	"email_verified" boolean NOT NULL,
 	"image" text,
 	"created_at" timestamp(3) with time zone DEFAULT now() NOT NULL,
@@ -48,6 +48,7 @@ CREATE TABLE "verifications" (
 --> statement-breakpoint
 CREATE TABLE "files" (
 	"id" text PRIMARY KEY,
+	"bucket" text DEFAULT 'public' NOT NULL,
 	"storage_key" text NOT NULL UNIQUE,
 	"name" text NOT NULL,
 	"mime_type" text NOT NULL,
@@ -56,10 +57,9 @@ CREATE TABLE "files" (
 	"updated_at" timestamp(3) with time zone DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
-CREATE UNIQUE INDEX "users_email_idx" ON "users" ("email");--> statement-breakpoint
 CREATE INDEX "sessions_user_id_idx" ON "sessions" ("user_id");--> statement-breakpoint
-CREATE INDEX "sessions_token_idx" ON "sessions" ("token");--> statement-breakpoint
 CREATE INDEX "accounts_user_id_idx" ON "accounts" ("user_id");--> statement-breakpoint
+CREATE UNIQUE INDEX "accounts_provider_account_id_idx" ON "accounts" ("provider_id","account_id");--> statement-breakpoint
 CREATE INDEX "verifications_identifier_idx" ON "verifications" ("identifier");--> statement-breakpoint
 ALTER TABLE "sessions" ADD CONSTRAINT "sessions_user_id_users_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE;--> statement-breakpoint
 ALTER TABLE "accounts" ADD CONSTRAINT "accounts_user_id_users_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE;

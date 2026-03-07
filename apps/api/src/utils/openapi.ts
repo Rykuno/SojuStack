@@ -1,5 +1,6 @@
 import { OpenAPIObject } from '@nestjs/swagger';
 import chalk from 'chalk';
+import { spawnSync } from 'node:child_process';
 import * as fsSync from 'node:fs';
 import * as fs from 'node:fs/promises';
 import openapiTS from 'openapi-typescript';
@@ -88,6 +89,7 @@ async function generateSingleSpec(spec: OpenApiSpec): Promise<void> {
 
     // Write the updated file
     await writeOpenApiFile(filePath, newContents);
+    formatGeneratedFile(filePath);
     console.log(chalk.green(`  ✅ ${fileName} updated`));
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
@@ -116,6 +118,23 @@ async function writeOpenApiFile(filePath: string, contents: string): Promise<voi
 
   // Write file
   await fs.writeFile(filePath, contents, 'utf8');
+}
+
+function formatGeneratedFile(filePath: string): void {
+  const command = process.platform === 'win32' ? 'pnpm.cmd' : 'pnpm';
+  const result = spawnSync(command, ['exec', 'oxfmt', filePath], {
+    stdio: 'inherit',
+  });
+
+  if (result.status === 0) {
+    return;
+  }
+
+  if (result.error) {
+    throw result.error;
+  }
+
+  throw new Error(`Failed to format generated OpenAPI file: ${filePath}`);
 }
 
 // Convenience function for single spec (backward compatibility)

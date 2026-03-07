@@ -13,6 +13,7 @@ import {
 } from '@aws-sdk/client-s3';
 import { Injectable } from '@nestjs/common';
 import { StorageConfig } from 'src/common/config/storage.config';
+import { StorageBucket, type StorageBucket as StorageBucketType } from './storage.constants';
 
 type PublicBucketPolicy = Awaited<ReturnType<S3Service['getPublicBucketPolicy']>>;
 
@@ -79,12 +80,35 @@ export class S3Service {
     );
   }
 
-  putObject({ bucketName, key, file }: { bucketName: string; key: string; file: Buffer }) {
+  getBucketName(bucket: StorageBucketType) {
+    return this.storageConfig[
+      bucket === StorageBucket.Public ? 'publicBucketName' : 'privateBucketName'
+    ];
+  }
+
+  getPublicObjectUrl(storageKey: string | null | undefined) {
+    return storageKey
+      ? `${this.storageConfig.url.replace(/\/+$/, '')}/${this.storageConfig.publicBucketName}/${storageKey}`
+      : null;
+  }
+
+  putObject({
+    bucketName,
+    key,
+    file,
+    contentType,
+  }: {
+    bucketName: string;
+    key: string;
+    file: Buffer;
+    contentType?: string;
+  }) {
     return this.client.send(
       new PutObjectCommand({
         Bucket: bucketName,
         Key: key,
         Body: file,
+        ContentType: contentType,
       }),
     );
   }
@@ -116,7 +140,7 @@ export class S3Service {
         chunks.push(chunk as Buffer);
       }
 
-      return Buffer.concat(chunks).toString('utf-8');
+      return Buffer.concat(chunks);
     }
     throw new Error('Object not found');
   }

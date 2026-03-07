@@ -5,17 +5,16 @@ import { DrizzleTransactionClient } from 'src/databases/drizzle.provider';
 import { eq } from 'drizzle-orm';
 import { users } from 'src/databases/drizzle.schema';
 import { ImagesService } from 'src/storage/images.service';
-import { StorageConfig } from 'src/common/config/storage.config';
 import { takeFirstOrThrow } from 'src/databases/drizzle.utils';
 import { createId } from '@paralleldrive/cuid2';
-import { toPublicStorageUrl } from 'src/storage/storage.utils';
+import { S3Service } from 'src/storage/s3.service';
 
 @Injectable()
 export class UsersService {
   constructor(
     private readonly txHost: TransactionHost<DrizzleTransactionClient>,
     private readonly imagesService: ImagesService,
-    private readonly storageConfig: StorageConfig,
+    private readonly s3Service: S3Service,
   ) {}
 
   @Transactional()
@@ -56,7 +55,7 @@ export class UsersService {
 
     return {
       ...updatedUser,
-      image: toPublicStorageUrl(this.storageConfig, updatedUser.image),
+      image: this.s3Service.getPublicObjectUrl(updatedUser.image),
     };
   }
 
@@ -65,7 +64,7 @@ export class UsersService {
 
     return userRecords.map((userRecord) => ({
       ...userRecord,
-      image: toPublicStorageUrl(this.storageConfig, userRecord.image),
+      image: this.s3Service.getPublicObjectUrl(userRecord.image),
     }));
   }
 }

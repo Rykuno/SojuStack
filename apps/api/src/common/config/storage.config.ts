@@ -15,8 +15,13 @@ export class StorageConfig {
 
   @IsString()
   @IsNotEmpty()
-  @Value('STORAGE_BUCKET_NAME', { default: 'public' })
-  bucketName!: string;
+  @Value('STORAGE_PUBLIC_BUCKET_NAME', { default: 'public' })
+  publicBucketName!: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @Value('STORAGE_PRIVATE_BUCKET_NAME', { default: 'private' })
+  privateBucketName!: string;
 
   @IsBoolean()
   @IsNotEmpty()
@@ -24,7 +29,7 @@ export class StorageConfig {
     default: 'false',
     parse: (value: string) => value === 'true',
   })
-  publicReadEnabled!: boolean;
+  publicBucketReadEnabled!: boolean;
 
   @IsString()
   @IsNotEmpty()

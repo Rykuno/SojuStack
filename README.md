@@ -96,7 +96,9 @@ pnpm -C apps/api db:push
 pnpm dev
 ```
 
-If you want uploaded objects to be directly public, set `STORAGE_PUBLIC_READ_ENABLED=true` in `apps/api/.env`. Keep it `false` unless you intentionally want public bucket reads.
+The API storage layer now expects both `STORAGE_PUBLIC_BUCKET_NAME` and `STORAGE_PRIVATE_BUCKET_NAME` in `apps/api/.env`. Public asset URLs are emitted only from the public bucket, and private bucket reads stay backend-only in the current implementation.
+
+If you want objects in the public bucket to be directly readable, set `STORAGE_PUBLIC_READ_ENABLED=true`. Keep it `false` unless you intentionally want public bucket reads.
 
 ## Default Local Endpoints
 

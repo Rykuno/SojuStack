@@ -11,7 +11,6 @@ import { apiReference } from '@scalar/nestjs-api-reference';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
-  const logger = app.get(Logger);
   const { cors, port, isProduction } = app.get(AppConfig);
 
   /* -------------------------------------------------------------------------- */
@@ -38,7 +37,7 @@ async function bootstrap() {
   /*                                   Server                                   */
   /* -------------------------------------------------------------------------- */
   await app.listen(port, () => {
-    logger.log(chalk.green(`🚀 Server is running on port ${port}`));
+    console.log(chalk.green(`🚀 Server is running on port ${port}`));
   });
 }
 

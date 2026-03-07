@@ -1,6 +1,7 @@
 import { Injectable, OnApplicationBootstrap } from '@nestjs/common';
 import { S3Service } from './storage/s3.service';
 import { StorageConfig } from './common/config/storage.config';
+import { StorageBucket } from './storage/storage.constants';
 
 @Injectable()
 export class AppService implements OnApplicationBootstrap {
@@ -14,14 +15,30 @@ export class AppService implements OnApplicationBootstrap {
   }
 
   private async setupStorage() {
-    const bucketExists = await this.s3Service.bucketExists(this.storageConfig.bucketName);
-    if (bucketExists) return;
-    await this.s3Service.createBucket(this.storageConfig.bucketName);
-    if (this.storageConfig.publicReadEnabled) {
-      await this.s3Service.setBucketPolicy(
-        this.storageConfig.bucketName,
-        this.s3Service.getPublicBucketPolicy(this.storageConfig.bucketName),
-      );
+    const buckets = [
+      {
+        name: this.s3Service.getBucketName(StorageBucket.Public),
+        shouldEnablePublicRead: this.storageConfig.publicBucketReadEnabled,
+      },
+      {
+        name: this.s3Service.getBucketName(StorageBucket.Private),
+        shouldEnablePublicRead: false,
+      },
+    ];
+
+    for (const bucket of buckets) {
+      const bucketExists = await this.s3Service.bucketExists(bucket.name);
+
+      if (!bucketExists) {
+        await this.s3Service.createBucket(bucket.name);
+      }
+
+      if (bucket.shouldEnablePublicRead) {
+        await this.s3Service.setBucketPolicy(
+          bucket.name,
+          this.s3Service.getPublicBucketPolicy(bucket.name),
+        );
+      }
     }
   }
 }

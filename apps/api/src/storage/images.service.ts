@@ -1,6 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import sharp from 'sharp';
 import { FilesService } from './files.service';
+import { StorageBucket } from './storage.constants';
 
 @Injectable()
 export class ImagesService {
@@ -15,12 +16,12 @@ export class ImagesService {
 
   async create(file: Express.Multer.File) {
     await this.assertValidImage(file);
-    return this.filesService.create(file);
+    return this.filesService.create(file, StorageBucket.Public);
   }
 
   async createWithStorageKey(storageKey: string, file: Express.Multer.File) {
     await this.assertValidImage(file);
-    return this.filesService.createWithStorageKey(storageKey, file);
+    return this.filesService.createWithStorageKey(storageKey, file, StorageBucket.Public);
   }
 
   async update(storageKey: string, file: Express.Multer.File) {

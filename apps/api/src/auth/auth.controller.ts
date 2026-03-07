@@ -1,4 +1,4 @@
-import { Controller, Req, Res, All } from '@nestjs/common';
+import { Controller, Req, Res, All, RawBodyRequest } from '@nestjs/common';
 import { Auth, AuthType } from './decorators/auth.decorator';
 import type { Request, Response } from 'express';
 import { toNodeHandler } from 'better-auth/node';
@@ -11,7 +11,8 @@ export class AuthController {
 
   @All('/client/*path')
   @Auth(AuthType.Public)
-  async handler(@Req() req: Request, @Res() res: Response) {
+  async handler(@Req() req: RawBodyRequest<Request>, @Res() res: Response) {
+    if (req.rawBody) req.body = req.rawBody.toString('utf-8');
     return toNodeHandler(this.betterAuth)(req, res);
   }
 }
