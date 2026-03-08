@@ -8,6 +8,13 @@ import { eq } from 'drizzle-orm';
 import { TransactionHost, Transactional } from '@nestjs-cls/transactional';
 import { type StorageBucket } from './storage.constants';
 
+type FileRecord = typeof files.$inferSelect;
+type FileMetadata = Pick<FileRecord, 'name' | 'mimeType' | 'sizeBytes'>;
+type StoredObjectLocation = Pick<FileRecord, 'bucket' | 'storageKey' | 'mimeType'>;
+type StoredObjectSnapshot = StoredObjectLocation & {
+  file: Buffer;
+};
+
 @Injectable()
 export class FilesService {
   private readonly logger = new Logger(FilesService.name);
@@ -25,20 +32,12 @@ export class FilesService {
 
   @Transactional()
   async createWithStorageKey(storageKey: string, file: Express.Multer.File, bucket: StorageBucket) {
-    await this.putStoredFile({ bucket, key: storageKey, file });
+    await this.storeIncomingFile({ bucket, storageKey, file });
 
     try {
-      return await this.txHost.tx
-        .insert(files)
-        .values({
-          ...this.toFileMetadata(file),
-          bucket,
-          storageKey,
-        })
-        .returning()
-        .then(takeFirstOrThrow);
+      return await this.insertFileRecord({ bucket, storageKey, file });
     } catch (error) {
-      await this.tryDeleteStoredFile({ bucket, key: storageKey });
+      await this.safelyDeleteStoredObject({ bucket, storageKey });
       throw error;
     }
   }
@@ -54,22 +53,18 @@ export class FilesService {
   @Transactional()
   async update(key: string, file: Express.Multer.File) {
     const fileRecord = await this.getByStorageKey(key);
-    const previousContents = await this.s3Service.getObject({
+    const previousObject = await this.createStoredObjectSnapshot(fileRecord);
+
+    await this.storeIncomingFile({
       bucket: fileRecord.bucket,
-      key,
+      storageKey: key,
+      file,
     });
 
-    await this.putStoredFile({ bucket: fileRecord.bucket, key, file });
-
     try {
-      return await this.txHost.tx
-        .update(files)
-        .set(this.toFileMetadata(file))
-        .where(eq(files.storageKey, key))
-        .returning()
-        .then(takeFirstOrThrow);
+      return await this.updateFileRecord(key, file);
     } catch (error) {
-      await this.tryRestoreStoredFile(fileRecord, previousContents);
+      await this.safelyRestoreStoredObject(previousObject);
       throw error;
     }
   }
@@ -77,17 +72,14 @@ export class FilesService {
   @Transactional()
   async delete(key: string) {
     const fileRecord = await this.getByStorageKey(key);
-    const previousContents = await this.s3Service.getObject({
-      bucket: fileRecord.bucket,
-      key,
-    });
+    const previousObject = await this.createStoredObjectSnapshot(fileRecord);
 
-    await this.s3Service.deleteObject({ bucket: fileRecord.bucket, key });
+    await this.deleteStoredObject(fileRecord);
 
     try {
-      await this.txHost.tx.delete(files).where(eq(files.storageKey, key));
+      await this.deleteFileRecord(key);
     } catch (error) {
-      await this.tryRestoreStoredFile(fileRecord, previousContents);
+      await this.safelyRestoreStoredObject(previousObject);
       throw error;
     }
   }
@@ -106,7 +98,7 @@ export class FilesService {
     return fileRecord;
   }
 
-  private toFileMetadata(file: Express.Multer.File) {
+  private toFileMetadata(file: Express.Multer.File): FileMetadata {
     return {
       name: file.originalname,
       mimeType: file.mimetype,
@@ -114,45 +106,102 @@ export class FilesService {
     };
   }
 
-  private putStoredFile({
+  private insertFileRecord({
     bucket,
-    key,
+    storageKey,
     file,
   }: {
     bucket: StorageBucket;
-    key: string;
+    storageKey: string;
+    file: Express.Multer.File;
+  }) {
+    return this.txHost.tx
+      .insert(files)
+      .values({
+        ...this.toFileMetadata(file),
+        bucket,
+        storageKey,
+      })
+      .returning()
+      .then(takeFirstOrThrow);
+  }
+
+  private updateFileRecord(storageKey: string, file: Express.Multer.File) {
+    return this.txHost.tx
+      .update(files)
+      .set(this.toFileMetadata(file))
+      .where(eq(files.storageKey, storageKey))
+      .returning()
+      .then(takeFirstOrThrow);
+  }
+
+  private deleteFileRecord(storageKey: string) {
+    return this.txHost.tx.delete(files).where(eq(files.storageKey, storageKey));
+  }
+
+  private storeIncomingFile({
+    bucket,
+    storageKey,
+    file,
+  }: {
+    bucket: StorageBucket;
+    storageKey: string;
     file: Pick<Express.Multer.File, 'buffer' | 'mimetype'>;
   }) {
     return this.s3Service.putObject({
       bucket,
-      key,
+      key: storageKey,
       file: file.buffer,
       contentType: file.mimetype,
     });
   }
 
-  private async tryDeleteStoredFile({ bucket, key }: { bucket: StorageBucket; key: string }) {
+  private deleteStoredObject({
+    bucket,
+    storageKey,
+  }: Pick<StoredObjectLocation, 'bucket' | 'storageKey'>) {
+    return this.s3Service.deleteObject({ bucket, key: storageKey });
+  }
+
+  private async createStoredObjectSnapshot(fileRecord: FileRecord): Promise<StoredObjectSnapshot> {
+    const file = await this.s3Service.getObject({
+      bucket: fileRecord.bucket,
+      key: fileRecord.storageKey,
+    });
+
+    return {
+      bucket: fileRecord.bucket,
+      storageKey: fileRecord.storageKey,
+      mimeType: fileRecord.mimeType,
+      file,
+    };
+  }
+
+  private async safelyDeleteStoredObject({
+    bucket,
+    storageKey,
+  }: Pick<StoredObjectLocation, 'bucket' | 'storageKey'>) {
     try {
-      await this.s3Service.deleteObject({ bucket, key });
+      await this.deleteStoredObject({ bucket, storageKey });
     } catch (rollbackError) {
       this.logger.error(
-        `Failed to roll back uploaded object "${key}" in bucket "${bucket}".`,
+        `Failed to clean up object "${storageKey}" in bucket "${bucket}" after a database error.`,
         rollbackError instanceof Error ? rollbackError.stack : undefined,
       );
     }
   }
 
-  private async tryRestoreStoredFile(fileRecord: typeof files.$inferSelect, file: Buffer) {
+  private async safelyRestoreStoredObject(snapshot: StoredObjectSnapshot) {
     try {
       await this.s3Service.putObject({
-        bucket: fileRecord.bucket,
-        key: fileRecord.storageKey,
-        file,
-        contentType: fileRecord.mimeType,
+        bucket: snapshot.bucket,
+        key: snapshot.storageKey,
+        file: snapshot.file,
+        contentType: snapshot.mimeType,
       });
     } catch (rollbackError) {
       this.logger.error(
-        `Failed to restore object "${fileRecord.storageKey}" in bucket "${fileRecord.bucket}".`,
+        `Failed to restore object "${snapshot.storageKey}" in bucket "${snapshot.bucket}" after a database error.`,
         rollbackError instanceof Error ? rollbackError.stack : undefined,
       );
     }
