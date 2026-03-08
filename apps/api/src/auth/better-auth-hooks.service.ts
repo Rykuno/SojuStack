@@ -4,7 +4,7 @@ import { User } from 'better-auth/types';
 
 @Injectable()
 export class BetterAuthHooksService {
-  async afterUserCreated(user: User): Promise<void> {}
+  async afterUserCreated(_user: User): Promise<void> {}
 
   async beforeSessionCreated(session: Session): Promise<Session> {
     return session;
