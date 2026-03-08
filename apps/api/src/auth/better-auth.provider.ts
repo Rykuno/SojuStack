@@ -9,23 +9,21 @@ import { MailService } from 'src/notifications/mail.service';
 import { AuthConfig } from 'src/common/config/auth.config';
 import { AppConfig } from 'src/common/config/app.config';
 import { hoursToSeconds, minutesToSeconds } from 'date-fns';
-import { EventEmitter2 } from '@nestjs/event-emitter';
-import { AuthService } from './auth.service';
+import { BetterAuthHooksService } from './better-auth-hooks.service';
 
 export const BETTER_AUTH_PROVIDER = Symbol('BETTER_AUTH_PROVIDER');
 export type BetterAuth = ReturnType<typeof BetterAuthProvider.useFactory>;
 
 export const BetterAuthProvider = {
   provide: BETTER_AUTH_PROVIDER,
-  inject: [TransactionHost, Cache, EventEmitter2, MailService, AppConfig, AuthConfig, AuthService],
+  inject: [TransactionHost, Cache, MailService, AppConfig, AuthConfig, BetterAuthHooksService],
   useFactory: (
     txHost: TransactionHost<DrizzleTransactionClient>,
     cache: Cache,
-    eventEmitter: EventEmitter2,
     mailService: MailService,
     appConfig: AppConfig,
     authConfig: AuthConfig,
-    authService: AuthService,
+    betterAuthHooksService: BetterAuthHooksService,
   ) => {
     const trustedOrigins = [...new Set([appConfig.webUrl, ...authConfig.trustedOrigins])];
 
@@ -75,14 +73,14 @@ export const BetterAuthProvider = {
         user: {
           create: {
             async after(user) {
-              await authService.afterUserCreated(user);
+              await betterAuthHooksService.afterUserCreated(user);
             },
           },
         },
         session: {
           create: {
             async before(session) {
-              const updatedSession = await authService.beforeSessionCreated(session);
+              const updatedSession = await betterAuthHooksService.beforeSessionCreated(session);
               return {
                 data: {
                   ...updatedSession,
