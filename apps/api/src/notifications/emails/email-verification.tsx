@@ -15,15 +15,19 @@ import {
 export interface EmailVerificationProps {
   userEmail?: string;
   verificationUrl?: string;
-  expirationHours?: number;
+  expiresIn?: number;
 }
 
 const EmailVerification = (props: EmailVerificationProps) => {
   const {
     userEmail = 'me@rykuno.com',
     verificationUrl = 'https://example.com/verify',
-    expirationHours = 1,
+    expiresIn = 60 * 60,
   } = props;
+  const expirationLabel =
+    expiresIn % (60 * 60) === 0
+      ? `${expiresIn / (60 * 60)} hour${expiresIn / (60 * 60) !== 1 ? 's' : ''}`
+      : `${expiresIn / 60} minute${expiresIn / 60 !== 1 ? 's' : ''}`;
 
   return (
     <Html lang='en' dir='ltr'>
@@ -79,9 +83,8 @@ const EmailVerification = (props: EmailVerificationProps) => {
                 <strong>Security Notice:</strong>
               </Text>
               <Text className='text-[14px] text-gray-600 m-0'>
-                This verification link will expire in {expirationHours} hour
-                {expirationHours !== 1 ? 's' : ''}. If you didn't create an account, you can safely
-                ignore this email.
+                This verification link will expire in {expirationLabel}. If you didn't create an
+                account, you can safely ignore this email.
               </Text>
             </Section>
           </Container>
@@ -94,7 +97,7 @@ const EmailVerification = (props: EmailVerificationProps) => {
 EmailVerification.PreviewProps = {
   userEmail: 'me@rykuno.com',
   verificationUrl: 'https://example.com/verify?token=abc123xyz789',
-  expirationHours: 1,
+  expiresIn: 60 * 60,
 } as EmailVerificationProps;
 
 export default EmailVerification;

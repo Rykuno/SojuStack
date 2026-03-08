@@ -15,15 +15,19 @@ import {
 export interface PasswordResetProps {
   userEmail?: string;
   resetUrl?: string;
-  expirationHours?: number;
+  expiresIn?: number;
 }
 
 const PasswordReset = (props: PasswordResetProps) => {
   const {
     userEmail = 'me@rykuno.com',
     resetUrl = 'https://example.com/reset-password',
-    expirationHours = 1,
+    expiresIn = 60 * 60,
   } = props;
+  const expirationLabel =
+    expiresIn % (60 * 60) === 0
+      ? `${expiresIn / (60 * 60)} hour${expiresIn / (60 * 60) !== 1 ? 's' : ''}`
+      : `${expiresIn / 60} minute${expiresIn / 60 !== 1 ? 's' : ''}`;
 
   return (
     <Html lang='en' dir='ltr'>
@@ -79,8 +83,7 @@ const PasswordReset = (props: PasswordResetProps) => {
                 <strong>Important Security Information:</strong>
               </Text>
               <Text className='text-[14px] text-red-600 m-0 mb-[8px]'>
-                This password reset link will expire in {expirationHours} hour
-                {expirationHours !== 1 ? 's' : ''}.
+                This password reset link will expire in {expirationLabel}.
               </Text>
               <Text className='text-[14px] text-red-600 m-0'>
                 If you didn't request this password reset, please ignore this email or contact our
@@ -116,7 +119,7 @@ const PasswordReset = (props: PasswordResetProps) => {
 PasswordReset.PreviewProps = {
   userEmail: 'me@rykuno.com',
   resetUrl: 'https://example.com/reset-password?token=abc123xyz789',
-  expirationHours: 1,
+  expiresIn: 60 * 60,
   requestTime: 'December 23, 2025 at 2:10 PM CST',
   userLocation: 'McKinney, TX',
 } as PasswordResetProps;

@@ -22,13 +22,15 @@ import { DRIZZLE_PROVIDER } from './databases/drizzle.provider';
 import { SecurityHeadersMiddleware } from './common/middlewares/security-headers.middleware';
 import { secondsToMilliseconds } from 'date-fns';
 import bytes from 'bytes';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 
 @Module({
   imports: [
     ConfigifyModule.forRootAsync(),
+    EventEmitterModule.forRoot(),
     MulterModule.register({
       limits: {
-        fileSize: Number(bytes('5MB')),
+        fileSize: Number(bytes('1BG')),
       },
     }),
     ThrottlerModule.forRootAsync({
@@ -38,7 +40,7 @@ import bytes from 'bytes';
           throttlers: [
             {
               ttl: secondsToMilliseconds(60),
-              limit: 100,
+              limit: 300,
             },
           ],
           storage: new ThrottlerStorageRedisService(cacheConfig.url),

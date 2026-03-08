@@ -1,9 +1,7 @@
-import { Inject } from '@nestjs/common';
 import { betterAuth } from 'better-auth';
 import { emailOTP, openAPI } from 'better-auth/plugins';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import { Cache } from '@nestjs/cache-manager';
-import { seconds } from '@nestjs/throttler';
 import { TransactionHost } from '@nestjs-cls/transactional';
 import { DrizzleTransactionClient } from 'src/databases/drizzle.provider';
 import * as schema from 'src/databases/drizzle.schema';
@@ -11,20 +9,23 @@ import { MailService } from 'src/notifications/mail.service';
 import { AuthConfig } from 'src/common/config/auth.config';
 import { AppConfig } from 'src/common/config/app.config';
 import { hoursToSeconds, minutesToSeconds } from 'date-fns';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { AuthService } from './auth.service';
 
-const BETTER_AUTH = Symbol('BETTER_AUTH');
-export const InjectBetterAuth = () => Inject(BETTER_AUTH);
+export const BETTER_AUTH_PROVIDER = Symbol('BETTER_AUTH_PROVIDER');
 export type BetterAuth = ReturnType<typeof BetterAuthProvider.useFactory>;
 
 export const BetterAuthProvider = {
-  provide: BETTER_AUTH,
-  inject: [TransactionHost, MailService, Cache, AppConfig, AuthConfig],
+  provide: BETTER_AUTH_PROVIDER,
+  inject: [TransactionHost, Cache, EventEmitter2, MailService, AppConfig, AuthConfig, AuthService],
   useFactory: (
     txHost: TransactionHost<DrizzleTransactionClient>,
-    mailService: MailService,
     cache: Cache,
+    eventEmitter: EventEmitter2,
+    mailService: MailService,
     appConfig: AppConfig,
     authConfig: AuthConfig,
+    authService: AuthService,
   ) => {
     const trustedOrigins = [...new Set([appConfig.webUrl, ...authConfig.trustedOrigins])];
 
@@ -51,8 +52,7 @@ export const BetterAuthProvider = {
           return value ?? null;
         },
         set: async (key, value, ttl) => {
-          if (ttl) await cache.set(key, value, seconds(ttl));
-          else await cache.set(key, value);
+          await cache.set(key, value, ttl);
         },
         delete: async (key) => {
           await cache.del(key);
@@ -71,6 +71,27 @@ export const BetterAuthProvider = {
         storeSessionInDatabase: true,
         freshAge: hoursToSeconds(1),
       },
+      databaseHooks: {
+        user: {
+          create: {
+            async after(user) {
+              await authService.afterUserCreated(user);
+            },
+          },
+        },
+        session: {
+          create: {
+            async before(session) {
+              const updatedSession = await authService.beforeSessionCreated(session);
+              return {
+                data: {
+                  ...updatedSession,
+                },
+              };
+            },
+          },
+        },
+      },
       user: {
         changeEmail: {
           enabled: true,
@@ -83,36 +104,6 @@ export const BetterAuthProvider = {
               },
             });
           },
-        },
-      },
-      emailVerification: {
-        sendOnSignUp: true,
-        sendVerificationEmail: async ({ user, url }) => {
-          return mailService.sendVerificationEmail({
-            to: user.email,
-            props: {
-              expirationHours: 24,
-              userEmail: user.email,
-              verificationUrl: url,
-            },
-          });
-        },
-        autoSignInAfterVerification: true,
-        expiresIn: hoursToSeconds(24), // 24 hours
-      },
-      emailAndPassword: {
-        resetPasswordTokenExpiresIn: hoursToSeconds(1), // 1 hour
-        enabled: true,
-        autoSignIn: true,
-        sendResetPassword: async ({ user, url }) => {
-          return mailService.sendPasswordResetEmail({
-            to: user.email,
-            props: {
-              expirationHours: 1,
-              userEmail: user.email,
-              resetUrl: url,
-            },
-          });
         },
       },
       plugins: [

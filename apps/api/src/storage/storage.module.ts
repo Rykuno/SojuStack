@@ -6,6 +6,6 @@ import { StorageBootstrapService } from './storage-bootstrap.service';
 
 @Module({
   providers: [S3Service, FilesService, ImagesService, StorageBootstrapService],
-  exports: [FilesService, ImagesService],
+  exports: [FilesService, ImagesService, S3Service],
 })
 export class StorageModule {}

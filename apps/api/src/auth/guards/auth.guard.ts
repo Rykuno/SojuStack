@@ -1,9 +1,15 @@
-import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  CanActivate,
+  ExecutionContext,
+  Inject,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { AUTH_TYPE_KEY, AuthType } from '../decorators/auth.decorator';
 import { Reflector } from '@nestjs/core';
 import { Session, User } from 'better-auth';
 import type { Request } from 'express';
-import { BetterAuth, InjectBetterAuth } from '../better-auth.provider';
+import { BETTER_AUTH_PROVIDER, BetterAuth } from '../better-auth.provider';
 import { S3Service } from 'src/storage/s3.service';
 
 export interface AuthGuardRequest extends Request {
@@ -16,7 +22,7 @@ export class AuthGuard implements CanActivate {
   private static readonly defaultAuthType = AuthType.Required;
 
   constructor(
-    @InjectBetterAuth() private readonly betterAuth: BetterAuth,
+    @Inject(BETTER_AUTH_PROVIDER) private readonly betterAuth: BetterAuth,
     private readonly reflector: Reflector,
     private readonly s3Service: S3Service,
   ) {}
