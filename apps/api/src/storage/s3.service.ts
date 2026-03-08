@@ -16,6 +16,10 @@ import { StorageConfig } from 'src/common/config/storage.config';
 import { StorageBucket, type StorageBucket as StorageBucketType } from './storage.constants';
 
 type PublicBucketPolicy = Awaited<ReturnType<S3Service['getPublicBucketPolicy']>>;
+type BucketObjectLocation = {
+  bucket: StorageBucketType;
+  key: string;
+};
 
 export type BucketPolicy = PublicBucketPolicy | undefined;
 
@@ -93,19 +97,19 @@ export class S3Service {
   }
 
   putObject({
-    bucketName,
+    bucket,
     key,
     file,
     contentType,
   }: {
-    bucketName: string;
+    bucket: StorageBucketType;
     key: string;
     file: Buffer;
     contentType?: string;
   }) {
     return this.client.send(
       new PutObjectCommand({
-        Bucket: bucketName,
+        Bucket: this.getBucketName(bucket),
         Key: key,
         Body: file,
         ContentType: contentType,
@@ -113,19 +117,19 @@ export class S3Service {
     );
   }
 
-  deleteObject({ bucketName, key }: { bucketName: string; key: string }) {
+  deleteObject({ bucket, key }: BucketObjectLocation) {
     return this.client.send(
       new DeleteObjectCommand({
-        Bucket: bucketName,
+        Bucket: this.getBucketName(bucket),
         Key: key,
       }),
     );
   }
 
-  async getObject({ bucketName, key }: { bucketName: string; key: string }) {
+  async getObject({ bucket, key }: BucketObjectLocation) {
     const response = await this.client.send(
       new GetObjectCommand({
-        Bucket: bucketName,
+        Bucket: this.getBucketName(bucket),
         Key: key,
       }),
     );

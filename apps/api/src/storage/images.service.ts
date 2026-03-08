@@ -15,18 +15,21 @@ export class ImagesService {
   constructor(private readonly filesService: FilesService) {}
 
   async create(file: Express.Multer.File) {
-    await this.assertValidImage(file);
-    return this.filesService.create(file, StorageBucket.Public);
+    return this.withValidatedImage(file, (validFile) =>
+      this.filesService.create(validFile, StorageBucket.Public),
+    );
   }
 
   async createWithStorageKey(storageKey: string, file: Express.Multer.File) {
-    await this.assertValidImage(file);
-    return this.filesService.createWithStorageKey(storageKey, file, StorageBucket.Public);
+    return this.withValidatedImage(file, (validFile) =>
+      this.filesService.createWithStorageKey(storageKey, validFile, StorageBucket.Public),
+    );
   }
 
   async update(storageKey: string, file: Express.Multer.File) {
-    await this.assertValidImage(file);
-    return this.filesService.update(storageKey, file);
+    return this.withValidatedImage(file, (validFile) =>
+      this.filesService.update(storageKey, validFile),
+    );
   }
 
   private async assertValidImage(file: Express.Multer.File) {
@@ -47,5 +50,13 @@ export class ImagesService {
     if (file.mimetype !== expectedMimeType) {
       throw new BadRequestException('File content does not match the provided MIME type.');
     }
+  }
+
+  private async withValidatedImage<T>(
+    file: Express.Multer.File,
+    callback: (file: Express.Multer.File) => Promise<T>,
+  ) {
+    await this.assertValidImage(file);
+    return callback(file);
   }
 }

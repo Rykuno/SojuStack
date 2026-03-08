@@ -1,6 +1,5 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { DatabasesModule } from './databases/databases.module';
 import { AuthModule } from './auth/auth.module';
 import { APP_GUARD } from '@nestjs/core';
@@ -21,13 +20,15 @@ import { CacheConfig } from './common/config/cache.config';
 import { TransactionalAdapterDrizzleOrm } from '@nestjs-cls/transactional-adapter-drizzle-orm';
 import { DRIZZLE_PROVIDER } from './databases/drizzle.provider';
 import { SecurityHeadersMiddleware } from './common/middlewares/security-headers.middleware';
+import { secondsToMilliseconds } from 'date-fns';
+import bytes from 'bytes';
 
 @Module({
   imports: [
     ConfigifyModule.forRootAsync(),
     MulterModule.register({
       limits: {
-        fileSize: 5 * 1024 * 1024,
+        fileSize: Number(bytes('5MB')),
       },
     }),
     ThrottlerModule.forRootAsync({
@@ -36,7 +37,7 @@ import { SecurityHeadersMiddleware } from './common/middlewares/security-headers
         return {
           throttlers: [
             {
-              ttl: 60_000,
+              ttl: secondsToMilliseconds(60),
               limit: 100,
             },
           ],
@@ -76,7 +77,6 @@ import { SecurityHeadersMiddleware } from './common/middlewares/security-headers
   ],
   controllers: [AppController],
   providers: [
-    AppService,
     {
       provide: APP_GUARD,
       useClass: ThrottlerGuard,

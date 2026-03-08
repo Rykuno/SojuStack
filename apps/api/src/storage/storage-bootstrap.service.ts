@@ -1,10 +1,10 @@
 import { Injectable, OnApplicationBootstrap } from '@nestjs/common';
-import { S3Service } from './storage/s3.service';
-import { StorageConfig } from './common/config/storage.config';
-import { StorageBucket } from './storage/storage.constants';
+import { StorageConfig } from 'src/common/config/storage.config';
+import { S3Service } from './s3.service';
+import { StorageBucket } from './storage.constants';
 
 @Injectable()
-export class AppService implements OnApplicationBootstrap {
+export class StorageBootstrapService implements OnApplicationBootstrap {
   constructor(
     private readonly s3Service: S3Service,
     private readonly storageConfig: StorageConfig,
