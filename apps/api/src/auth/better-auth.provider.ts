@@ -16,14 +16,14 @@ export type BetterAuth = ReturnType<typeof BetterAuthProvider.useFactory>;
 
 export const BetterAuthProvider = {
   provide: BETTER_AUTH_PROVIDER,
-  inject: [TransactionHost, Cache, MailService, AppConfig, AuthConfig, BetterAuthHooksService],
+  inject: [TransactionHost, Cache, MailService, BetterAuthHooksService, AppConfig, AuthConfig],
   useFactory: (
     txHost: TransactionHost<DrizzleTransactionClient>,
     cache: Cache,
     mailService: MailService,
+    betterAuthHooksService: BetterAuthHooksService,
     appConfig: AppConfig,
     authConfig: AuthConfig,
-    betterAuthHooksService: BetterAuthHooksService,
   ) => {
     const trustedOrigins = [...new Set([appConfig.webUrl, ...authConfig.trustedOrigins])];
 
