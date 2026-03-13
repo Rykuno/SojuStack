@@ -5,7 +5,7 @@ import { Cache } from '@nestjs/cache-manager';
 import { TransactionHost } from '@nestjs-cls/transactional';
 import { DrizzleTransactionClient } from 'src/databases/drizzle.provider';
 import * as schema from 'src/databases/drizzle.schema';
-import { MailService } from 'src/notifications/mail.service';
+import { MailService } from 'src/mail/mail.service';
 import { AuthConfig } from 'src/common/config/auth.config';
 import { AppConfig } from 'src/common/config/app.config';
 import { hoursToSeconds, minutesToSeconds } from 'date-fns';
@@ -102,7 +102,7 @@ export const BetterAuthProvider = {
             newEmail: string;
             url: string;
           }) => {
-            await mailService.sendChangeEmailVerificationEmail({
+            await mailService.sendChangeEmailVerification({
               to: user.email,
               props: {
                 newEmail,
@@ -120,7 +120,7 @@ export const BetterAuthProvider = {
           allowedAttempts: 5,
           sendVerificationOTP: async ({ email, otp, type }) => {
             if (type === 'sign-in') {
-              return mailService.sendSignInOtpEmail({
+              return mailService.sendSignInOtp({
                 to: email,
                 props: {
                   otpCode: otp,

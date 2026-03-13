@@ -5,8 +5,17 @@ import { IsNotEmpty, IsString, IsUrl } from 'class-validator';
 export class MailConfig {
   @IsString()
   @IsNotEmpty()
-  @Value('MAIL_DOMAIN')
-  domain!: string;
+  @Value('MAIL_FROM_NAME', {
+    default: 'SojuStack',
+  })
+  fromName!: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @Value('MAIL_FROM_EMAIL', {
+    default: 'noreply@example.com',
+  })
+  fromEmail!: string;
 
   @IsUrl({ require_tld: false })
   @IsNotEmpty()
@@ -14,4 +23,10 @@ export class MailConfig {
     default: 'http://localhost:8025',
   })
   mailpitUrl!: string;
+
+  @IsString()
+  @Value('RESEND_API_KEY', {
+    default: '',
+  })
+  resendApiKey!: string;
 }

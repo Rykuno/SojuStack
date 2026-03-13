@@ -1,11 +1,11 @@
 import { Module } from '@nestjs/common';
 import { AuthController } from './auth.controller';
-import { NotificationsModule } from 'src/notifications/notifications.module';
+import { MailModule } from 'src/mail/mail.module';
 import { BetterAuthProvider } from './better-auth.provider';
 import { BetterAuthHooksService } from './better-auth-hooks.service';
 
 @Module({
-  imports: [NotificationsModule],
+  imports: [MailModule],
   providers: [BetterAuthProvider, BetterAuthHooksService],
   controllers: [AuthController],
   exports: [BetterAuthProvider, BetterAuthHooksService],

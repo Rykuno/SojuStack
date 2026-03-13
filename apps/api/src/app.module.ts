@@ -4,7 +4,7 @@ import { DatabasesModule } from './databases/databases.module';
 import { AuthModule } from './auth/auth.module';
 import { APP_GUARD } from '@nestjs/core';
 import { AuthGuard } from './auth/guards/auth.guard';
-import { NotificationsModule } from './notifications/notifications.module';
+import { MailModule } from './mail/mail.module';
 import { CacheModule } from '@nestjs/cache-manager';
 import { createKeyv, Keyv } from '@keyv/redis';
 import { CacheableMemory } from 'cacheable';
@@ -73,7 +73,7 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
     }),
     DatabasesModule,
     AuthModule,
-    NotificationsModule,
+    MailModule,
     UsersModule,
     StorageModule,
   ],
