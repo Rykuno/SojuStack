@@ -90,12 +90,6 @@ export class S3Service {
     ];
   }
 
-  getPublicObjectUrl(storageKey: string | null | undefined) {
-    return storageKey
-      ? `${this.storageConfig.url.replace(/\/+$/, '')}/${this.storageConfig.publicBucketName}/${storageKey}`
-      : null;
-  }
-
   putObject({
     bucket,
     key,

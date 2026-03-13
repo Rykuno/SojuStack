@@ -1,18 +1,25 @@
+import { TransactionHost, Transactional } from '@nestjs-cls/transactional';
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
-import { S3Service } from './s3.service';
-import { createId } from '@paralleldrive/cuid2';
+import { and, eq } from 'drizzle-orm';
+import { basename } from 'node:path';
 import { DrizzleTransactionClient } from 'src/databases/drizzle.provider';
 import { files } from 'src/databases/drizzle.schema';
 import { takeFirstOrThrow } from 'src/databases/drizzle.utils';
-import { eq } from 'drizzle-orm';
-import { TransactionHost, Transactional } from '@nestjs-cls/transactional';
+import { S3Service } from './s3.service';
 import { type StorageBucket } from './storage.constants';
+import { normalizeStorageFileName, normalizeStorageKey } from './storage.utils';
 
 type FileRecord = typeof files.$inferSelect;
 type FileMetadata = Pick<FileRecord, 'name' | 'mimeType' | 'sizeBytes'>;
 type StoredObjectLocation = Pick<FileRecord, 'bucket' | 'storageKey' | 'mimeType'>;
 type StoredObjectSnapshot = StoredObjectLocation & {
   file: Buffer;
+};
+type StoredFilePayload = {
+  bucket: StorageBucket;
+  storageKey: string;
+  file: Buffer;
+  metadata: FileMetadata;
 };
 
 @Injectable()
@@ -24,72 +31,108 @@ export class FilesService {
     private readonly txHost: TransactionHost<DrizzleTransactionClient>,
   ) {}
 
-  @Transactional()
-  async create(file: Express.Multer.File, bucket: StorageBucket) {
-    const storageKey = createId();
-    return this.createWithStorageKey(storageKey, file, bucket);
-  }
+  async get(bucket: StorageBucket, key: string) {
+    const fileRecord = await this.getRecordOrThrow(bucket, key);
 
-  @Transactional()
-  async createWithStorageKey(storageKey: string, file: Express.Multer.File, bucket: StorageBucket) {
-    await this.storeIncomingFile({ bucket, storageKey, file });
-
-    try {
-      return await this.insertFileRecord({ bucket, storageKey, file });
-    } catch (error) {
-      await this.safelyDeleteStoredObject({ bucket, storageKey });
-      throw error;
-    }
-  }
-
-  async read(key: string) {
-    const fileRecord = await this.getByStorageKey(key);
     return this.s3Service.getObject({
       bucket: fileRecord.bucket,
-      key,
+      key: fileRecord.storageKey,
     });
   }
 
-  @Transactional()
-  async update(key: string, file: Express.Multer.File) {
-    const fileRecord = await this.getByStorageKey(key);
-    const previousObject = await this.createStoredObjectSnapshot(fileRecord);
+  async exists(bucket: StorageBucket, key: string) {
+    const storageKey = normalizeStorageKey(key);
+    return Boolean(await this.getRecord(bucket, storageKey));
+  }
 
-    await this.storeIncomingFile({
-      bucket: fileRecord.bucket,
-      storageKey: key,
+  @Transactional()
+  async put(
+    bucket: StorageBucket,
+    key: string,
+    contents: Buffer | string,
+    options?: { contentType?: string },
+  ) {
+    const storageKey = normalizeStorageKey(key);
+    const file = this.toBuffer(contents);
+
+    await this.writeFile({
+      bucket,
+      storageKey,
       file,
+      metadata: {
+        name: basename(storageKey),
+        mimeType: options?.contentType ?? 'application/octet-stream',
+        sizeBytes: file.length,
+      },
     });
 
-    try {
-      return await this.updateFileRecord(key, file);
-    } catch (error) {
-      await this.safelyRestoreStoredObject(previousObject);
-      throw error;
-    }
+    return storageKey;
   }
 
   @Transactional()
-  async delete(key: string) {
-    const fileRecord = await this.getByStorageKey(key);
+  async putFileAs(bucket: StorageBucket, file: Express.Multer.File, name: string) {
+    const storageKey = normalizeStorageFileName(name);
+
+    await this.writeFile({
+      bucket,
+      storageKey,
+      file: file.buffer,
+      metadata: {
+        name: basename(storageKey),
+        mimeType: file.mimetype || 'application/octet-stream',
+        sizeBytes: file.size,
+      },
+    });
+
+    return storageKey;
+  }
+
+  @Transactional()
+  async delete(bucket: StorageBucket, key: string) {
+    const storageKey = normalizeStorageKey(key);
+    const fileRecord = await this.getRecord(bucket, storageKey);
+
+    if (!fileRecord) {
+      return false;
+    }
+
     const previousObject = await this.createStoredObjectSnapshot(fileRecord);
 
     await this.deleteStoredObject(fileRecord);
 
     try {
-      await this.deleteFileRecord(key);
+      await this.deleteFileRecord(bucket, storageKey);
+      return true;
     } catch (error) {
       await this.safelyRestoreStoredObject(previousObject);
       throw error;
     }
   }
 
-  private async getByStorageKey(key: string) {
-    const fileRecord = await this.txHost.tx.query.files.findFirst({
+  async size(bucket: StorageBucket, key: string) {
+    return (await this.getRecordOrThrow(bucket, key)).sizeBytes;
+  }
+
+  async mimeType(bucket: StorageBucket, key: string) {
+    return (await this.getRecordOrThrow(bucket, key)).mimeType;
+  }
+
+  private toBuffer(contents: Buffer | string) {
+    return Buffer.isBuffer(contents) ? contents : Buffer.from(contents);
+  }
+
+  private async getRecord(bucket: StorageBucket, storageKey: string) {
+    return this.txHost.tx.query.files.findFirst({
       where: {
-        storageKey: key,
+        bucket,
+        storageKey,
       },
     });
+  }
+
+  private async getRecordOrThrow(bucket: StorageBucket, key: string) {
+    const storageKey = normalizeStorageKey(key);
+    const fileRecord = await this.getRecord(bucket, storageKey);
 
     if (!fileRecord) {
       throw new NotFoundException('File not found');
@@ -98,27 +141,50 @@ export class FilesService {
     return fileRecord;
   }
 
-  private toFileMetadata(file: Express.Multer.File): FileMetadata {
-    return {
-      name: file.originalname,
-      mimeType: file.mimetype,
-      sizeBytes: file.size,
-    };
+  private async writeFile(payload: StoredFilePayload) {
+    const existingFileRecord = await this.getRecord(payload.bucket, payload.storageKey);
+
+    if (!existingFileRecord) {
+      await this.createFile(payload);
+      return;
+    }
+
+    await this.replaceFile(existingFileRecord, payload);
+  }
+
+  private async createFile(payload: StoredFilePayload) {
+    await this.storeObject(payload);
+
+    try {
+      await this.insertFileRecord(payload);
+    } catch (error) {
+      await this.safelyDeleteStoredObject(payload);
+      throw error;
+    }
+  }
+
+  private async replaceFile(existingFileRecord: FileRecord, payload: StoredFilePayload) {
+    const previousObject = await this.createStoredObjectSnapshot(existingFileRecord);
+
+    await this.storeObject(payload);
+
+    try {
+      await this.updateFileRecord(payload);
+    } catch (error) {
+      await this.safelyRestoreStoredObject(previousObject);
+      throw error;
+    }
   }
 
   private insertFileRecord({
     bucket,
     storageKey,
-    file,
-  }: {
-    bucket: StorageBucket;
-    storageKey: string;
-    file: Express.Multer.File;
-  }) {
+    metadata,
+  }: Pick<StoredFilePayload, 'bucket' | 'storageKey' | 'metadata'>) {
     return this.txHost.tx
       .insert(files)
       .values({
-        ...this.toFileMetadata(file),
+        ...metadata,
         bucket,
         storageKey,
       })
@@ -126,33 +192,31 @@ export class FilesService {
       .then(takeFirstOrThrow);
   }
 
-  private updateFileRecord(storageKey: string, file: Express.Multer.File) {
+  private updateFileRecord({
+    bucket,
+    storageKey,
+    metadata,
+  }: Pick<StoredFilePayload, 'bucket' | 'storageKey' | 'metadata'>) {
     return this.txHost.tx
       .update(files)
-      .set(this.toFileMetadata(file))
-      .where(eq(files.storageKey, storageKey))
+      .set(metadata)
+      .where(and(eq(files.bucket, bucket), eq(files.storageKey, storageKey)))
       .returning()
       .then(takeFirstOrThrow);
   }
 
-  private deleteFileRecord(storageKey: string) {
-    return this.txHost.tx.delete(files).where(eq(files.storageKey, storageKey));
+  private deleteFileRecord(bucket: StorageBucket, storageKey: string) {
+    return this.txHost.tx
+      .delete(files)
+      .where(and(eq(files.bucket, bucket), eq(files.storageKey, storageKey)));
   }
 
-  private storeIncomingFile({
-    bucket,
-    storageKey,
-    file,
-  }: {
-    bucket: StorageBucket;
-    storageKey: string;
-    file: Pick<Express.Multer.File, 'buffer' | 'mimetype'>;
-  }) {
+  private storeObject({ bucket, storageKey, file, metadata }: StoredFilePayload) {
     return this.s3Service.putObject({
       bucket,
       key: storageKey,
-      file: file.buffer,
-      contentType: file.mimetype,
+      file,
+      contentType: metadata.mimeType,
     });
   }
 

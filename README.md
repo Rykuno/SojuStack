@@ -96,9 +96,11 @@ pnpm -C apps/api db:push
 pnpm dev
 ```
 
-The API storage layer now expects both `STORAGE_PUBLIC_BUCKET_NAME` and `STORAGE_PRIVATE_BUCKET_NAME` in `apps/api/.env`. Public asset URLs are emitted only from the public bucket, and private bucket reads stay backend-only in the current implementation.
+The API storage layer uses two buckets: `public` and `private`.
 
-If you want objects in the public bucket to be directly readable, set `STORAGE_PUBLIC_READ_ENABLED=true`. Keep it `false` unless you intentionally want public bucket reads.
+Public files are stored in the public bucket and returned from the API as flat relative keys like `user-avatar-user-id`. Compose the final URL in the web app with `VITE_STORAGE_URL`, for example `http://localhost:9000/public/user-avatar-user-id`.
+
+Private files stay backend-only and should be read through the API instead of being linked directly.
 
 ## Default Local Endpoints
 

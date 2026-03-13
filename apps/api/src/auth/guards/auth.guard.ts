@@ -10,7 +10,6 @@ import { Reflector } from '@nestjs/core';
 import { Session, User } from 'better-auth';
 import type { Request } from 'express';
 import { BETTER_AUTH_PROVIDER, BetterAuth } from '../better-auth.provider';
-import { S3Service } from 'src/storage/s3.service';
 
 export interface AuthGuardRequest extends Request {
   session?: Session;
@@ -24,7 +23,6 @@ export class AuthGuard implements CanActivate {
   constructor(
     @Inject(BETTER_AUTH_PROVIDER) private readonly betterAuth: BetterAuth,
     private readonly reflector: Reflector,
-    private readonly s3Service: S3Service,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -44,12 +42,7 @@ export class AuthGuard implements CanActivate {
 
     // set session and user on request
     request.session = session?.session;
-    request.user = session?.user
-      ? {
-          ...session.user,
-          image: this.s3Service.getPublicObjectUrl(session.user.image),
-        }
-      : undefined;
+    request.user = session?.user;
 
     // if auth type is required, check if session exists
     if (authType === AuthType.Required) {

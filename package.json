@@ -19,13 +19,13 @@
   },
   "devDependencies": {
     "chalk": "^5.6.2",
-    "lefthook": "^2.1.3",
-    "lint-staged": "^16.3.2",
-    "oxfmt": "^0.36.0",
-    "oxlint": "^1.51.0",
+    "lefthook": "^2.1.4",
+    "lint-staged": "^16.3.3",
+    "oxfmt": "^0.40.0",
+    "oxlint": "^1.55.0",
     "oxlint-tsgolint": "^0.16.0",
     "rimraf": "^6.1.3",
-    "turbo": "^2.8.14",
+    "turbo": "^2.8.16",
     "typescript": "5.9.3"
   },
   "lint-staged": {
@@ -34,7 +34,7 @@
   "engines": {
     "node": ">=25.2.1"
   },
-  "packageManager": "pnpm@10.27.0",
+  "packageManager": "pnpm@10.32.1",
   "pnpm": {
     "overrides": {
       "react": "^19.2.0",
