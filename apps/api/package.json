@@ -41,6 +41,7 @@
     "@nestjs/core": "^11.1.16",
     "@nestjs/platform-express": "^11.1.16",
     "@nestjs/swagger": "catalog:",
+    "@nestjs/terminus": "catalog:",
     "@paralleldrive/cuid2": "catalog:",
     "@react-email/components": "catalog:",
     "@react-email/render": "catalog:",

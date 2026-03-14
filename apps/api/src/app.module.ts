@@ -22,6 +22,7 @@ import { CacheModule } from '@nestjs/cache-manager';
 import { createKeyv, Keyv } from '@keyv/redis';
 import { CacheableMemory } from 'cacheable';
 import { HttpModule } from '@nestjs/axios';
+import { HealthModule } from './health/health.module';
 
 @Catch(HttpException)
 class HttpExceptionFilter extends BaseExceptionFilter {
@@ -79,6 +80,7 @@ class HttpExceptionFilter extends BaseExceptionFilter {
     AuthModule,
     EnvModule,
     DatabaseModule,
+    HealthModule,
   ],
   controllers: [AppController],
   providers: [
