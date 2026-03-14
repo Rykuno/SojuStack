@@ -15,6 +15,7 @@
     "@base-ui/react": "catalog:",
     "@faker-js/faker": "^10.3.0",
     "@fontsource-variable/jetbrains-mono": "catalog:",
+    "@nestjs/mapped-types": "*",
     "@tailwindcss/vite": "^4.1.18",
     "@tanstack/match-sorter-utils": "latest",
     "@tanstack/react-devtools": "latest",

@@ -7,6 +7,13 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const envService = app.get(EnvService);
 
+  app.enableCors({
+    origin: 'http://localhost:3000',
+    credentials: true,
+    methods: ['GET', 'PATCH', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'HEAD'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'user-agent', 'Accept'],
+  });
+
   if (!envService.app.isProduction) {
     setupScalar(app);
   }

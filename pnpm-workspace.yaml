@@ -12,6 +12,7 @@ catalog:
   '@keyv/redis': ^5.1.6
   '@nestjs-cls/transactional': ^3.2.0
   '@nestjs-cls/transactional-adapter-drizzle-orm': ^1.2.3
+  '@nestjs/axios': ^4.0.1
   '@nestjs/cache-manager': ^3.1.0
   '@nestjs/config': ^4.0.3
   '@nestjs/swagger': ^11.2.6
@@ -25,6 +26,7 @@ catalog:
   '@types/multer': ^2.1.0
   '@types/node': ^24
   '@types/react': ^19.2.14
+  axios: ^1.13.6
   better-auth: ^1.5.5
   cacheable: ^2.3.3
   cmdk: ^1.1.1

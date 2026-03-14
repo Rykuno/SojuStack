@@ -21,6 +21,7 @@ import { EnvService } from './common/env/env.service';
 import { CacheModule } from '@nestjs/cache-manager';
 import { createKeyv, Keyv } from '@keyv/redis';
 import { CacheableMemory } from 'cacheable';
+import { HttpModule } from '@nestjs/axios';
 
 @Catch(HttpException)
 class HttpExceptionFilter extends BaseExceptionFilter {
@@ -41,7 +42,11 @@ class HttpExceptionFilter extends BaseExceptionFilter {
 
 @Module({
   imports: [
-    AuthModule,
+    HttpModule.register({
+      global: true,
+      timeout: 5000,
+      maxRedirects: 5,
+    }),
     ConfigModule.forRoot({
       validate: (env) => envSchema.parse(env),
       isGlobal: true,
@@ -71,7 +76,7 @@ class HttpExceptionFilter extends BaseExceptionFilter {
         };
       },
     }),
-
+    AuthModule,
     EnvModule,
     DatabaseModule,
   ],

@@ -1,21 +1,19 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { MailTransport, type MailMessage } from './mail.transport';
 import { EnvService } from 'src/common/env/env.service';
+import { HttpService } from '@nestjs/axios';
 
 @Injectable()
 export class MailpitTransport implements MailTransport {
-  private readonly logger = new Logger(MailpitTransport.name);
-
-  constructor(private readonly envService: EnvService) {}
+  constructor(
+    private readonly envService: EnvService,
+    private readonly httpService: HttpService,
+  ) {}
 
   async send({ to, subject, html, text }: MailMessage) {
     const mailpitUrl = this.envService.mail.mailpit.url;
-    const response = await fetch(`${mailpitUrl}/api/v1/send`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
+    this.httpService.post(`${mailpitUrl}/api/v1/send`, {
+      data: {
         Attachments: [],
         From: {
           Email: `${this.envService.mail.domain} <${this.envService.mail.domain}>`,
@@ -25,14 +23,7 @@ export class MailpitTransport implements MailTransport {
         Subject: subject,
         Text: text,
         To: [{ Email: to, Name: to }],
-      }),
+      },
     });
-
-    if (!response.ok) {
-      throw new Error(`Mailpit request failed with ${response.status} ${response.statusText}.`);
-    }
-
-    const data = (await response.json()) as { ID: string };
-    this.logger.log(`${mailpitUrl}/view/${data.ID}`);
   }
 }

@@ -3,11 +3,11 @@ import { Session, User } from 'better-auth/db';
 
 @Injectable()
 export class AuthService {
-  afterUserCreated(user: User) {
+  async afterUserCreated(user: User) {
     console.log('afterUserCreated', user);
   }
 
-  beforeSessionCreated(session: Session): Session {
+  async beforeSessionCreated(session: Session): Promise<Session> {
     return session;
   }
 }

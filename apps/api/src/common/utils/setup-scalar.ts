@@ -15,6 +15,8 @@ export function setupScalar(app: INestApplication) {
 
   const document = SwaggerModule.createDocument(app, config);
 
+  SwaggerModule.setup('swagger', app, document, { yamlDocumentUrl: '/api.yaml' });
+
   app.use(
     '/openapi',
     apiReference({

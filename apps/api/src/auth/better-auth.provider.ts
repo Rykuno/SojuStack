@@ -69,7 +69,7 @@ export const BetterAuthProvider = {
         user: {
           create: {
             async after(user) {
-              await authService.afterUserCreated(user);
+              return authService.afterUserCreated(user);
             },
           },
         },
