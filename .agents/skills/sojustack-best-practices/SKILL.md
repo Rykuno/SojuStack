@@ -1,105 +1,53 @@
 ---
 name: sojustack-best-practices
-description: Best-practice guidance for the SojuStack monorepo (NestJS + Drizzle + Better Auth + TanStack Start). Use when editing files in apps/api or apps/web, designing routes, query/form patterns, auth/transaction flows, or implementing cross-stack features.
+description: Repo-specific implementation guardrails for SojuStack-derived apps built with NestJS, Drizzle, Better Auth, and TanStack Start. Use when editing `apps/api` or `apps/web`, adding routes/controllers/DTOs/services, wiring frontend code to backend contracts, consuming `api/generated/openapi`, using `apps/web/src/lib/api-client.ts`, working with Better Auth helpers, or making cross-stack changes that must preserve end-to-end typing and shared client conventions.
 ---
 
 # SojuStack Best Practices
 
-Use this skill to keep changes idiomatic and safe in this repository.
+Use this skill as the default contract for code generation in SojuStack and projects derived from it.
 
 ## Repository Map
 
-- Backend: `apps/api/` (NestJS + Drizzle ORM + Better Auth)
-- Frontend: `apps/web/` (TanStack Start + TanStack Query + TanStack Form + ShadCN/Base UI)
-- Shared config: `packages/typescript-config/`
+- `apps/api/`: NestJS API, Drizzle ORM, Better Auth
+- `apps/web/`: TanStack Start, TanStack Query, TanStack Form, Base UI, ShadCN
+- `apps/api/generated/openapi.d.ts`: generated API contract consumed by the web app
+- `apps/web/src/lib/api-client.ts`: default typed frontend HTTP client
+- `packages/typescript-config/`: shared TypeScript config
 
-## Universal Rules
+## Non-Negotiables
 
 - Keep scope tight to the user request; avoid opportunistic refactors.
-- Maintain strict typing; avoid `any` and unsafe casts.
-- Match naming and folder conventions already used in the touched area.
-- Prefer small reusable helpers over duplicate logic.
-- If behavior changes, update/add tests for the impacted area.
+- Maintain strict typing; avoid `any`, unsafe casts, and hand-wavy escape hatches.
+- Match naming, file placement, and folder conventions already used in the touched area.
+- Reuse existing providers, helpers, and patterns before adding abstractions.
+- Preserve end-to-end typing across backend and frontend changes.
+- Treat existing repo paths and conventions as defaults, not optional examples.
+- If behavior changes, update or add the relevant tests.
 
-## Frontend Rules (`apps/web`)
+## Workflow
 
-### Routing (TanStack Start)
-
-- Keep route modules focused; move reusable logic to hooks or components.
-
-### Data Fetching (TanStack Query)
-
-- Use stable query keys like `['resource', id, 'sub-resource']`.
-- Use `invalidateQueries()` without parameters when broad refresh is intended.
-- Keep server-state logic in query/mutation hooks, not presentational components.
-
-### API Clients and Types
-
-- Prefer end-to-end types from `apps/api/generated/openapi.d.ts` instead of introducing parallel custom web types such as `apps/web/src/lib/types.ts`.
-- Prefer importing generated API types via `api/generated/openapi` (`paths`, `components`, etc.) when modeling request and response shapes in the web app.
-- Prefer `apps/web/src/lib/api-client.ts` for frontend API calls instead of native `fetch`.
-- Treat the shared API client as the default path for request behavior, credentials, forwarded headers, and error handling. Use raw `fetch` only when there is a clear reason the shared client cannot support the use case.
-
-### UI (ShadCN + Base UI)
-
-- Prefer components from `apps/web/src/components/ui/`.
-- Prefer Base UI primitives over raw HTML where an equivalent exists.
-- Use `cn()` from `apps/web/src/lib/utils.ts` for class composition.
-- Keep Tailwind usage aligned with existing tokens and utility patterns.
-
-## Backend Rules (`apps/api`)
-
-### Database (Drizzle)
-
-- Add tables in `apps/api/src/databases/tables/{name}.table.ts`.
-- Export new tables from `drizzle.schema.ts`.
-- Add/update relations in `drizzle.relations.ts`.
-
-### Auth (Better Auth)
-
-- Follow existing setup in `apps/api/src/auth/better-auth.provider.ts`.
-- Use framework auth helpers (`@Auth()`, `@ActiveUser()`, `@ActiveSession()`) rather than ad hoc request parsing.
-
-### Transactions
-
-- Use `@Transactional()` with `TransactionHost<DrizzleTransactionClient>`.
-- Do not manually nest/start transactions via `tx.transaction()`.
-
-### Services and Errors
-
-- Keep controllers thin; place business logic in services or providers.
-- Use NestJS exceptions (`NotFoundException`, `UnauthorizedException`, etc.) for expected failures.
-
-### API Type Safety
-
-- Treat `apps/api/generated/openapi.d.ts` as generated source of truth for E2E typing.
-- Use existing DTO and serialization patterns in the module.
-
-## Execution Workflow
-
-1. Read nearby code and existing module patterns.
-2. Implement the smallest correct change.
-3. Run repository validation commands from the repo root:
+1. Read nearby code and copy the local pattern before introducing anything new.
+2. Classify the change as frontend-only, backend-only, or cross-stack.
+3. If the API surface changes, update the backend source-of-truth shapes so generated OpenAPI types stay accurate.
+4. Implement the smallest correct change.
+5. Run repository validation commands from the repo root:
    - `pnpm typecheck`
    - `pnpm format`
    - `pnpm lint`
-4. If any of those commands fail, fix the issues and re-run until they pass.
-5. Ensure unrelated files are not modified.
-6. Report what changed, why, and how it was validated.
+6. Fix failures and rerun until the touched area is clean.
+7. Ensure unrelated files are not modified.
+8. Report what changed, why, and how it was validated.
 
-## Do / Don't
+## Topic Guide
 
-### Do
+- Read `references/frontend-api-contracts.md` for generated OpenAPI usage, shared API client rules, and cross-stack frontend contract changes.
+- Read `references/frontend-ui-routing.md` for TanStack Start route structure, TanStack Query and Form placement, and UI composition defaults.
+- Read `references/backend-dto.md` for DTO, Swagger, serialization, and generated OpenAPI preservation rules.
+- Read `references/backend-database.md` for Drizzle table placement, schema export rules, and relation updates.
+- Read `references/backend-auth-transactions.md` for Better Auth usage, auth decorators, transaction boundaries, service layering, and NestJS error handling.
 
-- Prefer simplicity and human readability of code over complex or verbose implementations.
-- Heir on asking more questions rather than too little.
-- Beware of premature optimization
-- Reuse existing providers/utilities before adding abstractions.
-- Keep functions cohesive and predictable.
-- Add short comments only for non-obvious logic.
+## References
 
-### Don't
-
-- Introduce architectural shifts unless requested.
-- Add dependencies when existing stack primitives are sufficient.
-- Bypass validation, auth, or typing conventions.
+- Keep topic-specific rules in `references/` instead of bloating `SKILL.md`.
+- Add future focused references here when a topic becomes large enough to deserve its own file.

@@ -1,6 +1,6 @@
 {
   "$schema": "./node_modules/oxfmt/configuration_schema.json",
-  "ignorePatterns": ["apps/api/generated/openapi.d.ts"],
+  "ignorePatterns": ["apps/api/generated/*"],
   "singleQuote": true,
   "jsxSingleQuote": true,
   "printWidth": 100

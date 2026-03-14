@@ -22,7 +22,7 @@ import { Tailwind, pixelBasedPreset } from '@react-email/components';
   }}
 >
   {/* Email content */}
-</Tailwind>
+</Tailwind>;
 ```
 
 ## pixelBasedPreset
@@ -91,7 +91,7 @@ const Email = ({ source }: { source: string }) => {
 };
 
 Email.PreviewProps = {
-  source: "https://example.com",
+  source: 'https://example.com',
 };
 ```
 
@@ -116,9 +116,9 @@ White background, centered, left-aligned content:
 Include physical address, unsubscribe link, current year:
 
 ```tsx
-<Section className="text-center text-gray-500 text-sm">
-  <Text className="m-0">123 Main St, City, State 12345</Text>
-  <Text className="m-0">&copy; {new Date().getFullYear()} Company Name</Text>
+<Section className='text-center text-gray-500 text-sm'>
+  <Text className='m-0'>123 Main St, City, State 12345</Text>
+  <Text className='m-0'>&copy; {new Date().getFullYear()} Company Name</Text>
   <Link href={unsubscribeUrl}>Unsubscribe</Link>
 </Section>
 ```
@@ -156,11 +156,7 @@ Use consistent spacing that respects content hierarchy. Larger margins for headi
 - Include `alt` text for accessibility
 
 ```tsx
-<Img
-  src="https://example.com/image.png"
-  alt="Description"
-  className="w-full h-auto"
-/>
+<Img src='https://example.com/image.png' alt='Description' className='w-full h-auto' />
 ```
 
 ## Buttons
@@ -169,8 +165,8 @@ Always use `box-border` to prevent padding overflow:
 
 ```tsx
 <Button
-  href="https://example.com"
-  className="bg-blue-600 text-white px-5 py-3 rounded box-border block text-center no-underline"
+  href='https://example.com'
+  className='bg-blue-600 text-white px-5 py-3 rounded box-border block text-center no-underline'
 >
   Click Here
 </Button>
@@ -192,8 +188,8 @@ Use `Row` and `Column` components instead of flexbox/grid:
 
 ```tsx
 <Row>
-  <Column className="w-1/2">Left content</Column>
-  <Column className="w-1/2">Right content</Column>
+  <Column className='w-1/2'>Left content</Column>
+  <Column className='w-1/2'>Right content</Column>
 </Row>
 ```
 
@@ -262,13 +258,13 @@ Import the shared config in every email template:
 import tailwindConfig, { brandAssets } from './tailwind.config';
 
 <Tailwind config={tailwindConfig}>
-  <Body className="bg-gray-100 font-sans">
-    <Container className="bg-white p-6">
+  <Body className='bg-gray-100 font-sans'>
+    <Container className='bg-white p-6'>
       <Img src={brandAssets.logo.src} alt={brandAssets.logo.alt} width={brandAssets.logo.width} />
-      <Button className="bg-brand-primary text-white">Action</Button>
+      <Button className='bg-brand-primary text-white'>Action</Button>
     </Container>
   </Body>
-</Tailwind>
+</Tailwind>;
 ```
 
 ### Maintaining Consistency
@@ -286,7 +282,9 @@ Direct users to place brand assets in appropriate locations:
 - **Custom fonts**: Use the `Font` component with a web font URL (Google Fonts, Adobe Fonts, or self-hosted).
 
 **Example prompt for gathering brand info:**
+
 > "Before I create your email template, I need some brand information to ensure consistency. Could you provide:
+>
 > 1. Your primary brand color (hex code, e.g., #007bff)
 > 2. Your logo URL (must be a publicly accessible PNG or JPEG)
 > 3. Any secondary colors you'd like to use
@@ -299,4 +297,3 @@ Direct users to place brand assets in appropriate locations:
 3. **Keep file size under 102KB** - Gmail clips larger emails
 4. **Use keywords strategically** - Increase engagement in email body
 5. **Inline styles as fallback** - Some clients strip `<style>` tags
-

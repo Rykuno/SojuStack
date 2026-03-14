@@ -63,6 +63,12 @@ export interface components {
         UserDto: {
             id: string;
             name: string;
+            email: string;
+            emailVerified: boolean;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
             image: string | null;
         };
     };

@@ -6,7 +6,7 @@
   "author": "rykuno",
   "scripts": {
     "build": "turbo run build",
-    "dev": "turbo run dev",
+    "dev2": "turbo run dev",
     "dev:setup": "pnpm dlx tsx setup.ts",
     "lint:fix": "turbo run lint:fix",
     "lint": "turbo run lint",

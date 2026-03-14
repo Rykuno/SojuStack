@@ -5,23 +5,22 @@ import { ApiConsumes, ApiOkResponse } from '@nestjs/swagger';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { Auth, AuthType } from 'src/auth/decorators/auth.decorator';
 import { ActiveUser } from 'src/auth/decorators/active-user.decorator';
-import { ActiveUserDto } from 'src/auth/dtos/active-user.dto';
 import { UserDto } from './dto/user.dto';
-import { TransformDataInterceptor } from 'src/common/interceptors/transform-data.interceptor';
+import { Serialize } from 'src/common/decorators/serialize.decorator';
 
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Patch('/me')
-  @UseInterceptors(new TransformDataInterceptor(UserDto))
-  @ApiConsumes('multipart/form-data')
+  @Serialize(UserDto)
   @Auth(AuthType.Required)
   @ApiOkResponse({ type: UserDto })
+  @ApiConsumes('multipart/form-data')
   @UseInterceptors(FileInterceptor('image'))
   update(
     @Body() updateUserDto: UpdateUserDto,
-    @ActiveUser() activeUser: ActiveUserDto,
+    @ActiveUser() activeUser: UserDto,
     @UploadedFile() image?: Express.Multer.File,
   ) {
     return this.usersService.update(activeUser.id, {

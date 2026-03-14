@@ -7,13 +7,14 @@ import {
 } from '@nestjs/common';
 import { AUTH_TYPE_KEY, AuthType } from '../decorators/auth.decorator';
 import { Reflector } from '@nestjs/core';
-import { Session, User } from 'better-auth';
 import type { Request } from 'express';
 import { BETTER_AUTH_PROVIDER, BetterAuth } from '../better-auth.provider';
+import { SessionDto } from '../dto/session.dto';
+import { UserDto } from 'src/users/dto/user.dto';
 
 export interface AuthGuardRequest extends Request {
-  session?: Session;
-  user?: User;
+  session?: SessionDto;
+  user?: UserDto;
 }
 
 @Injectable()
@@ -41,8 +42,8 @@ export class AuthGuard implements CanActivate {
     });
 
     // set session and user on request
-    request.session = session?.session;
-    request.user = session?.user;
+    request.session = session?.session as SessionDto;
+    request.user = session?.user as UserDto;
 
     // if auth type is required, check if session exists
     if (authType === AuthType.Required) {
