@@ -1,13 +1,13 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { setupScalar } from './utils/setup-scalar';
-import { EnvService } from './env/env.service';
+import { setupScalar } from './common/utils/setup-scalar';
+import { EnvService } from './common/env/env.service';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const envService = app.get(EnvService);
 
-  if (envService.app.isProduction) {
+  if (!envService.app.isProduction) {
     setupScalar(app);
   }
 

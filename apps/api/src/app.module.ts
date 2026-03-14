@@ -9,9 +9,18 @@ import { Module, HttpException, ArgumentsHost, Logger, Catch } from '@nestjs/com
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
-import { EnvModule } from './env/env.module';
+import { EnvModule } from './common/env/env.module';
 import { ConfigModule } from '@nestjs/config';
-import { envSchema } from './env/env.schema';
+import { envSchema } from './common/env/env.schema';
+import { DatabaseModule } from './database/database.module';
+import { ClsPluginTransactional } from '@nestjs-cls/transactional';
+import { TransactionalAdapterDrizzleOrm } from '@nestjs-cls/transactional-adapter-drizzle-orm';
+import { DRIZZLE_PROVIDER } from './database/drizzle.provider';
+import { ClsModule } from 'nestjs-cls';
+import { EnvService } from './common/env/env.service';
+import { CacheModule } from '@nestjs/cache-manager';
+import { createKeyv, Keyv } from '@keyv/redis';
+import { CacheableMemory } from 'cacheable';
 
 @Catch(HttpException)
 class HttpExceptionFilter extends BaseExceptionFilter {
@@ -37,7 +46,34 @@ class HttpExceptionFilter extends BaseExceptionFilter {
       validate: (env) => envSchema.parse(env),
       isGlobal: true,
     }),
+    ClsModule.forRoot({
+      global: true,
+      plugins: [
+        new ClsPluginTransactional({
+          imports: [DatabaseModule],
+          adapter: new TransactionalAdapterDrizzleOrm({
+            drizzleInstanceToken: DRIZZLE_PROVIDER,
+          }),
+        }),
+      ],
+    }),
+    CacheModule.registerAsync({
+      isGlobal: true,
+      inject: [EnvService],
+      useFactory: (envService: EnvService) => {
+        return {
+          stores: [
+            new Keyv({
+              store: new CacheableMemory({ lruSize: 5000 }),
+            }),
+            createKeyv(envService.cache.url),
+          ],
+        };
+      },
+    }),
+
     EnvModule,
+    DatabaseModule,
   ],
   controllers: [AppController],
   providers: [

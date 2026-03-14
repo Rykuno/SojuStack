@@ -5,8 +5,8 @@
   "type": "module",
   "scripts": {
     "ready": "vp fmt && vp lint && vp run test -r && vp run build -r",
-    "dev": "vp run api#dev & vp run website#dev",
-    "build": "vp run website#build & vp run api#build",
+    "dev": "vp run web#dev & vp run api#dev",
+    "build": "vp run web#build & vp run api#build",
     "prepare": "vp config"
   },
   "devDependencies": {

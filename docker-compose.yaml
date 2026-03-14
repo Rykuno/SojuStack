@@ -1,0 +1,61 @@
+services:
+  postgres:
+    container_name: kimchistack-postgres
+    image: postgres:18.0
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_data:/data
+    networks:
+      - app-network
+  valkey:
+    container_name: kimchistack-valkey
+    image: valkey/valkey:9.0
+    ports:
+      - '6379:6379'
+    volumes:
+      - valkey_data:/data
+    networks:
+      - app-network
+  mailpit:
+    container_name: kimchistack-mailpit
+    image: axllent/mailpit
+    volumes:
+      - mailpit_data:/data
+    ports:
+      - 8025:8025
+      - 1025:1025
+    environment:
+      MP_MAX_MESSAGES: 5000
+      MP_DATABASE: /data/mailpit.db
+      MP_SMTP_AUTH_ACCEPT_ANY: 1
+      MP_SMTP_AUTH_ALLOW_INSECURE: 1
+    networks:
+      - app-network
+  rustfs:
+    container_name: kimchistack-rustfs
+    image: rustfs/rustfs:latest
+    networks:
+      - app-network
+    environment:
+      - RUSTFS_ACCESS_KEY=admin
+      - RUSTFS_SECRET_KEY=admin
+      - RUSTFS_CONSOLE_ENABLE=true
+    ports:
+      - 9000:9000
+      - 9001:9001
+    volumes:
+      - rustfs_data:/data
+volumes:
+  postgres_data:
+  valkey_data:
+  mailpit_data:
+  rustfs_data:
+
+networks:
+  app-network:
+    driver: bridge
