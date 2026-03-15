@@ -11,6 +11,7 @@
     "experimentalDecorators": true,
     "allowSyntheticDefaultImports": true,
     "target": "ES2023",
+    "noUncheckedIndexedAccess": true,
     "sourceMap": true,
     "outDir": "./dist",
     "incremental": true,
@@ -25,5 +26,6 @@
     "paths": {
       "src/*": ["./src/*"]
     }
-  }
+  },
+  "exclude": ["node_modules", "dist", "generated"]
 }

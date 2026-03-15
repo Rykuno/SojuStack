@@ -2,6 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { setupScalar } from './common/utils/setup-scalar';
 import { EnvService } from './common/env/env.service';
+import { generateOpenApiTypesInBackground } from './common/utils/openapi-typescript';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -15,7 +16,8 @@ async function bootstrap() {
   });
 
   if (!envService.app.isProduction) {
-    setupScalar(app);
+    const openApiDocument = setupScalar(app);
+    generateOpenApiTypesInBackground(openApiDocument);
   }
 
   await app.listen(envService.app.port);

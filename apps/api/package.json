@@ -5,6 +5,9 @@
   "description": "API for KimchiStack",
   "license": "UNLICENSED",
   "author": "Rykuno",
+  "types": {
+    "openapi": "./generated/openapi.d.ts"
+  },
   "scripts": {
     "build": "nest build",
     "db:push": "drizzle-kit push",
@@ -45,6 +48,7 @@
     "@paralleldrive/cuid2": "catalog:",
     "@react-email/components": "catalog:",
     "@react-email/render": "catalog:",
+    "@redocly/openapi-core": "catalog:",
     "@scalar/nestjs-api-reference": "catalog:",
     "axios": "catalog:",
     "better-auth": "catalog:",
@@ -55,6 +59,7 @@
     "keyv": "catalog:",
     "nestjs-cls": "catalog:",
     "nestjs-zod": "catalog:",
+    "openapi-typescript": "catalog:",
     "pg": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",
