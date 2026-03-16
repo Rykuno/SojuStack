@@ -105,6 +105,9 @@ catalogs:
     next-themes:
       specifier: ^0.4.6
       version: 0.4.6
+    openapi-fetch:
+      specifier: ^0.17.0
+      version: 0.17.0
     openapi-typescript:
       specifier: ^7.13.0
       version: 7.13.0
@@ -400,6 +403,9 @@ importers:
       '@tanstack/router-plugin':
         specifier: ^1.132.0
         version: 1.166.9(@tanstack/react-router@1.167.0(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(@voidzero-dev/vite-plus-core@0.1.11(@types/node@22.19.15)(esbuild@0.27.4)(jiti@2.6.1)(terser@5.46.0)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2))(webpack@5.104.1(esbuild@0.27.4))
+      api:
+        specifier: workspace:*
+        version: link:../api
       class-variance-authority:
         specifier: ^0.7.1
         version: 0.7.1
@@ -427,6 +433,9 @@ importers:
       nitro:
         specifier: npm:nitro-nightly@latest
         version: nitro-nightly@3.0.1-20260312-093400-ba5147a5(@azure/identity@4.13.0)(@voidzero-dev/vite-plus-core@0.1.11(@types/node@22.19.15)(esbuild@0.27.4)(jiti@2.6.1)(terser@5.46.0)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2))(chokidar@5.0.0)(dotenv@17.3.1)(giget@2.0.0)(jiti@2.6.1)(lru-cache@11.2.7)(mongodb@7.1.0)
+      openapi-fetch:
+        specifier: 'catalog:'
+        version: 0.17.0
       radix-ui:
         specifier: 'catalog:'
         version: 1.4.3(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
@@ -7842,6 +7851,12 @@ packages:
   open@11.0.0:
     resolution: {integrity: sha512-smsWv2LzFjP03xmvFoJ331ss6h+jixfA4UUV/Bsiyuu4YJPfN+FIQGOIiv4w9/+MoHkfkJ22UIaQWRVFRfH6Vw==}
     engines: {node: '>=20'}
+
+  openapi-fetch@0.17.0:
+    resolution: {integrity: sha512-PsbZR1wAPcG91eEthKhN+Zn92FMHxv+/faECIwjXdxfTODGSGegYv0sc1Olz+HYPvKOuoXfp+0pA2XVt2cI0Ig==}
+
+  openapi-typescript-helpers@0.1.0:
+    resolution: {integrity: sha512-OKTGPthhivLw/fHz6c3OPtg72vi86qaMlqbJuVJ23qOvQ+53uw1n7HdmkJFibloF7QEjDrDkzJiOJuockM/ljw==}
 
   openapi-typescript@7.13.0:
     resolution: {integrity: sha512-EFP392gcqXS7ntPvbhBzbF8TyBA+baIYEm791Hy5YkjDYKTnk/Tn5OQeKm5BIZvJihpp8Zzr4hzx0Irde1LNGQ==}
@@ -17139,6 +17154,12 @@ snapshots:
       is-inside-container: 1.0.0
       powershell-utils: 0.1.0
       wsl-utils: 0.3.1
+
+  openapi-fetch@0.17.0:
+    dependencies:
+      openapi-typescript-helpers: 0.1.0
+
+  openapi-typescript-helpers@0.1.0: {}
 
   openapi-typescript@7.13.0(typescript@5.9.3):
     dependencies:
