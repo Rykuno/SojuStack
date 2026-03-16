@@ -8,7 +8,6 @@ import { ApiExcludeEndpoint } from '@nestjs/swagger';
 export class AuthController {
   constructor(@Inject(BETTER_AUTH_PROVIDER) private readonly betterAuth: BetterAuth) {}
 
-  // exclude this from openapi
   @ApiExcludeEndpoint()
   @All('/client/*path')
   async handler(@Req() req: RawBodyRequest<Request>, @Res() res: Response) {

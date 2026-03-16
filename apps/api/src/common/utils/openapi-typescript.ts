@@ -37,12 +37,10 @@ async function hasOpenApiTypesChanged(nextContents: string) {
   return currentContents !== nextContents;
 }
 
-async function writeOpenApiTypesIfChanged(document: OpenAPIObject) {
+export async function generateOpenApiTypes(document: OpenAPIObject) {
   const contents = await buildOpenApiTypeContents(document);
-
-  if (!(await hasOpenApiTypesChanged(contents))) {
-    return;
-  }
+  const shouldGenerate = await hasOpenApiTypesChanged(contents);
+  if (!shouldGenerate) return;
 
   await fs.mkdir(OUTPUT_DIR, { recursive: true });
   await fs.writeFile(OUTPUT_PATH, contents, 'utf8');
@@ -68,7 +66,7 @@ export function generateOpenApiTypesInBackground(document: OpenAPIObject) {
 }
 
 if (!isMainThread) {
-  void writeOpenApiTypesIfChanged(workerData as OpenAPIObject)
+  void generateOpenApiTypes(workerData as OpenAPIObject)
     .then(() => {
       console.log(`✅ OpenAPI types generated and saved to ${path.join(OUTPUT_DIR, FILE_NAME)}`);
     })

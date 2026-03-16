@@ -29,7 +29,7 @@
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "test:watch": "jest --watch",
     "typecheck": "tsc --noEmit",
-    "openapi:generate": "tsx src/utils/openapi.ts",
+    "openapi:generate": "node -r tsconfig-paths/register -r ts-node/register src/common/utils/generate-openapi-types.ts",
     "depcheck": "depcheck"
   },
   "dependencies": {

@@ -14,15 +14,12 @@ export function setupScalar(app: INestApplication) {
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
-  const cleanedDocument = cleanupOpenApiDoc(document);
-
-  SwaggerModule.setup('swagger', app, cleanedDocument, { yamlDocumentUrl: '/openapi.yaml' });
 
   app.use(
     '/openapi',
     apiReference({
       sources: [
-        { content: cleanedDocument, title: `Example API` },
+        { content: cleanupOpenApiDoc(document), title: `Example API` },
         { url: '/auth/client/open-api/generate-schema', title: 'BetterAuth' },
       ],
     }),

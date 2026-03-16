@@ -1,4 +1,4 @@
-import { TransactionHost, Transactional } from '@nestjs-cls/transactional';
+import { TransactionHost } from '@nestjs-cls/transactional';
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { and, eq } from 'drizzle-orm';
 import { basename } from 'node:path';
@@ -45,7 +45,6 @@ export class FilesService {
     return Boolean(await this.getRecord(bucket, storageKey));
   }
 
-  @Transactional()
   async put(
     bucket: StorageBucketType,
     key: string,
@@ -69,7 +68,6 @@ export class FilesService {
     return storageKey;
   }
 
-  @Transactional()
   async putFileAs(bucket: StorageBucketType, file: Express.Multer.File, name: string) {
     const storageKey = normalizeStorageFileName(name);
 
@@ -87,7 +85,6 @@ export class FilesService {
     return storageKey;
   }
 
-  @Transactional()
   async delete(bucket: StorageBucketType, key: string) {
     const storageKey = normalizeStorageKey(key);
     const fileRecord = await this.getRecord(bucket, storageKey);
@@ -96,17 +93,18 @@ export class FilesService {
       return false;
     }
 
-    const previousObject = await this.createStoredObjectSnapshot(fileRecord);
-
-    await this.deleteStoredObject(fileRecord);
+    await this.deleteFileRecord(bucket, storageKey);
 
     try {
-      await this.deleteFileRecord(bucket, storageKey);
-      return true;
+      await this.deleteStoredObject(fileRecord);
     } catch (error) {
-      await this.safelyRestoreStoredObject(previousObject);
-      throw error;
+      this.logger.error(
+        `Deleted database record for "${storageKey}" in bucket "${bucket}" but failed to delete the stored object.`,
+        error instanceof Error ? error.stack : undefined,
+      );
     }
+
+    return true;
   }
 
   async size(bucket: StorageBucketType, key: string) {

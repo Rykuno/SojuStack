@@ -19,10 +19,10 @@ import { DRIZZLE_PROVIDER } from './database/drizzle.provider';
 import { ClsModule } from 'nestjs-cls';
 import { EnvService } from './common/env/env.service';
 import { CacheModule } from '@nestjs/cache-manager';
-import { createKeyv, Keyv } from '@keyv/redis';
-import { CacheableMemory } from 'cacheable';
+import { createKeyv } from '@keyv/redis';
 import { HttpModule } from '@nestjs/axios';
 import { HealthModule } from './health/health.module';
+import { StorageModule } from './storage/storage.module';
 
 @Catch(HttpException)
 class HttpExceptionFilter extends BaseExceptionFilter {
@@ -68,18 +68,14 @@ class HttpExceptionFilter extends BaseExceptionFilter {
       inject: [EnvService],
       useFactory: (envService: EnvService) => {
         return {
-          stores: [
-            new Keyv({
-              store: new CacheableMemory({ lruSize: 5000 }),
-            }),
-            createKeyv(envService.cache.url),
-          ],
+          stores: [createKeyv(envService.cache.url)],
         };
       },
     }),
     AuthModule,
     EnvModule,
     DatabaseModule,
+    StorageModule,
     HealthModule,
   ],
   controllers: [AppController],
