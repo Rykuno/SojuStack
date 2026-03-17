@@ -10,16 +10,12 @@ const OUTPUT_DIR = './generated';
 const FILE_NAME = 'openapi.d.ts';
 
 const OUTPUT_PATH = path.join(OUTPUT_DIR, FILE_NAME);
-const DATE = ts.factory.createTypeReferenceNode(ts.factory.createIdentifier('Date')); // `Date`
 const BLOB = ts.factory.createTypeReferenceNode(ts.factory.createIdentifier('Blob')); // `Blob`
 const NULL = ts.factory.createLiteralTypeNode(ts.factory.createNull()); // `null`
 
 async function buildOpenApiTypeContents(document: OpenAPIObject) {
   const ast = await openapiTS(document as OpenAPI3, {
     transform(schemaObject, _metadata) {
-      if (schemaObject.format === 'date-time') {
-        return schemaObject.nullable ? ts.factory.createUnionTypeNode([DATE, NULL]) : DATE;
-      }
       if (schemaObject.format === 'binary') {
         return schemaObject.nullable ? ts.factory.createUnionTypeNode([BLOB, NULL]) : BLOB;
       }

@@ -3,6 +3,7 @@ import * as schema from './drizzle.schema';
 
 export const relations = defineRelations(schema, (r) => ({
   files: {},
+  todos: {},
   users: {
     accounts: r.many.accounts({
       from: r.users.id,

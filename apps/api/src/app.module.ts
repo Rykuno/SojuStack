@@ -23,6 +23,7 @@ import { createKeyv } from '@keyv/redis';
 import { HttpModule } from '@nestjs/axios';
 import { HealthModule } from './health/health.module';
 import { StorageModule } from './storage/storage.module';
+import { TodosModule } from './todos/todos.module';
 
 @Catch(HttpException)
 class HttpExceptionFilter extends BaseExceptionFilter {
@@ -77,6 +78,7 @@ class HttpExceptionFilter extends BaseExceptionFilter {
     DatabaseModule,
     StorageModule,
     HealthModule,
+    TodosModule,
   ],
   controllers: [AppController],
   providers: [

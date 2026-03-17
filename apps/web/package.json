@@ -18,6 +18,8 @@
     "@nestjs/mapped-types": "*",
     "@tailwindcss/vite": "^4.1.18",
     "@tanstack/match-sorter-utils": "latest",
+    "@tanstack/query-db-collection": "catalog:",
+    "@tanstack/react-db": "catalog:",
     "@tanstack/react-devtools": "latest",
     "@tanstack/react-form": "latest",
     "@tanstack/react-query": "latest",
