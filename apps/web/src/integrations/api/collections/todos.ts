@@ -1,5 +1,5 @@
 import { mutationOptions, queryOptions } from '@tanstack/react-query';
-import { apiClient } from '../client.ts';
+import { apiClient, requireData } from '../client.ts';
 import type { Collection, CreateTodo, UpdateTodo } from '../types.ts';
 
 export class TodoCollection implements Collection {
@@ -8,10 +8,7 @@ export class TodoCollection implements Collection {
   findMany() {
     return queryOptions({
       queryKey: [...this.queryKeys],
-      queryFn: () =>
-        apiClient()
-          .GET('/todos')
-          .then(({ data }) => data ?? []),
+      queryFn: () => apiClient().GET('/todos').then(requireData),
     });
   }
 
@@ -21,16 +18,14 @@ export class TodoCollection implements Collection {
       queryFn: () =>
         apiClient()
           .GET('/todos/{id}', { params: { path: { id } } })
-          .then(({ data }) => data),
+          .then(requireData),
     });
   }
 
   create() {
     return mutationOptions({
       mutationFn: (todo: CreateTodo) =>
-        apiClient()
-          .POST('/todos', { body: todo })
-          .then(({ data }) => data),
+        apiClient().POST('/todos', { body: todo }).then(requireData),
     });
   }
 
@@ -39,7 +34,7 @@ export class TodoCollection implements Collection {
       mutationFn: ({ id, todo }: { id: string; todo: UpdateTodo }) =>
         apiClient()
           .PATCH('/todos/{id}', { params: { path: { id } }, body: todo })
-          .then(({ data }) => data),
+          .then(requireData),
     });
   }
 

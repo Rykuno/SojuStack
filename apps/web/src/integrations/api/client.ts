@@ -5,6 +5,10 @@ import createClient from 'openapi-fetch';
 
 type ApiClient = ReturnType<typeof createClient<paths>>;
 type FetchImpl = (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>;
+type ApiResult<T> = {
+  data?: T;
+  response: Response;
+};
 let browserClient: ApiClient | undefined;
 
 function toHeaderObject(headers?: HeadersInit) {
@@ -63,6 +67,14 @@ function getClientApiClient() {
     browserClient = initApiClient({ fetch: clientFetch });
   }
   return browserClient;
+}
+
+export function requireData<T>({ data, response }: ApiResult<T>) {
+  if (data === undefined) {
+    throw new Error(`Expected response body for ${response.status} ${response.statusText}`);
+  }
+
+  return data;
 }
 
 export const apiClient = createIsomorphicFn().server(getServerApiClient).client(getClientApiClient);

@@ -10,8 +10,8 @@ const OUTPUT_DIR = './generated';
 const FILE_NAME = 'openapi.d.ts';
 
 const OUTPUT_PATH = path.join(OUTPUT_DIR, FILE_NAME);
-const BLOB = ts.factory.createTypeReferenceNode(ts.factory.createIdentifier('Blob')); // `Blob`
-const NULL = ts.factory.createLiteralTypeNode(ts.factory.createNull()); // `null`
+const BLOB = ts.factory.createTypeReferenceNode(ts.factory.createIdentifier('Blob'));
+const NULL = ts.factory.createLiteralTypeNode(ts.factory.createNull());
 
 async function buildOpenApiTypeContents(document: OpenAPIObject) {
   const ast = await openapiTS(document as OpenAPI3, {
