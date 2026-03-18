@@ -18,6 +18,7 @@ import { EnvService } from 'src/common/env/env.service';
         mailpitTransport: MailpitTransport,
         resendTransport: ResendTransport,
       ) => {
+        console.log('IS PRODUCTION', envService.app.isProduction);
         return envService.app.isProduction ? resendTransport : mailpitTransport;
       },
     },

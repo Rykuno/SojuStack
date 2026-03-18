@@ -11,7 +11,7 @@ export class AuthCollection implements Collection {
       queryFn: () =>
         authClient()
           .getSession()
-          .then(({ data }) => data?.session),
+          .then(({ data }) => data?.session ?? null),
     });
   }
 
@@ -21,7 +21,7 @@ export class AuthCollection implements Collection {
       queryFn: () =>
         authClient()
           .getSession()
-          .then(({ data }) => data?.user),
+          .then(({ data }) => data?.user ?? null),
     });
   }
 

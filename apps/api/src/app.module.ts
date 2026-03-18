@@ -24,6 +24,7 @@ import { HttpModule } from '@nestjs/axios';
 import { HealthModule } from './health/health.module';
 import { StorageModule } from './storage/storage.module';
 import { TodosModule } from './todos/todos.module';
+import { BullModule } from '@nestjs/bullmq';
 
 @Catch(HttpException)
 class HttpExceptionFilter extends BaseExceptionFilter {
@@ -64,10 +65,21 @@ class HttpExceptionFilter extends BaseExceptionFilter {
         }),
       ],
     }),
+    BullModule.forRootAsync({
+      inject: [EnvService],
+      useFactory: (envService: EnvService) => {
+        return {
+          connection: {
+            host: envService.cache.url,
+          },
+        };
+      },
+    }),
     CacheModule.registerAsync({
       isGlobal: true,
       inject: [EnvService],
       useFactory: (envService: EnvService) => {
+        console.log('registering cache module', envService.cache.url);
         return {
           stores: [createKeyv(envService.cache.url)],
         };

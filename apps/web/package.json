@@ -13,6 +13,8 @@
   },
   "dependencies": {
     "@base-ui/react": "catalog:",
+    "@dicebear/collection": "catalog:",
+    "@dicebear/core": "catalog:",
     "@faker-js/faker": "^10.3.0",
     "@fontsource-variable/jetbrains-mono": "catalog:",
     "@nestjs/mapped-types": "*",
@@ -47,7 +49,7 @@
     "react-dom": "^19.2.0",
     "react-resizable-panels": "catalog:",
     "recharts": "catalog:",
-    "shadcn": "catalog:",
+    "shadcn": "^4.0.8",
     "sonner": "catalog:",
     "tailwind-merge": "^3.0.2",
     "tailwindcss": "^4.1.18",

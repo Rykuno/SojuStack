@@ -6,6 +6,8 @@ packages:
 catalog:
   '@aws-sdk/client-s3': ^3.1009.0
   '@base-ui/react': ^1.3.0
+  '@dicebear/collection': ^9.4.0
+  '@dicebear/core': ^9.4.0
   '@fontsource-variable/jetbrains-mono': ^5.2.8
   '@hono/node-server': ^1.19.11
   '@hono/vite-dev-server': ^0.25.1
@@ -13,6 +15,7 @@ catalog:
   '@nestjs-cls/transactional': ^3.2.0
   '@nestjs-cls/transactional-adapter-drizzle-orm': ^1.2.3
   '@nestjs/axios': ^4.0.1
+  '@nestjs/bullmq': ^11.0.4
   '@nestjs/cache-manager': ^3.1.0
   '@nestjs/config': ^4.0.3
   '@nestjs/swagger': ^11.2.6
@@ -32,6 +35,7 @@ catalog:
   '@types/react': ^19.2.14
   axios: ^1.13.6
   better-auth: ^1.5.5
+  bullmq: ^5.71.0
   cacheable: ^2.3.3
   cmdk: ^1.1.1
   date-fns: ^4.1.0
@@ -57,6 +61,7 @@ catalog:
   recharts: 2.15.4
   sanitize-filename: ^1.6.3
   shadcn: ^4.0.7
+  slugify: ^1.6.8
   sonner: ^2.0.7
   swc-loader: ^0.2.7
   typescript: ^5

@@ -14,7 +14,7 @@ import {
 } from '#/components/ui/item';
 import { todoSchema, useCreateTodoForm } from '#/hooks/forms/use-todo-form';
 
-export const Route = createFileRoute('/todos')({
+export const Route = createFileRoute('/_app/')({
   component: RouteComponent,
 });
 

@@ -6,9 +6,10 @@ import { TransactionHost } from '@nestjs-cls/transactional';
 import { DrizzleTransactionClient } from 'src/database/drizzle.provider';
 import * as schema from 'src/database/drizzle.schema';
 import { MailService } from 'src/mail/mail.service';
-import { hoursToSeconds, minutesToSeconds } from 'date-fns';
+import { hoursToSeconds, minutesToSeconds, secondsToMilliseconds } from 'date-fns';
 import { EnvService } from 'src/common/env/env.service';
 import { AuthService } from './auth.service';
+import slugify from 'slugify';
 
 export const BETTER_AUTH_PROVIDER = Symbol('BETTER_AUTH_PROVIDER');
 export type BetterAuth = ReturnType<typeof BetterAuthProvider.useFactory>;
@@ -35,7 +36,7 @@ export const BetterAuthProvider = {
         },
       }),
       advanced: {
-        cookiePrefix: envService.app.name,
+        cookiePrefix: slugify(envService.app.name),
         database: {
           generateId: false,
         },
@@ -46,7 +47,8 @@ export const BetterAuthProvider = {
           return value ?? null;
         },
         set: async (key, value, ttl) => {
-          await cache.set(key, value, ttl);
+          if (ttl) await cache.set(key, value, secondsToMilliseconds(ttl));
+          else await cache.set(key, value);
         },
         delete: async (key) => {
           await cache.del(key);
