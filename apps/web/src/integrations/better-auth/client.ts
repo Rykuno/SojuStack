@@ -1,8 +1,9 @@
 import { createIsomorphicFn } from '@tanstack/react-start';
 import { getRequest } from '@tanstack/react-start/server';
-import { emailOTPClient } from 'better-auth/client/plugins';
+import { emailOTPClient, inferAdditionalFields } from 'better-auth/client/plugins';
 import { createAuthClient } from 'better-auth/react';
 import { tanstackStartCookies } from 'better-auth/tanstack-start';
+import { type BetterAuth } from 'api/src/auth/better-auth.provider';
 
 let browserAuthClient: ReturnType<typeof initAuthClient> | undefined;
 
@@ -18,7 +19,7 @@ function initAuthClient(fetchOptions: RequestInit) {
   return createAuthClient({
     baseURL: getRequiredApiUrl(),
     basePath: '/auth/client',
-    plugins: [tanstackStartCookies(), emailOTPClient()],
+    plugins: [inferAdditionalFields<BetterAuth>(), tanstackStartCookies(), emailOTPClient()],
     fetchOptions,
   });
 }

@@ -8,7 +8,7 @@ import PasswordReset, { type PasswordResetProps } from './templates/password-res
 import SignInOtp, { type SignInOtpProps } from './templates/sign-in-otp.email';
 import { MAIL_TRANSPORT, MailTransport } from './transports/mail.transport';
 
-type MailInput<TemplateProps> = {
+export type MailInput<TemplateProps> = {
   to: string;
   props: TemplateProps;
 };

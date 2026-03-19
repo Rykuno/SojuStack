@@ -3,7 +3,13 @@ import {
   ZodSerializationException,
   createZodSerializerInterceptor,
 } from 'nestjs-zod';
-import { APP_PIPE, APP_INTERCEPTOR, APP_FILTER, BaseExceptionFilter } from '@nestjs/core';
+import {
+  APP_PIPE,
+  APP_INTERCEPTOR,
+  APP_FILTER,
+  BaseExceptionFilter,
+  APP_GUARD,
+} from '@nestjs/core';
 import { ZodError } from 'zod';
 import { Module, HttpException, ArgumentsHost, Logger, Catch } from '@nestjs/common';
 import { AppController } from './app.controller';
@@ -25,6 +31,11 @@ import { HealthModule } from './health/health.module';
 import { StorageModule } from './storage/storage.module';
 import { TodosModule } from './todos/todos.module';
 import { BullModule } from '@nestjs/bullmq';
+import { QueuesModule } from 'src/queues/queues.module';
+import { AuthGuard } from './auth/guards/auth.guard';
+import { secondsToMilliseconds } from 'date-fns';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { ThrottlerStorageRedisService } from '@nest-lab/throttler-storage-redis';
 
 @Catch(HttpException)
 class HttpExceptionFilter extends BaseExceptionFilter {
@@ -50,6 +61,26 @@ class HttpExceptionFilter extends BaseExceptionFilter {
       timeout: 5000,
       maxRedirects: 5,
     }),
+    ThrottlerModule.forRootAsync({
+      inject: [EnvService],
+      useFactory: (envService: EnvService) => {
+        return {
+          throttlers: [
+            {
+              name: 'burst',
+              ttl: secondsToMilliseconds(10),
+              limit: 50,
+            },
+            {
+              name: 'sustained',
+              ttl: secondsToMilliseconds(60),
+              limit: 300,
+            },
+          ],
+          storage: new ThrottlerStorageRedisService(envService.cache.url),
+        };
+      },
+    }),
     ConfigModule.forRoot({
       validate: (env) => envSchema.parse(env),
       isGlobal: true,
@@ -70,7 +101,7 @@ class HttpExceptionFilter extends BaseExceptionFilter {
       useFactory: (envService: EnvService) => {
         return {
           connection: {
-            host: envService.cache.url,
+            url: envService.cache.url,
           },
         };
       },
@@ -91,6 +122,7 @@ class HttpExceptionFilter extends BaseExceptionFilter {
     StorageModule,
     HealthModule,
     TodosModule,
+    QueuesModule,
   ],
   controllers: [AppController],
   providers: [
@@ -105,9 +137,18 @@ class HttpExceptionFilter extends BaseExceptionFilter {
         reportInput: true,
       }),
     },
+
     {
       provide: APP_FILTER,
       useClass: HttpExceptionFilter,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: AuthGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
     },
   ],
 })

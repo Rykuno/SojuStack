@@ -10,19 +10,21 @@ import { hoursToSeconds, minutesToSeconds, secondsToMilliseconds } from 'date-fn
 import { EnvService } from 'src/common/env/env.service';
 import { AuthService } from './auth.service';
 import slugify from 'slugify';
+import { QueueService } from 'src/queues/queue.service';
 
 export const BETTER_AUTH_PROVIDER = Symbol('BETTER_AUTH_PROVIDER');
 export type BetterAuth = ReturnType<typeof BetterAuthProvider.useFactory>;
 
 export const BetterAuthProvider = {
   provide: BETTER_AUTH_PROVIDER,
-  inject: [TransactionHost, Cache, MailService, EnvService, AuthService],
+  inject: [TransactionHost, Cache, MailService, EnvService, AuthService, QueueService],
   useFactory: (
     txHost: TransactionHost<DrizzleTransactionClient>,
     cache: Cache,
     mailService: MailService,
     envService: EnvService,
     authService: AuthService,
+    queueService: QueueService,
   ) => {
     return betterAuth({
       database: drizzleAdapter(txHost.tx, {
@@ -59,13 +61,10 @@ export const BetterAuthProvider = {
       baseURL: envService.app.url,
       basePath: envService.auth.basePath,
       trustedOrigins: envService.auth.trustedOrigins,
-      rateLimit: {
-        enabled: true,
-        storage: 'secondary-storage',
-      },
       session: {
         storeSessionInDatabase: true,
         freshAge: hoursToSeconds(1),
+        preserveSessionInDatabase: true,
       },
       databaseHooks: {
         user: {
@@ -118,7 +117,7 @@ export const BetterAuthProvider = {
           allowedAttempts: 5,
           sendVerificationOTP: async ({ email, otp, type }) => {
             if (type === 'sign-in') {
-              return mailService.sendSignInOtp({
+              await queueService.dispatchMailSignInOtp({
                 to: email,
                 props: {
                   otpCode: otp,

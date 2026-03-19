@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Env } from './env.schema';
+import { CorsOptions } from '@nestjs/common/interfaces/external/cors-options.interface';
 
 @Injectable()
 export class EnvService {
@@ -17,6 +18,18 @@ export class EnvService {
       environment: this.get('NODE_ENV'),
       url: this.get('BASE_URL'),
       port: this.get('PORT'),
+      cors: {
+        origin: this.get('AUTH_TRUSTED_ORIGINS'),
+        methods: ['GET', 'PATCH', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'HEAD'],
+        allowedHeaders: [
+          'Content-Type',
+          'Authorization',
+          'X-Requested-With',
+          'user-agent',
+          'Accept',
+        ],
+        credentials: true,
+      } satisfies CorsOptions,
     };
   }
 

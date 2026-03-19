@@ -12,6 +12,7 @@ catalog:
   '@hono/node-server': ^1.19.11
   '@hono/vite-dev-server': ^0.25.1
   '@keyv/redis': ^5.1.6
+  '@nest-lab/throttler-storage-redis': ^1.2.0
   '@nestjs-cls/transactional': ^3.2.0
   '@nestjs-cls/transactional-adapter-drizzle-orm': ^1.2.3
   '@nestjs/axios': ^4.0.1
@@ -20,6 +21,7 @@ catalog:
   '@nestjs/config': ^4.0.3
   '@nestjs/swagger': ^11.2.6
   '@nestjs/terminus': ^11.1.1
+  '@nestjs/throttler': ^6.5.0
   '@paralleldrive/cuid2': ^3.3.0
   '@react-email/components': 1.0.9
   '@react-email/preview-server': 5.2.9
@@ -38,11 +40,13 @@ catalog:
   bullmq: ^5.71.0
   cacheable: ^2.3.3
   cmdk: ^1.1.1
+  csrf-csrf: ^4.0.3
   date-fns: ^4.1.0
   dotenv: ^17.3.1
   drizzle-kit: 1.0.0-beta.17-67b1795
   drizzle-orm: 1.0.0-beta.17-67b1795
   embla-carousel-react: ^8.6.0
+  helmet: ^8.1.0
   hono: ^4.12.8
   input-otp: ^1.4.2
   keyv: ^5.6.0

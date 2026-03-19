@@ -3,17 +3,16 @@ import { AppModule } from './app.module';
 import { setupScalar } from './common/utils/setup-scalar';
 import { EnvService } from './common/env/env.service';
 import { generateOpenApiTypesInBackground } from './common/utils/openapi-typescript';
+import { NestExpressApplication } from '@nestjs/platform-express';
+import helmet from 'helmet';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
   const envService = app.get(EnvService);
 
-  app.enableCors({
-    origin: 'http://localhost:3000',
-    credentials: true,
-    methods: ['GET', 'PATCH', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'HEAD'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'user-agent', 'Accept'],
-  });
+  app.set('trust proxy', 'loopback');
+  app.enableCors(envService.app.cors);
+  app.use(helmet());
 
   if (!envService.app.isProduction) {
     const openApiDocument = setupScalar(app);
