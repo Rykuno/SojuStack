@@ -32,6 +32,7 @@ catalog:
   '@swc/core': ^1.15.18
   '@tanstack/query-db-collection': ^1.0.30
   '@tanstack/react-db': ^0.1.77
+  '@types/cookie-parser': ^1.4.10
   '@types/multer': ^2.1.0
   '@types/node': ^24
   '@types/react': ^19.2.14
@@ -40,6 +41,7 @@ catalog:
   bullmq: ^5.71.0
   cacheable: ^2.3.3
   cmdk: ^1.1.1
+  cookie-parser: ^1.4.7
   csrf-csrf: ^4.0.3
   date-fns: ^4.1.0
   dotenv: ^17.3.1

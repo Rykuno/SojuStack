@@ -37,8 +37,15 @@ export const BetterAuthProvider = {
           verification: schema.verifications,
         },
       }),
+      account: {
+        encryptOAuthTokens: true,
+      },
+      experimental: {
+        joins: true,
+      },
       advanced: {
-        cookiePrefix: slugify(envService.app.name),
+        cookiePrefix: slugify(envService.app.name, { lower: true, trim: true }),
+        useSecureCookies: envService.app.isProduction,
         database: {
           generateId: false,
         },
@@ -74,6 +81,7 @@ export const BetterAuthProvider = {
             },
           },
         },
+
         session: {
           create: {
             async before(session) {
