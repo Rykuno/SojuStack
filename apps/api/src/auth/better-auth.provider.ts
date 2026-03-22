@@ -81,7 +81,6 @@ export const BetterAuthProvider = {
             },
           },
         },
-
         session: {
           create: {
             async before(session) {

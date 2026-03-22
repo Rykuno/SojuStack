@@ -33,15 +33,21 @@ export class AuthCollection implements Collection {
 
   sendSignInOtp() {
     return mutationOptions({
-      mutationFn: (email: string) =>
-        authClient().emailOtp.sendVerificationOtp({ email, type: 'sign-in' }),
+      mutationFn: async (email: string) =>
+        authClient().emailOtp.sendVerificationOtp({
+          email,
+          type: 'sign-in',
+        }),
     });
   }
 
   verifySignInOtp() {
     return mutationOptions({
-      mutationFn: ({ email, otp }: { email: string; otp: string }) =>
-        authClient().signIn.emailOtp({ email, otp }),
+      mutationFn: async ({ email, otp }: { email: string; otp: string }) => {
+        const { data, error } = await authClient().signIn.emailOtp({ email, otp });
+        if (error) throw error;
+        return data;
+      },
     });
   }
 

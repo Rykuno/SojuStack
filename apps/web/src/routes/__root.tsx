@@ -10,6 +10,7 @@ import { OpenAPIDevtools } from '../integrations/openapi/devtools';
 import { RustFSDevtools } from '../integrations/rust-fs/devtools';
 import appCss from '../styles.css?url';
 import type { QueryClient } from '@tanstack/react-query';
+import { Toaster } from '#/components/ui/sonner';
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
   head: () => ({
@@ -44,6 +45,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       <body>
         <TanStackQueryProvider>
           {children}
+          <Toaster />
           <TanStackDevtools
             config={{
               position: 'bottom-right',

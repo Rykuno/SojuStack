@@ -9,6 +9,7 @@ import { api } from '#/integrations/api';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useNavigate } from '@tanstack/react-router';
+import { toast } from 'sonner';
 
 const emailSchema = z.object({
   email: z.email(),
@@ -101,6 +102,7 @@ export function OtpForm({ email }: { email: string }) {
       queryClient.clear();
       void navigate({ to: '/' });
     },
+    onError: (error) => toast.error(error.message),
   });
 
   const form = useForm({
@@ -111,9 +113,7 @@ export function OtpForm({ email }: { email: string }) {
       onBlur: otpSchema,
       onSubmit: otpSchema,
     },
-    onSubmit: ({ value }) => {
-      verifySignInOtpMutation.mutate({ email, otp: value.otp });
-    },
+    onSubmit: ({ value }) => verifySignInOtpMutation.mutate({ email, otp: value.otp }),
   });
 
   return (
