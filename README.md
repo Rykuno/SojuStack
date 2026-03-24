@@ -2,7 +2,7 @@
 
 # SojuStack
 
-Opinionated, production-minded full-stack starter with strong TypeScript ergonomics and end-to-end type safety.
+Opinionated, production-minded full-stack starter with strong TypeScript ergonomics, end-to-end type safety, and a modern local-first developer workflow.
 
 Human-first by design: this stack is built for developers to lead decisions, with AI used as an accelerator for implementation, iteration, and review.
 
@@ -10,35 +10,40 @@ Human-first by design: this stack is built for developers to lead decisions, wit
 
 ### Monorepo and Tooling
 
-- `pnpm` workspaces
-- `turbo` task orchestration
-- `TypeScript` everywhere
-- `oxlint` + `oxfmt`
-- `lefthook` (pre-push checks)
+- `Vite+` as the unified CLI and workflow layer
+- `pnpm` under the hood via `Vite+`
+- `TypeScript` across the entire monorepo
+- `Oxlint` + `Oxfmt` through `vp check`
+- Git hook integration via `vp config`
 
 ### Web (`apps/web`)
 
 - `TanStack Start` + `TanStack Router`
-- `TanStack Query`
-- `openapi-fetch` generated client types
-- `Tailwind CSS` + `shadcn` + `@base-ui/react`
+- `React 19`
+- `TanStack Query`, `TanStack Form`, and `TanStack Table`
+- `openapi-fetch` with generated API types from the backend
+- `Tailwind CSS v4` + `shadcn/ui` + `@base-ui/react`
 - `better-auth` client integration
+- Built-in local devtools for OpenAPI, Drizzle, Mailpit, React Email, RustFS, and TanStack Query
 
 ### API (`apps/api`)
 
-- `NestJS` (v11)
+- `NestJS` 11
 - `Drizzle ORM` + `drizzle-kit`
 - `PostgreSQL`
 - `Valkey`/Redis-compatible caching via `Keyv`
+- `BullMQ` queues
 - `Better Auth`
-- OpenAPI generation (`@nestjs/swagger` + `openapi-typescript`)
+- `React Email` templates with `Mailpit` and `Resend` transports
+- OpenAPI generation with `@nestjs/swagger` + `openapi-typescript`
+- `RustFS` for S3-compatible object storage
 
 ### Local Infra (`docker-compose.yaml`)
 
 - `Postgres`
 - `Valkey`
 - `Mailpit`
-- `RustFS` (S3-compatible object storage)
+- `RustFS`
 
 ## Architecture
 
@@ -48,8 +53,9 @@ flowchart LR
   W -->|HTTP + Cookies| A[API<br/>NestJS]
   A --> P[(PostgreSQL)]
   A --> V[(Valkey)]
+  A --> Q[BullMQ Jobs]
   A --> S[(RustFS / S3-compatible)]
-  A --> M[Mailpit]
+  A --> E[Mailpit / Resend]
 ```
 
 ## Type-Safe Flow
@@ -68,15 +74,13 @@ sequenceDiagram
 
 ## Getting Started
 
-### Quick Trial (Automated)
+### Prerequisites
 
-Use this only for first-time trial runs:
+- `Node.js >= 22.12.0`
+- Docker
+- `vp` installed globally
 
-```sh
-pnpm dev:setup
-```
-
-### Manual Setup (Recommended)
+### Setup
 
 ```sh
 # 1) Create env files
@@ -84,17 +88,21 @@ cp apps/api/.env.example apps/api/.env
 cp apps/web/.env.example apps/web/.env
 
 # 2) Install dependencies
-pnpm install
+vp install
 
 # 3) Start local infrastructure
-docker-compose up -d
+docker compose up -d
 
-# 4) Apply DB schema
-pnpm -C apps/api db:push
+# 4) Apply the database schema
+vp run api#db:push
 
-# 5) Start apps
-pnpm dev
+# 5) Start the full dev environment
+vp run dev
 ```
+
+`vp run dev` starts the web app, the NestJS API in watch mode, the React Email preview server, and Drizzle Studio from the API workspace.
+
+## Storage Model
 
 The API storage layer uses two buckets: `public` and `private`.
 
@@ -105,24 +113,28 @@ Private files stay backend-only and should be read through the API instead of be
 ## Default Local Endpoints
 
 ```txt
-web:      http://localhost:3000
-api:      http://localhost:8000
-mailpit:  http://localhost:8025
-postgres: postgres://postgres:postgres@localhost:5432/postgres
-valkey:   redis://localhost:6379
-rustfs:   http://localhost:9000
+web:                http://localhost:3000
+api:                http://localhost:8000
+react-email:        http://localhost:3030
+mailpit:            http://localhost:8025
+postgres:           postgres://postgres:postgres@localhost:5432/postgres
+valkey:             redis://localhost:6379
+rustfs api:         http://localhost:9000
+rustfs console:     http://localhost:9001
 ```
 
-## Common Commands (Root)
+## Common Commands
 
 ```sh
-pnpm dev            # run web + api dev tasks via turbo
-pnpm build          # build all packages
-pnpm lint           # oxlint type-aware run
-pnpm lint:fix       # apply lint fixes
-pnpm typecheck      # turbo typecheck
-pnpm format         # oxfmt
-pnpm api:openapi:generate
+vp install                     # install dependencies
+vp check                       # format, lint, and type-check
+vp test                        # run tests where supported by Vite+
+vp run dev                     # start web + api development tasks
+vp run build                   # build the web and api apps
+vp run api#db:push             # push Drizzle schema to the database
+vp run api#db:studio           # open Drizzle Studio
+vp run api#openapi:generate    # regenerate committed OpenAPI types
+vp ready                       # project-wide format/lint/test/build pass
 ```
 
 ## End-to-End Type Safety
@@ -131,11 +143,11 @@ SojuStack keeps API and frontend contracts aligned by default:
 
 - Shared monorepo context
 - OpenAPI docs and generated type definitions
-- Typed API usage through `openapi-fetch`
+- Typed frontend requests through `openapi-fetch`
 
-In practice: update a DTO/route in API and frontend compile errors surface immediately where contracts changed.
+In practice: update a DTO or route in the API and frontend compile errors surface immediately where contracts changed.
 
-`apps/api/generated/openapi.d.ts` is a committed generated artifact and the source of truth consumed by the web app. After changing API contracts, run `pnpm api:openapi:generate` and commit the updated file. CI verifies that the committed contract matches freshly generated output.
+`apps/api/generated/openapi.d.ts` is a committed artifact and the source of truth consumed by the web app. After changing API contracts, run `vp run api#openapi:generate` and commit the updated file.
 
 ## Why This Stack
 
@@ -146,64 +158,46 @@ In practice: update a DTO/route in API and frontend compile errors surface immed
 3. Can I migrate away without pain?
 4. Does it scale with me?
 5. Is the developer experience actually good?
-6. Does it work well with AI(yeah, we're here so might as well)
+6. Does it work well with AI?
 
 ### Backend
 
 #### NestJS
 
-It checks all the boxes for me: mature, structured, testable, and easy to grow.  
-People call it verbose; I call it explicit. I prefer that when business logic gets real.
+It checks all the boxes: mature, structured, testable, and easy to grow. Explicit architecture wins when business logic gets real.
 
-#### PostgreSQL
+#### PostgreSQL + Drizzle
 
-I'm a relational DB person. Postgres has the right defaults and enough headroom that I rarely regret choosing it.
-
-#### Drizzle
-
-This is the SQL-first ORM experience I actually enjoy.  
-Minimal magic, typed queries, reviewable migrations, and no giant abstraction tax.
-
-#### Valkey (Redis-compatible cache)
-
-Simple, fast, and drop-in for Redis workflows.  
-With `Keyv` in the API layer, swapping providers is mostly config-level work.
+Postgres gives excellent defaults and long-term headroom. Drizzle keeps the data layer SQL-first, typed, and reviewable without a huge abstraction tax.
 
 #### Better Auth
 
-"Don't roll your own crypto" is still the rule.  
-Better Auth gives enough abstraction to move fast without boxing me in.
+Authentication should be boring and dependable. Better Auth moves quickly without boxing the project into a dead-end auth layer.
 
-#### RustFS (S3-compatible object storage)
+#### Queues, Cache, and Mail
 
-Local-first, self-hostable, and S3-compatible.  
-If I move to managed object storage later, it's mostly endpoint/credential changes.
+Valkey, BullMQ, Mailpit, and React Email make it straightforward to build background jobs and transactional email flows locally before swapping in hosted services.
+
+#### RustFS
+
+S3-compatible object storage keeps local development realistic and future migration low-friction.
 
 ### Frontend
 
-#### TanStack Start + Router
+#### TanStack Start
 
-Fantastic routing model and good long-term ergonomics.  
-File-based routes + typed APIs make iteration fast and refactors safer.
+TanStack Start provides a strong routing model, solid SSR-oriented ergonomics, and a clean foundation for typed, full-stack React apps.
 
-#### TanStack Query
+#### Tailwind + shadcn/ui + Base UI
 
-The default for server state in React apps for a reason.
+Composable primitives, fast iteration, and no hard lock-in to a black-box component library.
 
-#### shadcn + Base UI + Tailwind
+### Tooling
 
-Composable primitives, easy customization, and no hard lock-in to a black-box UI kit.
+#### Vite+
 
-### Monorepo + Tooling
+Vite+ gives the repo a single command surface for installs, checks, tests, builds, and workspace task execution, which keeps the day-to-day workflow much simpler than mixing separate package-manager and task-runner commands.
 
-#### pnpm + Turbo
+#### Type-Safe Contracts
 
-Fast workspace installs, clean task orchestration, and predictable monorepo workflows.
-
-#### Oxlint + Oxfmt
-
-Very fast lint/format feedback loops with type-aware checks where it matters.
-
-#### Lefthook
-
-Simple guardrails before push (`lint` + `typecheck`) so broken code is harder to ship.
+The API owns the schema, generated OpenAPI types are committed, and the frontend consumes that contract directly.
