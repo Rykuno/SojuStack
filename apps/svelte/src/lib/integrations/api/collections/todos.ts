@@ -1,15 +1,10 @@
 import { mutationOptions, queryOptions } from '@tanstack/svelte-query';
 import type { CreateTodo, UpdateTodo } from '../types.ts';
 import { requireData } from '../utils.ts';
-import type { ApiClient } from '../client.ts';
+import { ApiCollection } from '../types.ts';
 
-export class TodoCollection {
+export class TodoCollection extends ApiCollection {
   readonly queryKeys = ['todos'];
-  readonly client: ApiClient;
-
-  constructor(client: ApiClient) {
-    this.client = client;
-  }
 
   findMany() {
     return queryOptions({
