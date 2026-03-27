@@ -1,6 +1,6 @@
 import { createIsomorphicFn } from '@tanstack/react-start';
 import { getRequest } from '@tanstack/react-start/server';
-import { type paths } from 'api/generated/openapi';
+import type { paths } from 'api/generated/openapi';
 import createClient from 'openapi-fetch';
 
 type ApiClient = ReturnType<typeof createClient<paths>>;

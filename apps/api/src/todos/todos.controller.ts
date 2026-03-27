@@ -4,8 +4,10 @@ import { TodoDto } from './dto/todo.dto';
 import { UpdateTodoDto } from './dto/update-todo.dto';
 import { TodosService } from './todos.service';
 import { ZodResponse } from 'nestjs-zod';
+import { Auth, AuthType } from 'src/auth/decorators/auth.decorator';
 
 @Controller('todos')
+@Auth(AuthType.Unauthenticated)
 export class TodosController {
   constructor(private readonly todosService: TodosService) {}
 

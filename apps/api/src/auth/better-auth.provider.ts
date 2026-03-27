@@ -40,9 +40,6 @@ export const BetterAuthProvider = {
       account: {
         encryptOAuthTokens: true,
       },
-      experimental: {
-        joins: true,
-      },
       advanced: {
         cookiePrefix: slugify(envService.app.name, { lower: true, trim: true }),
         useSecureCookies: envService.app.isProduction,

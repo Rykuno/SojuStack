@@ -142,10 +142,10 @@ class HttpExceptionFilter extends BaseExceptionFilter {
       provide: APP_FILTER,
       useClass: HttpExceptionFilter,
     },
-    {
-      provide: APP_GUARD,
-      useClass: AuthGuard,
-    },
+    // {
+    //   provide: APP_GUARD,
+    //   useClass: AuthGuard,
+    // },
     {
       provide: APP_GUARD,
       useClass: ThrottlerGuard,
