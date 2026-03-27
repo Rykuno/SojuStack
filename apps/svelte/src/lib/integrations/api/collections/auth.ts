@@ -1,22 +1,22 @@
 import { mutationOptions, queryOptions } from '@tanstack/svelte-query';
 import { ApiCollection } from '../collection.ts';
-import { auth } from '$lib/integrations/auth/client';
+import { authClient } from '$lib/integrations/auth/client';
+import type { ApiClient } from '../client.ts';
 
 export class AuthCollection extends ApiCollection {
-  constructor(
-    client: ConstructorParameters<typeof ApiCollection>[0],
-    fetch?: typeof globalThis.fetch,
-  ) {
-    super(client, fetch);
-  }
-
   queryKeys = ['auth'];
+  customFetch: typeof fetch;
+
+  constructor(client: ApiClient, customFetch = fetch) {
+    super(client);
+    this.customFetch = customFetch;
+  }
 
   session() {
     return queryOptions({
       queryKey: [...this.queryKeys, 'session'],
       queryFn: () =>
-        auth(this.fetch)
+        authClient(this.customFetch)
           .getSession()
           .then((data) => data?.data ?? null),
     });
@@ -24,14 +24,14 @@ export class AuthCollection extends ApiCollection {
 
   signOut() {
     return mutationOptions({
-      mutationFn: () => auth(this.fetch).signOut(),
+      mutationFn: () => authClient(this.customFetch).signOut(),
     });
   }
 
   sendSignInOtp() {
     return mutationOptions({
       mutationFn: async (email: string) =>
-        auth(this.fetch).emailOtp.sendVerificationOtp({
+        authClient(this.customFetch).emailOtp.sendVerificationOtp({
           email,
           type: 'sign-in',
         }),
@@ -41,7 +41,7 @@ export class AuthCollection extends ApiCollection {
   verifySignInOtp() {
     return mutationOptions({
       mutationFn: async ({ email, otp }: { email: string; otp: string }) => {
-        const { data, error } = await auth(this.fetch).signIn.emailOtp({ email, otp });
+        const { data, error } = await authClient(this.customFetch).signIn.emailOtp({ email, otp });
         if (error) throw error;
         return data;
       },
@@ -50,7 +50,7 @@ export class AuthCollection extends ApiCollection {
 
   refreshSession() {
     return mutationOptions({
-      mutationFn: () => auth(this.fetch).updateSession(),
+      mutationFn: () => authClient(this.customFetch).updateSession(),
     });
   }
 }
