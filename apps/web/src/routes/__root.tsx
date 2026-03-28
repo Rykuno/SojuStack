@@ -9,7 +9,7 @@ import { ReactEmailDevtools } from '../integrations/react-email/devtools';
 import { OpenAPIDevtools } from '../integrations/openapi/devtools';
 import { RustFSDevtools } from '../integrations/rust-fs/devtools';
 import appCss from '../styles.css?url';
-import type { QueryClient } from '@tanstack/react-query';
+import { type QueryClient } from '@tanstack/react-query';
 import { Toaster } from '#/components/ui/sonner';
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({

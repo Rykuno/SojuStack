@@ -29,7 +29,7 @@
     "prepublishOnly": "pnpm run build"
   },
   "devDependencies": {
-    "@types/node": "^25.3.5",
+    "@types/node": "catalog:",
     "@typescript/native-preview": "7.0.0-dev.20260309.1",
     "bumpp": "^10.4.1",
     "typescript": "^5.9.3",
