@@ -1,7 +1,7 @@
 <script lang="ts">
   import "./layout.css";
   import favicon from "$lib/assets/favicon.svg";
-  import { QueryClientProvider } from "@tanstack/svelte-query";
+  import { createQuery, QueryClientProvider } from "@tanstack/svelte-query";
   import { TanStackDevtoolsCore } from "@tanstack/devtools";
 
   const { data, children } = $props();

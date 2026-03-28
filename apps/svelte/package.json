@@ -14,14 +14,17 @@
   "dependencies": {
     "@tanstack/svelte-query": "catalog:",
     "better-auth": "catalog:",
-    "openapi-fetch": "catalog:"
+    "formsnap": "catalog:",
+    "openapi-fetch": "catalog:",
+    "sveltekit-superforms": "catalog:",
+    "zod": "catalog:"
   },
   "devDependencies": {
     "@eslint/compat": "latest",
     "@eslint/js": "latest",
     "@fontsource-variable/geist": "^5.2.8",
     "@internationalized/date": "catalog:",
-    "@lucide/svelte": "^1.7.0",
+    "@lucide/svelte": "catalog:",
     "@sveltejs/adapter-node": "^5.5.2",
     "@sveltejs/kit": "^2.50.2",
     "@sveltejs/vite-plugin-svelte": "catalog:",
