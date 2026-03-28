@@ -2,6 +2,7 @@ import { TransactionHost } from '@nestjs-cls/transactional';
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { and, eq } from 'drizzle-orm';
 import { basename } from 'node:path';
+import type { Express } from 'express';
 import { S3Service } from './s3.service';
 import { type StorageBucketType } from './storage.constants';
 import { normalizeStorageFileName, normalizeStorageKey } from './storage.utils';
@@ -11,6 +12,7 @@ import { takeFirstOrThrow } from 'src/database/drizzle.utils';
 
 type FileRecord = typeof files.$inferSelect;
 type FileMetadata = Pick<FileRecord, 'name' | 'mimeType' | 'sizeBytes'>;
+type UploadedFile = Express.Multer.File;
 type StoredObjectLocation = Pick<FileRecord, 'bucket' | 'storageKey' | 'mimeType'>;
 type StoredObjectSnapshot = StoredObjectLocation & {
   file: Buffer;
@@ -68,7 +70,7 @@ export class FilesService {
     return storageKey;
   }
 
-  async putFileAs(bucket: StorageBucketType, file: Express.Multer.File, name: string) {
+  async putFileAs(bucket: StorageBucketType, file: UploadedFile, name: string) {
     const storageKey = normalizeStorageFileName(name);
 
     await this.writeFile({

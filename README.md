@@ -76,7 +76,7 @@ sequenceDiagram
 
 ### Prerequisites
 
-- `Node.js >= 22.12.0`
+- `Node.js 25.8.2`
 - Docker
 - `vp` installed globally
 

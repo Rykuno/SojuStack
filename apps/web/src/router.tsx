@@ -13,7 +13,7 @@ export function getRouter() {
   });
   setupRouterSsrQueryIntegration({
     router,
-    queryClient,
+    queryClient: getContext().queryClient,
   });
 
   return router;

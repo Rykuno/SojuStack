@@ -41,10 +41,10 @@
     "@nestjs/axios": "catalog:",
     "@nestjs/bullmq": "catalog:",
     "@nestjs/cache-manager": "catalog:",
-    "@nestjs/common": "^11.1.16",
+    "@nestjs/common": "^11.1.17",
     "@nestjs/config": "catalog:",
-    "@nestjs/core": "^11.1.16",
-    "@nestjs/platform-express": "^11.1.16",
+    "@nestjs/core": "^11.1.17",
+    "@nestjs/platform-express": "^11.1.17",
     "@nestjs/swagger": "catalog:",
     "@nestjs/terminus": "catalog:",
     "@nestjs/throttler": "catalog:",
@@ -81,13 +81,13 @@
     "@eslint/js": "^9.39.4",
     "@nestjs/cli": "^11.0.16",
     "@nestjs/schematics": "^11.0.9",
-    "@nestjs/testing": "^11.1.16",
+    "@nestjs/testing": "^11.1.17",
     "@react-email/preview-server": "catalog:",
     "@types/cookie-parser": "catalog:",
     "@types/express": "^5.0.6",
     "@types/jest": "^30.0.0",
     "@types/multer": "catalog:",
-    "@types/node": "^22.19.15",
+    "@types/node": "catalog:",
     "@types/react": "catalog:",
     "@types/supertest": "^6.0.3",
     "drizzle-kit": "catalog:",
@@ -105,7 +105,7 @@
     "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0",
     "typescript": "^5.9.3",
-    "typescript-eslint": "^8.57.0"
+    "typescript-eslint": "^8.57.2"
   },
   "jest": {
     "collectCoverageFrom": [

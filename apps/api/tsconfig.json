@@ -18,6 +18,7 @@
     "skipLibCheck": true,
     "jsx": "react-jsx",
     "jsxImportSource": "react",
+    "types": ["node", "jest", "multer"],
     "strictNullChecks": true,
     "forceConsistentCasingInFileNames": true,
     "noImplicitAny": true,
