@@ -9,7 +9,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { getUserAvatar } from '@/lib/utils';
+import { getUserAvatar } from '#/lib/helpers';
 import { api } from '#/integrations/api';
 import { Container } from './container';
 

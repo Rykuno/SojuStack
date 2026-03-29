@@ -1,6 +1,7 @@
 import * as React from 'react';
+import { mergeProps } from '@base-ui/react/merge-props';
+import { useRender } from '@base-ui/react/use-render';
 import { cva, type VariantProps } from 'class-variance-authority';
-import { Slot } from 'radix-ui';
 
 import { cn } from '#/lib/utils';
 import { Separator } from '#/components/ui/separator';
@@ -56,19 +57,24 @@ function Item({
   className,
   variant = 'default',
   size = 'default',
-  asChild = false,
+  render,
   ...props
-}: React.ComponentProps<'div'> & VariantProps<typeof itemVariants> & { asChild?: boolean }) {
-  const Comp = asChild ? Slot.Root : 'div';
-  return (
-    <Comp
-      data-slot='item'
-      data-variant={variant}
-      data-size={size}
-      className={cn(itemVariants({ variant, size, className }))}
-      {...props}
-    />
-  );
+}: useRender.ComponentProps<'div'> & VariantProps<typeof itemVariants>) {
+  return useRender({
+    defaultTagName: 'div',
+    props: mergeProps<'div'>(
+      {
+        className: cn(itemVariants({ variant, size, className })),
+      },
+      props,
+    ),
+    render,
+    state: {
+      slot: 'item',
+      variant,
+      size,
+    },
+  });
 }
 
 const itemMediaVariants = cva(
@@ -121,7 +127,7 @@ function ItemTitle({ className, ...props }: React.ComponentProps<'div'>) {
     <div
       data-slot='item-title'
       className={cn(
-        'line-clamp-1 flex w-fit items-center gap-2 text-xs font-medium underline-offset-4',
+        'font-heading line-clamp-1 flex w-fit items-center gap-2 text-xs font-medium underline-offset-4',
         className,
       )}
       {...props}
