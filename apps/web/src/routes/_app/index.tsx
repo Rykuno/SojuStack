@@ -13,6 +13,26 @@ import {
   ItemTitle,
 } from '#/components/ui/item';
 import { todoSchema, useCreateTodoForm } from '#/hooks/forms/use-todo-form';
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
+import {
+  Modal,
+  ModalClose,
+  ModalContent,
+  ModalDescription,
+  ModalFooter,
+  ModalHeader,
+  ModalTitle,
+  ModalTrigger,
+} from '#/components/ui/modal';
 
 export const Route = createFileRoute('/_app/')({
   component: RouteComponent,
@@ -50,6 +70,32 @@ function RouteComponent() {
 
   return (
     <div className='max-w-2xl mx-auto mt-24 space-y-4'>
+      <Modal>
+        <ModalTrigger>Test</ModalTrigger>
+        <ModalContent>
+          <ModalHeader>
+            <ModalTitle>Modal Title</ModalTitle>
+            <ModalDescription>Modal Description</ModalDescription>
+          </ModalHeader>
+          <ModalFooter>
+            <ModalClose>Close</ModalClose>
+            <Button>Save</Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+
+      <Dialog>
+        <DialogTrigger>Open Dialog</DialogTrigger>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Dialog Title</DialogTitle>
+            <DialogDescription>Dialog Description</DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <DialogClose>Close</DialogClose>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
       <h1>Todos</h1>
       <div>
         <createTodoForm.AppForm>
