@@ -24,8 +24,26 @@ import {
 } from '#/components/ui/drawer';
 import { useIsMobile } from '#/hooks/use-mobile';
 
+type ModalRootProps = React.ComponentProps<typeof Dialog> & React.ComponentProps<typeof Drawer>;
 type ModalContextValue = {
   isMobile: boolean;
+};
+type ModalTriggerProps = Omit<React.ComponentProps<typeof DialogTrigger>, 'className'> & {
+  children?: React.ReactNode;
+  className?: string;
+};
+type ModalCloseProps = Omit<React.ComponentProps<typeof DialogClose>, 'className'> & {
+  children?: React.ReactNode;
+  className?: string;
+};
+type ModalContentProps = Omit<React.ComponentProps<typeof DialogContent>, 'className'> & {
+  className?: string;
+};
+type ModalTitleProps = Omit<React.ComponentProps<typeof DialogTitle>, 'className'> & {
+  className?: string;
+};
+type ModalDescriptionProps = Omit<React.ComponentProps<typeof DialogDescription>, 'className'> & {
+  className?: string;
 };
 
 const ModalContext = React.createContext<ModalContextValue | null>(null);
@@ -40,20 +58,16 @@ function useModalContext() {
   return context;
 }
 
-function Modal({
-  children,
+function useModalOpenState({
   defaultOpen = false,
   open: openProp,
   onOpenChange,
-  ...props
-}: React.ComponentProps<typeof Dialog> & React.ComponentProps<typeof Drawer>) {
-  const isMobile = useIsMobile();
-  const Root = isMobile ? Drawer : Dialog;
+}: Pick<ModalRootProps, 'defaultOpen' | 'open' | 'onOpenChange'>) {
   const [uncontrolledOpen, setUncontrolledOpen] = React.useState(defaultOpen);
   const isControlled = openProp !== undefined;
   const open = isControlled ? openProp : uncontrolledOpen;
 
-  const handleOpenChange = React.useCallback(
+  const setOpen = React.useCallback(
     (nextOpen: boolean) => {
       if (!isControlled) {
         setUncontrolledOpen(nextOpen);
@@ -64,20 +78,35 @@ function Modal({
     [isControlled, onOpenChange],
   );
 
+  return [open, setOpen] as const;
+}
+
+function Modal({
+  children,
+  defaultOpen = false,
+  open: openProp,
+  onOpenChange,
+  ...props
+}: ModalRootProps) {
+  const isMobile = useIsMobile();
+  const Root = isMobile ? Drawer : Dialog;
+  const [open, setOpen] = useModalOpenState({
+    defaultOpen,
+    open: openProp,
+    onOpenChange,
+  });
+  const contextValue = React.useMemo(() => ({ isMobile }), [isMobile]);
+
   return (
-    <ModalContext.Provider value={{ isMobile }}>
-      <Root data-slot='modal' open={open} onOpenChange={handleOpenChange} {...props}>
+    <ModalContext.Provider value={contextValue}>
+      <Root data-slot='modal' open={open} onOpenChange={setOpen} {...props}>
         {children}
       </Root>
     </ModalContext.Provider>
   );
 }
 
-type ModalTriggerProps = React.ComponentProps<typeof DialogTrigger> & {
-  children?: React.ReactNode;
-};
-
-function getRenderedElement(candidate: unknown) {
+function getAsChildElement(candidate: unknown) {
   if (React.isValidElement(candidate)) {
     return candidate;
   }
@@ -85,14 +114,9 @@ function getRenderedElement(candidate: unknown) {
   return null;
 }
 
-function ModalTrigger({
-  children,
-  render,
-  className,
-  ...props
-}: Omit<ModalTriggerProps, 'className'> & { className?: string }) {
+function ModalTrigger({ children, render, className, ...props }: ModalTriggerProps) {
   const { isMobile } = useModalContext();
-  const child = getRenderedElement(render) ?? getRenderedElement(children);
+  const child = getAsChildElement(render) ?? getAsChildElement(children);
 
   if (isMobile) {
     if (child) {
@@ -117,18 +141,9 @@ function ModalTrigger({
   );
 }
 
-type ModalCloseProps = React.ComponentProps<typeof DialogClose> & {
-  children?: React.ReactNode;
-};
-
-function ModalClose({
-  children,
-  render,
-  className,
-  ...props
-}: Omit<ModalCloseProps, 'className'> & { className?: string }) {
+function ModalClose({ children, render, className, ...props }: ModalCloseProps) {
   const { isMobile } = useModalContext();
-  const child = getRenderedElement(render) ?? getRenderedElement(children);
+  const child = getAsChildElement(render) ?? getAsChildElement(children);
 
   if (isMobile) {
     if (child) {
@@ -153,14 +168,7 @@ function ModalClose({
   );
 }
 
-function ModalContent({
-  className,
-  children,
-  showCloseButton,
-  ...props
-}: Omit<React.ComponentProps<typeof DialogContent>, 'className'> & {
-  className?: string;
-}) {
+function ModalContent({ className, children, showCloseButton, ...props }: ModalContentProps) {
   const { isMobile } = useModalContext();
 
   if (isMobile) {
@@ -197,24 +205,14 @@ function ModalFooter({ className, ...props }: React.ComponentProps<'div'>) {
   return <Component data-slot='modal-footer' className={className} {...props} />;
 }
 
-function ModalTitle({
-  className,
-  ...props
-}: Omit<React.ComponentProps<typeof DialogTitle>, 'className'> & {
-  className?: string;
-}) {
+function ModalTitle({ className, ...props }: ModalTitleProps) {
   const { isMobile } = useModalContext();
   const Component = isMobile ? DrawerTitle : DialogTitle;
 
   return <Component data-slot='modal-title' className={className} {...props} />;
 }
 
-function ModalDescription({
-  className,
-  ...props
-}: Omit<React.ComponentProps<typeof DialogDescription>, 'className'> & {
-  className?: string;
-}) {
+function ModalDescription({ className, ...props }: ModalDescriptionProps) {
   const { isMobile } = useModalContext();
   const Component = isMobile ? DrawerDescription : DialogDescription;
 

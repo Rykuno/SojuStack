@@ -11,6 +11,9 @@
 @import 'tw-animate-css';
 @import 'shadcn/tailwind.css';
 @import '@fontsource-variable/inter';
+@import 'tw-animate-css';
+@import 'shadcn/tailwind.css';
+@import '@fontsource-variable/jetbrains-mono';
 
 @custom-variant dark (&:is(.dark *));
 
@@ -126,7 +129,7 @@
   --radius-3xl: calc(var(--radius) + 12px);
   --radius-4xl: calc(var(--radius) + 16px);
   --font-mono: 'JetBrains Mono Variable', monospace;
-  --font-heading: var(--font-sans);
+  --font-heading: var(--font-mono);
   --color-destructive-foreground: var(--destructive-foreground);
 }
 
@@ -138,6 +141,6 @@
     @apply font-sans bg-background text-foreground;
   }
   html {
-    @apply font-sans;
+    @apply font-mono;
   }
 }
