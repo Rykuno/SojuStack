@@ -4,7 +4,7 @@ packages:
   - tools/*
 
 catalog:
-  '@aws-sdk/client-s3': ^3.1019.0
+  '@aws-sdk/client-s3': ^3.1021.0
   '@base-ui/react': ^1.3.0
   '@dicebear/collection': ^9.4.2
   '@dicebear/core': ^9.4.2
@@ -22,7 +22,7 @@ catalog:
   '@nestjs/bullmq': ^11.0.4
   '@nestjs/cache-manager': ^3.1.0
   '@nestjs/config': ^4.0.3
-  '@nestjs/mapped-types': ^2.1.0
+  '@nestjs/mapped-types': ^2.1.1
   '@nestjs/swagger': ^11.2.6
   '@nestjs/terminus': ^11.1.1
   '@nestjs/throttler': ^6.5.0
@@ -35,7 +35,7 @@ catalog:
   '@react-email/components': 1.0.10
   '@react-email/preview-server': 5.2.10
   '@react-email/render': ^2.0.4
-  '@redocly/openapi-core': ^2.25.2
+  '@redocly/openapi-core': ^2.25.3
   '@scalar/nestjs-api-reference': ^1.1.5
   '@swc/cli': ^0.8.0
   '@swc/core': ^1.15.18
@@ -46,15 +46,15 @@ catalog:
   '@tanstack/query-db-collection': ^1.0.32
   '@tanstack/react-db': ^0.1.79
   '@tanstack/react-devtools': ^0.10.0
-  '@tanstack/react-form': ^1.28.5
-  '@tanstack/react-query': ^5.95.2
-  '@tanstack/react-query-devtools': ^5.95.2
-  '@tanstack/react-router': ^1.168.8
+  '@tanstack/react-form': ^1.28.6
+  '@tanstack/react-query': ^5.96.0
+  '@tanstack/react-query-devtools': ^5.96.0
+  '@tanstack/react-router': ^1.168.10
   '@tanstack/react-router-devtools': ^1.166.11
   '@tanstack/react-router-ssr-query': ^1.166.10
-  '@tanstack/react-start': ^1.167.13
+  '@tanstack/react-start': ^1.167.16
   '@tanstack/react-table': ^8.21.3
-  '@tanstack/router-plugin': ^1.167.9
+  '@tanstack/router-plugin': ^1.167.12
   '@testing-library/dom': ^10.4.1
   '@testing-library/react': ^16.3.2
   '@types/cookie-parser': ^1.4.10
@@ -100,7 +100,7 @@ catalog:
   recharts: 3.8.0
 
   sanitize-filename: ^1.6.4
-  shadcn: ^4.1.1
+  shadcn: ^4.1.2
   slugify: ^1.6.8
   sonner: ^2.0.7
   swc-loader: ^0.2.7
@@ -111,7 +111,7 @@ catalog:
   typescript: ^6.0.2
   vaul: ^1.1.2
   vite: npm:@voidzero-dev/vite-plus-core@latest
-  vite-plus: ^0.1.14
+  vite-plus: ^0.1.15
   vite-tsconfig-paths: ^6.1.1
   vitest: npm:@voidzero-dev/vite-plus-test@latest
   zod: ^4.3.6

@@ -76,10 +76,10 @@
     "jsdom": "catalog:",
     "openapi-typescript": "catalog:",
     "typescript": "catalog:",
-    "vite": "catalog:",
+    "vite": "npm:@voidzero-dev/vite-plus-core@^0.1.15",
     "vite-plus": "catalog:",
     "vite-tsconfig-paths": "catalog:",
-    "vitest": "catalog:"
+    "vitest": "npm:@voidzero-dev/vite-plus-test@^0.1.15"
   },
   "pnpm": {
     "onlyBuiltDependencies": [

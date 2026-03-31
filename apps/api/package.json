@@ -79,8 +79,8 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.5",
     "@eslint/js": "^10.0.1",
-    "@nestjs/cli": "^11.0.16",
-    "@nestjs/schematics": "^11.0.9",
+    "@nestjs/cli": "^11.0.17",
+    "@nestjs/schematics": "^11.0.10",
     "@nestjs/testing": "^11.1.17",
     "@react-email/preview-server": "catalog:",
     "@types/cookie-parser": "catalog:",
@@ -105,7 +105,7 @@
     "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0",
     "typescript": "catalog:",
-    "typescript-eslint": "^8.57.2"
+    "typescript-eslint": "^8.58.0"
   },
   "jest": {
     "collectCoverageFrom": [
