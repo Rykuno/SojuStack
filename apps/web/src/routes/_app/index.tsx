@@ -1,5 +1,5 @@
 import { api } from '#/integrations/api';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
 import { TrashIcon } from 'lucide-react';
 import { Button } from '#/components/ui/button';
@@ -14,16 +14,6 @@ import {
 } from '#/components/ui/item';
 import { todoSchema, useCreateTodoForm } from '#/hooks/forms/use-todo-form';
 import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog';
-import {
   Modal,
   ModalClose,
   ModalContent,
@@ -31,29 +21,41 @@ import {
   ModalFooter,
   ModalHeader,
   ModalTitle,
-  ModalTrigger,
 } from '#/components/ui/modal';
-import { useState } from 'react';
+import { Suspense, useState } from 'react';
+import { Spinner } from '#/components/ui/spinner';
 
 export const Route = createFileRoute('/_app/')({
   component: RouteComponent,
+  loader: async ({ context }) => {
+    void context.queryClient.fetchQuery(api.todos.findMany());
+  },
 });
 
 function RouteComponent() {
-  const { data: todos = [], refetch } = useQuery(api.todos.findMany());
+  const [open, setOpen] = useState<boolean>(false);
 
-  const deleteTodoMutation = useMutation({
-    onSuccess: () => void refetch(),
-    ...api.todos.delete(),
-  });
-  const createTodoMutation = useMutation({
-    onSuccess: () => void refetch(),
-    ...api.todos.create(),
-  });
-  const updateTodoMutation = useMutation({
-    onSuccess: () => void refetch(),
-    ...api.todos.update(),
-  });
+  return (
+    <div className='max-w-2xl mx-auto mt-24 space-y-4'>
+      <Button className='w-full' onClick={() => setOpen(true)}>
+        Add Todo
+      </Button>
+      <Suspense fallback={<Spinner className='size-4 animate-spin' />}>
+        <TodoList />
+      </Suspense>
+      <AddTodoModal open={open} onOpenChange={setOpen} />
+    </div>
+  );
+}
+
+function AddTodoModal({
+  open,
+  onOpenChange,
+}: {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+}) {
+  const queryClient = useQueryClient();
 
   const createTodoForm = useCreateTodoForm.useAppForm({
     defaultValues: {
@@ -66,104 +68,110 @@ function RouteComponent() {
     },
     onSubmit: ({ value }) => {
       createTodoMutation.mutate(value);
+      onOpenChange(false);
     },
   });
 
-  const [open, setOpen] = useState(false);
+  const createTodoMutation = useMutation({
+    onSuccess: () => void queryClient.invalidateQueries(),
+    ...api.todos.create(),
+  });
 
   return (
-    <div className='max-w-2xl mx-auto mt-24 space-y-4'>
-      <Modal open={open} onOpenChange={setOpen}>
-        <ModalTrigger>Test</ModalTrigger>
-        <ModalContent>
-          <ModalHeader>
-            <ModalTitle>Modal Title</ModalTitle>
-            <ModalDescription>Modal Description</ModalDescription>
-          </ModalHeader>
-          <ModalFooter>
+    <Modal open={open} onOpenChange={onOpenChange}>
+      <ModalContent>
+        <ModalHeader>
+          <ModalTitle>Add Todo</ModalTitle>
+          <ModalDescription>Add a new todo to your list</ModalDescription>
+        </ModalHeader>
+        <div className='flex flex-col gap-4'>
+          <createTodoForm.AppForm>
+            <div className='flex flex-col gap-2'>
+              <createTodoForm.Label>Title</createTodoForm.Label>
+              <createTodoForm.AppField
+                name='title'
+                children={(field) => (
+                  <field.Input
+                    value={field.state.value}
+                    onBlur={field.handleBlur}
+                    onChange={(e) => field.handleChange(e.target.value)}
+                    placeholder='Walk dog'
+                  />
+                )}
+              />
+            </div>
+            <div className='flex flex-col gap-2'>
+              <createTodoForm.Label>Description</createTodoForm.Label>
+              <createTodoForm.AppField
+                name='description'
+                children={(field) => (
+                  <field.Textarea
+                    value={field.state.value}
+                    onBlur={field.handleBlur}
+                    onChange={(e) => field.handleChange(e.target.value)}
+                    placeholder='Walk dog for 30 minutes'
+                  />
+                )}
+              />
+            </div>
+          </createTodoForm.AppForm>
+        </div>
+        <ModalFooter>
+          <createTodoForm.AppForm>
             <ModalClose>Close</ModalClose>
-            <Button>Save</Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
+            <createTodoForm.SubmitButton
+              type='button'
+              onClick={() => void createTodoForm.handleSubmit()}
+            >
+              Create
+            </createTodoForm.SubmitButton>
+          </createTodoForm.AppForm>
+        </ModalFooter>
+      </ModalContent>
+    </Modal>
+  );
+}
 
-      <Dialog>
-        <DialogTrigger>Open Dialog</DialogTrigger>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Dialog Title</DialogTitle>
-            <DialogDescription>Dialog Description</DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <DialogClose>Close</DialogClose>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-      <h1>Todos</h1>
-      <div>
-        <createTodoForm.AppForm>
-          <form
-            className='flex flex-col gap-2'
-            onSubmit={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              void createTodoForm.handleSubmit();
-            }}
-          >
-            <createTodoForm.AppField
-              name='title'
-              children={(field) => (
-                <field.Input
-                  value={field.state.value}
-                  onBlur={field.handleBlur}
-                  onChange={(e) => field.handleChange(e.target.value)}
-                  placeholder='Todo title'
-                />
-              )}
-            />
-            <createTodoForm.AppField
-              name='description'
-              children={(field) => (
-                <field.Textarea
-                  value={field.state.value}
-                  onBlur={field.handleBlur}
-                  onChange={(e) => field.handleChange(e.target.value)}
-                  placeholder='Description'
-                />
-              )}
-            />
-            <createTodoForm.AppForm>
-              <createTodoForm.SubmitButton>Create</createTodoForm.SubmitButton>
-            </createTodoForm.AppForm>
-          </form>
-        </createTodoForm.AppForm>
-      </div>
-      <ItemGroup>
-        {todos.map((todo) => (
-          <Item key={todo.id} variant='outline'>
-            <Checkbox
-              checked={todo.completed}
-              onCheckedChange={() =>
-                updateTodoMutation.mutate({ id: todo.id, todo: { completed: !todo.completed } })
-              }
-              aria-label={`Toggle ${todo.title}`}
-            />
-            <ItemContent>
-              <ItemTitle>{todo.title}</ItemTitle>
-              {todo.description ? <ItemDescription>{todo.description}</ItemDescription> : null}
-            </ItemContent>
-            <ItemActions>
-              <Button
-                variant='ghost'
-                size='icon-xs'
-                onClick={() => deleteTodoMutation.mutate(todo.id)}
-              >
-                <TrashIcon />
-              </Button>
-            </ItemActions>
-          </Item>
-        ))}
-      </ItemGroup>
-    </div>
+function TodoList() {
+  const queryClient = useQueryClient();
+  const { data: todos } = useSuspenseQuery(api.todos.findMany());
+
+  const deleteTodoMutation = useMutation({
+    onSuccess: () => void queryClient.invalidateQueries(),
+    ...api.todos.delete(),
+  });
+
+  const updateTodoMutation = useMutation({
+    onSuccess: () => void queryClient.invalidateQueries(),
+    ...api.todos.update(),
+  });
+
+  return (
+    <ItemGroup>
+      {todos.map((todo) => (
+        <Item key={todo.id} variant='outline'>
+          <Checkbox
+            checked={todo.completed}
+            onCheckedChange={() =>
+              updateTodoMutation.mutate({ id: todo.id, todo: { completed: !todo.completed } })
+            }
+            aria-label={`Toggle ${todo.title}`}
+          />
+          <ItemContent>
+            <ItemTitle>{todo.title}</ItemTitle>
+            {todo.description ? <ItemDescription>{todo.description}</ItemDescription> : null}
+          </ItemContent>
+          <ItemActions>
+            <Button
+              variant='ghost'
+              size='icon-xs'
+              onClick={() => deleteTodoMutation.mutate(todo.id)}
+            >
+              <TrashIcon />
+            </Button>
+          </ItemActions>
+        </Item>
+      ))}
+    </ItemGroup>
   );
 }

@@ -18,6 +18,7 @@ export const useCreateTodoForm = createFormHook({
     Textarea,
   },
   formComponents: {
+    Label: (props: React.ComponentProps<'label'>) => <label {...props} />,
     SubmitButton: (props) => <Button type='submit' {...props} />,
   },
   fieldContext,

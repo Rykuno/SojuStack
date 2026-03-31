@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link, useNavigate } from '@tanstack/react-router';
 import { Button, buttonVariants } from '@/components/ui/button';
@@ -27,6 +28,11 @@ export function AppNavbar() {
     },
   });
 
+  const avatarSrc = useMemo(() => {
+    if (!user) return undefined;
+    return getUserAvatar(user);
+  }, [user]);
+
   return (
     <header className='border-b'>
       <Container className='flex h-16 items-center justify-between'>
@@ -39,7 +45,7 @@ export function AppNavbar() {
             <DropdownMenu>
               <DropdownMenuTrigger>
                 <Avatar>
-                  <AvatarImage src={getUserAvatar(user)} alt={user.name ?? user.email ?? 'User'} />
+                  <AvatarImage src={avatarSrc} alt={user.name ?? user.email ?? 'User'} />
                 </Avatar>
               </DropdownMenuTrigger>
               <DropdownMenuContent>

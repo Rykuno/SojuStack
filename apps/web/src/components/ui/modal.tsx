@@ -61,24 +61,17 @@ const Modal = ({ dialogProps, open, onOpenChange, drawerProps, children }: Modal
 type ModalTriggerProps = {
   className?: string;
   children: React.ReactNode;
-  asChild?: boolean;
   drawerProps?: React.ComponentProps<typeof DrawerTrigger>;
   popoverProps?: React.ComponentProps<typeof DialogTrigger>;
 };
 
-const ModalTrigger = ({
-  className,
-  children,
-  asChild,
-  drawerProps,
-  popoverProps,
-}: ModalTriggerProps) => {
+const ModalTrigger = ({ className, children, drawerProps, popoverProps }: ModalTriggerProps) => {
   const { isMobile } = useContext();
   const Component = isMobile ? DrawerTrigger : DialogTrigger;
   const props = isMobile ? drawerProps : popoverProps;
 
   return (
-    <Component {...props} asChild={asChild} className={className}>
+    <Component {...props} className={className}>
       {children}
     </Component>
   );
@@ -87,24 +80,18 @@ const ModalTrigger = ({
 type ModalCloseProps = {
   className?: string;
   children?: React.ReactNode;
-  asChild?: boolean;
+
   drawerProps?: React.ComponentProps<typeof DrawerClose>;
   popoverProps?: React.ComponentProps<typeof DialogClose>;
 };
 
-const ModalClose = ({
-  className,
-  children,
-  asChild,
-  drawerProps,
-  popoverProps,
-}: ModalCloseProps) => {
+const ModalClose = ({ className, children, drawerProps, popoverProps }: ModalCloseProps) => {
   const { isMobile } = useContext();
   const Component = isMobile ? DrawerClose : DialogClose;
   const props = isMobile ? drawerProps : popoverProps;
 
   return (
-    <Component {...props} asChild={asChild} className={className}>
+    <Component {...props} className={className}>
       {children}
     </Component>
   );
