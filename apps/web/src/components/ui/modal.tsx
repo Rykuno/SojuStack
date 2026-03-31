@@ -1,7 +1,8 @@
 'use client';
 
-import * as React from 'react';
-
+import React from 'react';
+import { cn } from '@/lib/utils';
+import { useIsMobile } from '@/hooks/use-media-query';
 import {
   Dialog,
   DialogClose,
@@ -11,7 +12,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '#/components/ui/dialog';
+} from '@/components/ui/dialog';
 import {
   Drawer,
   DrawerClose,
@@ -21,211 +22,180 @@ import {
   DrawerHeader,
   DrawerTitle,
   DrawerTrigger,
-} from '#/components/ui/drawer';
-import { useIsMobile } from '#/hooks/use-mobile';
+} from '@/components/ui/drawer';
 
-type ModalRootProps = React.ComponentProps<typeof Dialog> & React.ComponentProps<typeof Drawer>;
-type ModalContextValue = {
-  isMobile: boolean;
-};
-type ModalTriggerProps = Omit<React.ComponentProps<typeof DialogTrigger>, 'className'> & {
-  children?: React.ReactNode;
-  className?: string;
-};
-type ModalCloseProps = Omit<React.ComponentProps<typeof DialogClose>, 'className'> & {
-  children?: React.ReactNode;
-  className?: string;
-};
-type ModalContentProps = Omit<React.ComponentProps<typeof DialogContent>, 'className'> & {
-  className?: string;
-};
-type ModalTitleProps = Omit<React.ComponentProps<typeof DialogTitle>, 'className'> & {
-  className?: string;
-};
-type ModalDescriptionProps = Omit<React.ComponentProps<typeof DialogDescription>, 'className'> & {
-  className?: string;
-};
+const ModalContext = React.createContext<{ isMobile: boolean } | null>(null);
 
-const ModalContext = React.createContext<ModalContextValue | null>(null);
-
-function useModalContext() {
+function useContext() {
   const context = React.useContext(ModalContext);
-
   if (!context) {
-    throw new Error('Modal components must be used within <Modal>.');
+    throw new Error('Trigger or Content must be used within <Modal>');
   }
-
   return context;
 }
 
-function useModalOpenState({
-  defaultOpen = false,
-  open: openProp,
-  onOpenChange,
-}: Pick<ModalRootProps, 'defaultOpen' | 'open' | 'onOpenChange'>) {
-  const [uncontrolledOpen, setUncontrolledOpen] = React.useState(defaultOpen);
-  const isControlled = openProp !== undefined;
-  const open = isControlled ? openProp : uncontrolledOpen;
+type ModalProps = {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  defaultOpen?: boolean;
+  children: React.ReactNode;
+  dialogProps?: React.ComponentProps<typeof Dialog>;
+  drawerProps?: React.ComponentProps<typeof Drawer>;
+};
 
-  const setOpen = React.useCallback(
-    (nextOpen: boolean) => {
-      if (!isControlled) {
-        setUncontrolledOpen(nextOpen);
-      }
-
-      onOpenChange?.(nextOpen);
-    },
-    [isControlled, onOpenChange],
-  );
-
-  return [open, setOpen] as const;
-}
-
-function Modal({
-  children,
-  defaultOpen = false,
-  open: openProp,
-  onOpenChange,
-  ...props
-}: ModalRootProps) {
+const Modal = ({ dialogProps, open, onOpenChange, drawerProps, children }: ModalProps) => {
   const isMobile = useIsMobile();
-  const Root = isMobile ? Drawer : Dialog;
-  const [open, setOpen] = useModalOpenState({
-    defaultOpen,
-    open: openProp,
-    onOpenChange,
-  });
-  const contextValue = React.useMemo(() => ({ isMobile }), [isMobile]);
+  const Component = isMobile ? Drawer : Dialog;
+  const props = isMobile ? drawerProps : dialogProps;
 
   return (
-    <ModalContext.Provider value={contextValue}>
-      <Root data-slot='modal' open={open} onOpenChange={setOpen} {...props}>
+    <ModalContext.Provider value={{ isMobile }}>
+      {/* @ts-expect-error - TODO: fix this */}
+      <Component {...props} onOpenChange={onOpenChange} open={open}>
         {children}
-      </Root>
+      </Component>
     </ModalContext.Provider>
   );
-}
+};
 
-function getAsChildElement(candidate: unknown) {
-  if (React.isValidElement(candidate)) {
-    return candidate;
-  }
+type ModalTriggerProps = {
+  className?: string;
+  children: React.ReactNode;
+  asChild?: boolean;
+  drawerProps?: React.ComponentProps<typeof DrawerTrigger>;
+  popoverProps?: React.ComponentProps<typeof DialogTrigger>;
+};
 
-  return null;
-}
-
-function ModalTrigger({ children, render, className, ...props }: ModalTriggerProps) {
-  const { isMobile } = useModalContext();
-  const child = getAsChildElement(render) ?? getAsChildElement(children);
-
-  if (isMobile) {
-    if (child) {
-      return (
-        <DrawerTrigger asChild {...props}>
-          {child}
-        </DrawerTrigger>
-      );
-    }
-
-    return (
-      <DrawerTrigger className={className} {...props}>
-        {children}
-      </DrawerTrigger>
-    );
-  }
+const ModalTrigger = ({
+  className,
+  children,
+  asChild,
+  drawerProps,
+  popoverProps,
+}: ModalTriggerProps) => {
+  const { isMobile } = useContext();
+  const Component = isMobile ? DrawerTrigger : DialogTrigger;
+  const props = isMobile ? drawerProps : popoverProps;
 
   return (
-    <DialogTrigger data-slot='modal-trigger' className={className} render={render} {...props}>
+    <Component {...props} asChild={asChild} className={className}>
       {children}
-    </DialogTrigger>
+    </Component>
   );
-}
+};
 
-function ModalClose({ children, render, className, ...props }: ModalCloseProps) {
-  const { isMobile } = useModalContext();
-  const child = getAsChildElement(render) ?? getAsChildElement(children);
+type ModalCloseProps = {
+  className?: string;
+  children?: React.ReactNode;
+  asChild?: boolean;
+  drawerProps?: React.ComponentProps<typeof DrawerClose>;
+  popoverProps?: React.ComponentProps<typeof DialogClose>;
+};
 
-  if (isMobile) {
-    if (child) {
-      return (
-        <DrawerClose asChild {...props}>
-          {child}
-        </DrawerClose>
-      );
-    }
-
-    return (
-      <DrawerClose className={className} {...props}>
-        {children}
-      </DrawerClose>
-    );
-  }
+const ModalClose = ({
+  className,
+  children,
+  asChild,
+  drawerProps,
+  popoverProps,
+}: ModalCloseProps) => {
+  const { isMobile } = useContext();
+  const Component = isMobile ? DrawerClose : DialogClose;
+  const props = isMobile ? drawerProps : popoverProps;
 
   return (
-    <DialogClose data-slot='modal-close' className={className} render={render} {...props}>
+    <Component {...props} asChild={asChild} className={className}>
       {children}
-    </DialogClose>
+    </Component>
   );
-}
+};
 
-function ModalContent({ className, children, showCloseButton, ...props }: ModalContentProps) {
-  const { isMobile } = useModalContext();
+type ModalContentProps = {
+  children: React.ReactNode;
+  className?: string;
+  drawerProps?: React.ComponentProps<typeof DrawerContent>;
+  popoverProps?: React.ComponentProps<typeof DialogContent>;
+};
 
-  if (isMobile) {
-    return (
-      <DrawerContent data-slot='modal-content' className={className} {...props}>
-        {children}
-      </DrawerContent>
-    );
-  }
+const ModalContent = ({ className, children, drawerProps, popoverProps }: ModalContentProps) => {
+  const { isMobile } = useContext();
+  const Component = isMobile ? DrawerContent : DialogContent;
+  const props = isMobile ? drawerProps : popoverProps;
 
   return (
-    <DialogContent
-      data-slot='modal-content'
-      className={className}
-      showCloseButton={showCloseButton}
-      {...props}
-    >
+    <Component {...props} className={className}>
       {children}
-    </DialogContent>
+    </Component>
   );
-}
+};
 
-function ModalHeader({ className, ...props }: React.ComponentProps<'div'>) {
-  const { isMobile } = useModalContext();
+const ModalHeader = ({ className, ...props }: React.ComponentProps<'div'>) => {
+  const { isMobile } = useContext();
   const Component = isMobile ? DrawerHeader : DialogHeader;
 
-  return <Component data-slot='modal-header' className={className} {...props} />;
-}
+  return <Component className={className} {...props} />;
+};
 
-function ModalFooter({ className, ...props }: React.ComponentProps<'div'>) {
-  const { isMobile } = useModalContext();
-  const Component = isMobile ? DrawerFooter : DialogFooter;
+type ModalTitleProps = {
+  className?: string;
+  children: React.ReactNode;
+  drawerProps?: React.ComponentProps<typeof DrawerTitle>;
+  popoverProps?: React.ComponentProps<typeof DialogTitle>;
+};
 
-  return <Component data-slot='modal-footer' className={className} {...props} />;
-}
-
-function ModalTitle({ className, ...props }: ModalTitleProps) {
-  const { isMobile } = useModalContext();
+const ModalTitle = ({ className, children, drawerProps, popoverProps }: ModalTitleProps) => {
+  const { isMobile } = useContext();
   const Component = isMobile ? DrawerTitle : DialogTitle;
+  const props = isMobile ? drawerProps : popoverProps;
 
-  return <Component data-slot='modal-title' className={className} {...props} />;
-}
+  return (
+    <Component {...props} className={className}>
+      {children}
+    </Component>
+  );
+};
 
-function ModalDescription({ className, ...props }: ModalDescriptionProps) {
-  const { isMobile } = useModalContext();
+type ModalDescriptionProps = {
+  className?: string;
+  children: React.ReactNode;
+  drawerProps?: React.ComponentProps<typeof DrawerDescription>;
+  popoverProps?: React.ComponentProps<typeof DialogDescription>;
+};
+
+const ModalDescription = ({
+  className,
+  children,
+  drawerProps,
+  popoverProps,
+}: ModalDescriptionProps) => {
+  const { isMobile } = useContext();
   const Component = isMobile ? DrawerDescription : DialogDescription;
+  const props = isMobile ? drawerProps : popoverProps;
 
-  return <Component data-slot='modal-description' className={className} {...props} />;
-}
+  return (
+    <Component {...props} className={className}>
+      {children}
+    </Component>
+  );
+};
+
+const ModalBody = ({ className, ...props }: React.ComponentProps<'div'>) => {
+  return <div className={cn('px-4 py-6', className)} {...props} />;
+};
+const ModalFooter = ({ className, ...props }: React.ComponentProps<'div'>) => {
+  const { isMobile } = useContext();
+  const Component = isMobile ? DrawerFooter : DialogFooter;
+  return <Component className={className} {...props} />;
+};
 
 export {
   Modal,
+  ModalTrigger,
   ModalClose,
   ModalContent,
   ModalDescription,
-  ModalFooter,
   ModalHeader,
   ModalTitle,
-  ModalTrigger,
+  ModalBody,
+  ModalFooter,
 };

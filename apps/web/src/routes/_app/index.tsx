@@ -33,6 +33,7 @@ import {
   ModalTitle,
   ModalTrigger,
 } from '#/components/ui/modal';
+import { useState } from 'react';
 
 export const Route = createFileRoute('/_app/')({
   component: RouteComponent,
@@ -68,9 +69,11 @@ function RouteComponent() {
     },
   });
 
+  const [open, setOpen] = useState(false);
+
   return (
     <div className='max-w-2xl mx-auto mt-24 space-y-4'>
-      <Modal>
+      <Modal open={open} onOpenChange={setOpen}>
         <ModalTrigger>Test</ModalTrigger>
         <ModalContent>
           <ModalHeader>
