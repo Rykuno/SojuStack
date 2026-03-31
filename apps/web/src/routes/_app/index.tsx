@@ -28,7 +28,7 @@ import { Spinner } from '#/components/ui/spinner';
 export const Route = createFileRoute('/_app/')({
   component: RouteComponent,
   loader: async ({ context }) => {
-    void context.queryClient.fetchQuery(api.todos.findMany());
+    void context.queryClient.prefetchQuery(api.todos.findMany());
   },
 });
 

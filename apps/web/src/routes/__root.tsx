@@ -11,6 +11,7 @@ import { RustFSDevtools } from '../integrations/rust-fs/devtools';
 import appCss from '../styles.css?url';
 import { type QueryClient } from '@tanstack/react-query';
 import { Toaster } from '#/components/ui/sonner';
+import { NotFoundDocument } from '#/components/not-found';
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
   head: () => ({
@@ -33,6 +34,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       },
     ],
   }),
+  notFoundComponent: NotFoundDocument,
   shellComponent: RootDocument,
 });
 
