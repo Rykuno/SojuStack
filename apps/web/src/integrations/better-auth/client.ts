@@ -3,7 +3,7 @@ import { getRequest } from '@tanstack/react-start/server';
 import { emailOTPClient, inferAdditionalFields } from 'better-auth/client/plugins';
 import { createAuthClient } from 'better-auth/react';
 import { tanstackStartCookies } from 'better-auth/tanstack-start';
-import { type BetterAuth } from 'api/src/auth/better-auth.provider';
+import { type BetterAuthClient } from 'api/src/auth/better-auth.service';
 
 let browserAuthClient: ReturnType<typeof initAuthClient> | undefined;
 
@@ -17,7 +17,7 @@ function initAuthClient(fetchOptions: RequestInit) {
   return createAuthClient({
     baseURL: getRequiredApiUrl(),
     basePath: '/auth/client',
-    plugins: [inferAdditionalFields<BetterAuth>(), tanstackStartCookies(), emailOTPClient()],
+    plugins: [inferAdditionalFields<BetterAuthClient>(), tanstackStartCookies(), emailOTPClient()],
     fetchOptions,
   });
 }

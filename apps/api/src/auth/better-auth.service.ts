@@ -1,4 +1,4 @@
-import { betterAuth } from 'better-auth';
+import { betterAuth, Session, User } from 'better-auth';
 import { emailOTP, openAPI } from 'better-auth/plugins';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import { Cache } from '@nestjs/cache-manager';
@@ -8,26 +8,25 @@ import * as schema from 'src/database/drizzle.schema';
 import { MailService } from 'src/mail/mail.service';
 import { hoursToSeconds, minutesToSeconds, secondsToMilliseconds } from 'date-fns';
 import { EnvService } from 'src/common/env/env.service';
-import { AuthService } from './auth.service';
 import slugify from 'slugify';
 import { QueueService } from 'src/queues/queue.service';
+import { Injectable } from '@nestjs/common';
 
-export const BETTER_AUTH_PROVIDER = Symbol('BETTER_AUTH_PROVIDER');
-export type BetterAuth = ReturnType<typeof BetterAuthProvider.useFactory>;
+export type BetterAuthClient = BetterAuthService['client'];
 
-export const BetterAuthProvider = {
-  provide: BETTER_AUTH_PROVIDER,
-  inject: [TransactionHost, Cache, MailService, EnvService, AuthService, QueueService],
-  useFactory: (
-    txHost: TransactionHost<DrizzleTransactionClient>,
-    cache: Cache,
-    mailService: MailService,
-    envService: EnvService,
-    authService: AuthService,
-    queueService: QueueService,
-  ) => {
-    return betterAuth({
-      database: drizzleAdapter(txHost.tx, {
+@Injectable()
+export class BetterAuthService {
+  readonly client;
+
+  constructor(
+    private readonly txHost: TransactionHost<DrizzleTransactionClient>,
+    private readonly cache: Cache,
+    private readonly mailService: MailService,
+    private readonly envService: EnvService,
+    private readonly queueService: QueueService,
+  ) {
+    this.client = betterAuth({
+      database: drizzleAdapter(this.txHost.tx, {
         provider: 'pg',
         schema: {
           ...schema,
@@ -41,30 +40,30 @@ export const BetterAuthProvider = {
         encryptOAuthTokens: true,
       },
       advanced: {
-        cookiePrefix: slugify(envService.app.name, { lower: true, trim: true }),
-        useSecureCookies: envService.app.isProduction,
+        cookiePrefix: slugify(this.envService.app.name, { lower: true, trim: true }),
+        useSecureCookies: this.envService.app.isProduction,
         database: {
           generateId: false,
         },
       },
       secondaryStorage: {
         get: async (key) => {
-          const value = await cache.get<string>(key);
+          const value = await this.cache.get<string>(key);
           return value ?? null;
         },
         set: async (key, value, ttl) => {
-          if (ttl) await cache.set(key, value, secondsToMilliseconds(ttl));
-          else await cache.set(key, value);
+          if (ttl) await this.cache.set(key, value, secondsToMilliseconds(ttl));
+          else await this.cache.set(key, value);
         },
         delete: async (key) => {
-          await cache.del(key);
+          await this.cache.del(key);
         },
       },
-      secret: envService.auth.secret,
-      appName: envService.app.name,
-      baseURL: envService.app.url,
-      basePath: envService.auth.basePath,
-      trustedOrigins: envService.auth.trustedOrigins,
+      secret: this.envService.auth.secret,
+      appName: this.envService.app.name,
+      baseURL: this.envService.app.url,
+      basePath: this.envService.auth.basePath,
+      trustedOrigins: this.envService.auth.trustedOrigins,
       session: {
         storeSessionInDatabase: true,
         freshAge: hoursToSeconds(1),
@@ -73,20 +72,16 @@ export const BetterAuthProvider = {
       databaseHooks: {
         user: {
           create: {
-            async after(user) {
-              return authService.afterUserCreated(user);
+            after: async (user) => {
+              return this.afterUserCreated(user);
             },
           },
         },
         session: {
           create: {
-            async before(session) {
-              const updatedSession = await authService.beforeSessionCreated(session);
-              return {
-                data: {
-                  ...updatedSession,
-                },
-              };
+            before: async (session) => {
+              const updatedSession = await this.beforeSessionCreated(session);
+              return { data: { ...updatedSession } };
             },
           },
         },
@@ -103,7 +98,7 @@ export const BetterAuthProvider = {
             newEmail: string;
             url: string;
           }) => {
-            await mailService.sendChangeEmailVerification({
+            await this.mailService.sendChangeEmailVerification({
               to: user.email,
               props: {
                 newEmail,
@@ -121,7 +116,7 @@ export const BetterAuthProvider = {
           allowedAttempts: 5,
           sendVerificationOTP: async ({ email, otp, type }) => {
             if (type === 'sign-in') {
-              await queueService.dispatchMailSignInOtp({
+              await this.queueService.dispatchMailSignInOtp({
                 to: email,
                 props: {
                   otpCode: otp,
@@ -136,5 +131,15 @@ export const BetterAuthProvider = {
         }),
       ],
     });
-  },
-};
+  }
+
+  private async afterUserCreated(user: User): Promise<void> {
+    console.log('afterUserCreated', user);
+  }
+
+  private async beforeSessionCreated(session: Session): Promise<Session> {
+    return {
+      ...session,
+    };
+  }
+}

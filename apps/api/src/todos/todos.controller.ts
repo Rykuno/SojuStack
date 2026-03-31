@@ -7,7 +7,7 @@ import { ZodResponse } from 'nestjs-zod';
 import { Auth, AuthType } from 'src/auth/decorators/auth.decorator';
 
 @Controller('todos')
-@Auth(AuthType.Unauthenticated)
+@Auth(AuthType.Authenticated)
 export class TodosController {
   constructor(private readonly todosService: TodosService) {}
 

@@ -1,8 +1,9 @@
 import { ExecutionContext, UnauthorizedException } from '@nestjs/common';
 import { CanActivate, Inject, Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { BETTER_AUTH_PROVIDER, type BetterAuth } from '../better-auth.provider';
+
 import { AUTH_TYPE_KEY, AuthType } from '../decorators/auth.decorator';
+import { BetterAuthService } from '../better-auth.service';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -10,8 +11,7 @@ export class AuthGuard implements CanActivate {
   constructor(
     @Inject(Reflector)
     private readonly reflector: Reflector,
-    @Inject(BETTER_AUTH_PROVIDER)
-    private readonly betterAuth: BetterAuth,
+    private readonly betterAuth: BetterAuthService,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -25,7 +25,7 @@ export class AuthGuard implements CanActivate {
       ]) ?? AuthGuard.defaultAuthType;
 
     // get session from better-auth
-    const session = await this.betterAuth.api.getSession({
+    const session = await this.betterAuth.client.api.getSession({
       headers: request.headers,
     });
 
