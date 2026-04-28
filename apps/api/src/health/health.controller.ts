@@ -1,6 +1,7 @@
 import { CACHE_MANAGER, type Cache } from '@nestjs/cache-manager';
 import { Controller, Get, Inject } from '@nestjs/common';
 import { HealthCheckService, HealthCheck, type HealthIndicatorResult } from '@nestjs/terminus';
+import { Auth, AuthType } from 'src/auth/decorators/auth.decorator';
 import { DRIZZLE_PROVIDER, DrizzleProvider } from 'src/database/drizzle.provider';
 import { S3Service } from 'src/storage/s3.service';
 import { StorageBucket } from 'src/storage/storage.constants';
@@ -17,6 +18,7 @@ export class HealthController {
   ) {}
 
   @Get()
+  @Auth(AuthType.Optional)
   @HealthCheck()
   check() {
     return this.health.check([
