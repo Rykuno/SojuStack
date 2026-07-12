@@ -15,27 +15,11 @@ import { Module, HttpException, ArgumentsHost, Logger, Catch } from '@nestjs/com
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
-import { EnvModule } from './common/env/env.module';
-import { ConfigModule } from '@nestjs/config';
-import { envSchema } from './common/env/env.schema';
-import { DatabaseModule } from './database/database.module';
-import { ClsPluginTransactional } from '@nestjs-cls/transactional';
-import { TransactionalAdapterDrizzleOrm } from '@nestjs-cls/transactional-adapter-drizzle-orm';
-import { DRIZZLE_PROVIDER } from './database/drizzle.provider';
-import { ClsModule } from 'nestjs-cls';
-import { EnvService } from './common/env/env.service';
-import { CacheModule } from '@nestjs/cache-manager';
-import { createKeyv } from '@keyv/redis';
-import { HttpModule } from '@nestjs/axios';
-import { HealthModule } from './health/health.module';
-import { StorageModule } from './storage/storage.module';
 import { TodosModule } from './todos/todos.module';
-import { BullModule } from '@nestjs/bullmq';
-import { QueuesModule } from 'src/queues/queues.module';
 import { AuthGuard } from './auth/guards/auth.guard';
-import { secondsToMilliseconds } from 'date-fns';
-import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
-import { ThrottlerStorageRedisService } from '@nest-lab/throttler-storage-redis';
+import { ThrottlerGuard } from '@nestjs/throttler';
+import { CommonModule } from './common/common.module';
+import { NotificationsModule } from './notifications/notifications.module';
 
 @Catch(HttpException)
 class HttpExceptionFilter extends BaseExceptionFilter {
@@ -55,75 +39,7 @@ class HttpExceptionFilter extends BaseExceptionFilter {
 }
 
 @Module({
-  imports: [
-    HttpModule.register({
-      global: true,
-      timeout: 5000,
-      maxRedirects: 5,
-    }),
-    ThrottlerModule.forRootAsync({
-      inject: [EnvService],
-      useFactory: (envService: EnvService) => {
-        return {
-          throttlers: [
-            {
-              name: 'burst',
-              ttl: secondsToMilliseconds(10),
-              limit: 50,
-            },
-            {
-              name: 'sustained',
-              ttl: secondsToMilliseconds(60),
-              limit: 300,
-            },
-          ],
-          storage: new ThrottlerStorageRedisService(envService.cache.url),
-        };
-      },
-    }),
-    ConfigModule.forRoot({
-      validate: (env) => envSchema.parse(env),
-      isGlobal: true,
-    }),
-    ClsModule.forRoot({
-      global: true,
-      plugins: [
-        new ClsPluginTransactional({
-          imports: [DatabaseModule],
-          adapter: new TransactionalAdapterDrizzleOrm({
-            drizzleInstanceToken: DRIZZLE_PROVIDER,
-          }),
-        }),
-      ],
-    }),
-    BullModule.forRootAsync({
-      inject: [EnvService],
-      useFactory: (envService: EnvService) => {
-        return {
-          connection: {
-            url: envService.cache.url,
-          },
-        };
-      },
-    }),
-    CacheModule.registerAsync({
-      isGlobal: true,
-      inject: [EnvService],
-      useFactory: (envService: EnvService) => {
-        console.log('registering cache module', envService.cache.url);
-        return {
-          stores: [createKeyv(envService.cache.url)],
-        };
-      },
-    }),
-    AuthModule,
-    EnvModule,
-    DatabaseModule,
-    StorageModule,
-    HealthModule,
-    TodosModule,
-    QueuesModule,
-  ],
+  imports: [CommonModule, AuthModule, TodosModule, NotificationsModule],
   controllers: [AppController],
   providers: [
     AppService,

@@ -1,23 +1,22 @@
 import { BullModule } from '@nestjs/bullmq';
 import { Module } from '@nestjs/common';
-import { MailModule } from '../mail/mail.module';
-import { APP_QUEUE_NAME } from './queue.jobs';
-import { QueueService } from './queue.service';
-import { QueuesProcessor } from './queues.processor';
+import { ConfigModule, ConfigType } from '@nestjs/config';
+import { CacheConfig } from 'src/common/config';
 
 @Module({
   imports: [
-    BullModule.registerQueue({
-      name: APP_QUEUE_NAME,
-      defaultJobOptions: {
-        attempts: 3,
-        removeOnComplete: 100,
-        removeOnFail: 1000,
+    BullModule.forRootAsync({
+      imports: [ConfigModule.forFeature(CacheConfig)],
+      inject: [CacheConfig.KEY],
+      useFactory: (cacheConfig: ConfigType<typeof CacheConfig>) => {
+        return {
+          connection: {
+            url: cacheConfig.url,
+          },
+        };
       },
     }),
-    MailModule,
   ],
-  providers: [QueueService, QueuesProcessor],
-  exports: [QueueService],
+  exports: [BullModule],
 })
 export class QueuesModule {}

@@ -2,15 +2,15 @@ import { betterAuth, Session, User } from 'better-auth';
 import { emailOTP, openAPI } from 'better-auth/plugins';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import { Cache } from '@nestjs/cache-manager';
-import { TransactionHost } from '@nestjs-cls/transactional';
-import { DrizzleTransactionClient } from 'src/database/drizzle.provider';
-import * as schema from 'src/database/drizzle.schema';
-import { MailService } from 'src/mail/mail.service';
-import { hoursToSeconds, minutesToSeconds, secondsToMilliseconds } from 'date-fns';
-import { EnvService } from 'src/common/env/env.service';
+import { type DrizzleClient } from 'src/common/database/drizzle.type';
+import * as schema from 'src/common/database/drizzle.schema';
+import { MailService } from 'src/notifications/mail/mail.service';
 import slugify from 'slugify';
-import { QueueService } from 'src/queues/queue.service';
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
+import { InjectDrizzle } from '@nest-native/drizzle';
+import { type ConfigType } from '@nestjs/config';
+import { AppConfig, AuthConfig } from 'src/common/config';
+import dayjs from 'dayjs';
 
 export type BetterAuthClient = BetterAuthService['client'];
 
@@ -19,14 +19,17 @@ export class BetterAuthService {
   readonly client;
 
   constructor(
-    private readonly txHost: TransactionHost<DrizzleTransactionClient>,
+    @InjectDrizzle()
+    private readonly db: DrizzleClient,
     private readonly cache: Cache,
     private readonly mailService: MailService,
-    private readonly envService: EnvService,
-    private readonly queueService: QueueService,
+    @Inject(AuthConfig.KEY)
+    private readonly authConfig: ConfigType<typeof AuthConfig>,
+    @Inject(AppConfig.KEY)
+    private readonly appConfig: ConfigType<typeof AppConfig>,
   ) {
     this.client = betterAuth({
-      database: drizzleAdapter(this.txHost.tx, {
+      database: drizzleAdapter(this.db, {
         provider: 'pg',
         schema: {
           ...schema,
@@ -40,8 +43,11 @@ export class BetterAuthService {
         encryptOAuthTokens: true,
       },
       advanced: {
-        cookiePrefix: slugify(this.envService.app.name, { lower: true, trim: true }),
-        useSecureCookies: this.envService.app.isProduction,
+        cookiePrefix: slugify(this.appConfig.name, {
+          lower: true,
+          trim: true,
+        }),
+        useSecureCookies: this.appConfig.isProduction,
         database: {
           generateId: false,
         },
@@ -52,21 +58,22 @@ export class BetterAuthService {
           return value ?? null;
         },
         set: async (key, value, ttl) => {
-          if (ttl) await this.cache.set(key, value, secondsToMilliseconds(ttl));
+          if (ttl)
+            await this.cache.set(key, value, dayjs.duration(ttl, 'seconds').asMilliseconds());
           else await this.cache.set(key, value);
         },
         delete: async (key) => {
           await this.cache.del(key);
         },
       },
-      secret: this.envService.auth.secret,
-      appName: this.envService.app.name,
-      baseURL: this.envService.app.url,
-      basePath: this.envService.auth.basePath,
-      trustedOrigins: this.envService.auth.trustedOrigins,
+      secret: this.authConfig.secret,
+      appName: this.appConfig.name,
+      baseURL: this.appConfig.url,
+      basePath: this.authConfig.basePath,
+      trustedOrigins: this.authConfig.trustedOrigins,
       session: {
         storeSessionInDatabase: true,
-        freshAge: hoursToSeconds(1),
+        freshAge: dayjs.duration(1, 'hours').asSeconds(),
         preserveSessionInDatabase: true,
       },
       databaseHooks: {
@@ -112,16 +119,13 @@ export class BetterAuthService {
         emailOTP({
           overrideDefaultEmailVerification: true,
           otpLength: 6,
-          expiresIn: minutesToSeconds(5),
+          expiresIn: dayjs.duration(5, 'minutes').asSeconds(),
           allowedAttempts: 5,
           sendVerificationOTP: async ({ email, otp, type }) => {
             if (type === 'sign-in') {
-              await this.queueService.dispatchMailSignInOtp({
+              await this.mailService.sendSignInOtp({
                 to: email,
-                props: {
-                  otpCode: otp,
-                  expiresInSeconds: minutesToSeconds(5),
-                },
+                props: { otpCode: otp, expiresInSeconds: dayjs.duration(5, 'minutes').asSeconds() },
               });
             }
           },
