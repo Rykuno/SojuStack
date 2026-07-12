@@ -1,0 +1,45 @@
+{
+  "version": 1,
+  "skills": {
+    "drizzle": {
+      "source": "/Users/rykuno/dev/kimchi-stack/node_modules/.pnpm/drizzle-kit@1.0.0-rc.4/node_modules/drizzle-kit/skills",
+      "sourceType": "local",
+      "computedHash": "1cbae732ee979cebb27a27154e923c1a669a22897c9b01669e2011bfeb8aa804"
+    },
+    "drizzle-generate": {
+      "source": "/Users/rykuno/dev/kimchi-stack/node_modules/.pnpm/drizzle-kit@1.0.0-rc.4/node_modules/drizzle-kit/skills",
+      "sourceType": "local",
+      "computedHash": "3d520b8d77221aa72bc7e34dc13cd133ffcd569c32135793ec43add27f42ebec"
+    },
+    "drizzle-hints": {
+      "source": "/Users/rykuno/dev/kimchi-stack/node_modules/.pnpm/drizzle-kit@1.0.0-rc.4/node_modules/drizzle-kit/skills",
+      "sourceType": "local",
+      "computedHash": "dc9bc7ed9a0d21f63e540a8702cb4cb34b51c585493507cec86fd21d9c255166"
+    },
+    "drizzle-migrations": {
+      "source": "/Users/rykuno/dev/kimchi-stack/node_modules/.pnpm/drizzle-kit@1.0.0-rc.4/node_modules/drizzle-kit/skills",
+      "sourceType": "local",
+      "computedHash": "aa30ca0f9e0a66e4feaa50a08e80b2908c8bb720433d1159107739f3aa2fbb86"
+    },
+    "drizzle-output-modes": {
+      "source": "/Users/rykuno/dev/kimchi-stack/node_modules/.pnpm/drizzle-kit@1.0.0-rc.4/node_modules/drizzle-kit/skills",
+      "sourceType": "local",
+      "computedHash": "5ad547aeb18630af024dd026b96364bce0df6274660f1d59ae11f259916b63c2"
+    },
+    "drizzle-pull": {
+      "source": "/Users/rykuno/dev/kimchi-stack/node_modules/.pnpm/drizzle-kit@1.0.0-rc.4/node_modules/drizzle-kit/skills",
+      "sourceType": "local",
+      "computedHash": "7be6f2a67aa5a4713352c23284d6cdacdc277e9d2ad8a159899257416327254c"
+    },
+    "drizzle-push": {
+      "source": "/Users/rykuno/dev/kimchi-stack/node_modules/.pnpm/drizzle-kit@1.0.0-rc.4/node_modules/drizzle-kit/skills",
+      "sourceType": "local",
+      "computedHash": "ff167ed20bdc051f9f8679a109d7dd065f91605adc1bd6c6af5c1c4d9ce0c7a4"
+    },
+    "drizzle-responses-and-errors": {
+      "source": "/Users/rykuno/dev/kimchi-stack/node_modules/.pnpm/drizzle-kit@1.0.0-rc.4/node_modules/drizzle-kit/skills",
+      "sourceType": "local",
+      "computedHash": "fbc0b0d5aa071cf06eee711b5de52ad821a0d1e5bc0c703f0c59b429697331d3"
+    }
+  }
+}
