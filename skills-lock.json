@@ -13,6 +13,12 @@
       "skillPath": "security/SKILL.md",
       "computedHash": "7a230edf3a24ce18162cb4379f59b6a19b8d24ca04db530609d0f15cede556dc"
     },
+    "create-auth": {
+      "source": "better-auth/skills",
+      "sourceType": "github",
+      "skillPath": "better-auth/create-auth/SKILL.md",
+      "computedHash": "4e261efac2ae9a2321c4495c846ef97cf239818fc8bd2ab7e92ed1f9d25470f7"
+    },
     "email-best-practices": {
       "source": "resend/email-best-practices",
       "sourceType": "github",
@@ -23,6 +29,12 @@
       "sourceType": "github",
       "skillPath": "SKILL.md",
       "computedHash": "fff896300fe25d6d2e41161da12a5b05d0d57a8adb2390c72fbb7a72e0d02440"
+    },
+    "organization-best-practices": {
+      "source": "better-auth/skills",
+      "sourceType": "github",
+      "skillPath": "better-auth/organization/SKILL.md",
+      "computedHash": "27627eb3a13bd44eff3a5d890f96e7db052b623db90e01684f759abe3e7fe56b"
     },
     "postgres": {
       "source": "planetscale/database-skills",
@@ -60,6 +72,12 @@
       "source": "anthropics/skills",
       "sourceType": "github",
       "computedHash": "b122f4d1e91aa1d83027e050b5b37c3156203ee85458d7b1360bc48167c9e02a"
+    },
+    "two-factor-authentication-best-practices": {
+      "source": "better-auth/skills",
+      "sourceType": "github",
+      "skillPath": "better-auth/twoFactor/SKILL.md",
+      "computedHash": "a6f720042e5a090909e0d519a6a50a7eb8179553cd5315f0bbad852a6d20dac8"
     },
     "vercel-composition-patterns": {
       "source": "vercel-labs/agent-skills",
